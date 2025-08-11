@@ -1,6 +1,6 @@
 <nav class="bg-primary-800">
   <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a href=""
+    <a routerLink=""
        class="flex items-center space-x-3">
       <i class="bi bi-box text-3xl text-primary-content"></i>
       <span class="self-center text-2xl font-semibold whitespace-nowrap text-primary-content">WMS</span>
@@ -28,13 +28,16 @@
       <ul
           class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-primary-hover rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0">
         <li>
-          <a href=""
-             class="block py-2 px-3 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:hover:text-primary-active md:hover:bg-transparent"
+          <a routerLink=""
+             routerLinkActive="bg-primary-active md:text-primary-active"
+             [routerLinkActiveOptions]="{exact:true}"
+             class="block py-2 px-3 mb-2 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:mb-0 md:hover:text-primary-active md:hover:bg-transparent"
              aria-current="page">Dashboard</a>
         </li>
         <li>
-          <a href=""
-             class="block py-2 px-3 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:hover:text-primary-active md:hover:bg-transparent"
+          <a routerLink="product"
+             routerLinkActive="bg-primary-active md:text-primary-active"
+             class="block py-2 px-3 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:my-0 md:hover:text-primary-active md:hover:bg-transparent"
              aria-current="page">Product</a>
         </li>
       </ul>
