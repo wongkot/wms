@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Pagination } from '@app/core/models/pagination';
 import { InMemoryDbService } from '@app/core/services/data/in-memory-db-service';
 import { Product } from '@app/modules/product/models/product';
 import { ProductService } from '@app/modules/product/services/data/product-service';
@@ -15,5 +16,10 @@ export class MockProductService implements ProductService {
   getProducts(): Observable<Product[]> {
     let products = this._inMemoryDbService.getProducts();
     return of(products);
+  }
+
+  getPageProducts(page: number, pageSize: number): Observable<Pagination<Product>> {
+    let pageProducts = this._inMemoryDbService.getPageProducts(page, pageSize);
+    return of(pageProducts);
   }
 }

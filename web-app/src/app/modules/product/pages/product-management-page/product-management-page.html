@@ -1,1 +1,17 @@
-<app-table [tableConfig]="tableConfig" [dataSource]="stateService.displayProducts()"></app-table>
+<div class="md:h-[82vh]">
+  <app-table
+  [tableConfig]="tableConfig"
+  [dataSource]="stateService.displayProducts().items"></app-table>
+</div>
+<div class="mt-3">
+  <app-pagination
+    [selectedPage]="stateService.selectedPage()"
+    [selectedPageSize]="stateService.selectedPageSize()"
+    [totalItems]="stateService.displayProducts().totalItems"
+    (pageSizeChange)="onPageSizeChanged($event)"
+    (toFirstPageClick)="onFirstPageClick($event)"
+    (toPreviousPageClick)="onPreviousPageClick($event)"
+    (toNextPageClick)="onNextPageClick($event)"
+    (toLastPageClick)="onLastPageClick($event)">
+  </app-pagination>
+</div>

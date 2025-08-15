@@ -6,7 +6,8 @@ import { TableConfig } from '@app/shared/table/models/table-config';
   selector: 'app-product-management',
   standalone: false,
   templateUrl: './product-management-page.html',
-  styleUrl: './product-management-page.css'
+  styleUrl: './product-management-page.css',
+  providers: [ProductManagementStateService]
 })
 export class ProductManagementPage {
   public stateService: ProductManagementStateService;
@@ -53,5 +54,25 @@ export class ProductManagementPage {
 
   constructor() { 
     this.stateService = inject(ProductManagementStateService);
+  }
+
+  onPageSizeChanged(newPageSize: number) {
+    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize);
+  }
+
+  onFirstPageClick(newPage: number) {
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+  }
+
+  onPreviousPageClick(newPage: number) {
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+  }
+
+  onNextPageClick(newPage: number) {
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+  }
+
+  onLastPageClick(newPage: number) {
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
   }
 }
