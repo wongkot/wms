@@ -47,6 +47,13 @@ Semantic format for naming colors
 	--color-table-row-primary-border: var(--color-gray-200);
 	--color-table-row-primary-hover: var(--color-gray-50);
 	--color-table-row-primary-content-focus: var(--color-gray-900);
+
+	/* Pagination */
+	--color-pagination-primary: var(--color-gray-800);
+	--color-pagination-primary-border: var(--color-gray-700);
+	--color-pagination-primary-hover: var(--color-gray-900);
+	--color-pagination-primary-content: var(--color-text-gray-400);
+	--color-pagination-primary-content-hover: var(--color-white);
 }
 
 @variant dark {
@@ -86,4 +93,11 @@ Semantic format for naming colors
 	--color-table-row-primary-border: var(--color-gray-700);
 	--color-table-row-primary-hover: var(--color-gray-600);
 	--color-table-row-primary-content-focus: var(--color-white);
+
+	/* Pagination */
+	--color-pagination-primary: var(--color-gray-800);
+	--color-pagination-primary-border: var(--color-gray-700);
+	--color-pagination-primary-hover: var(--color-gray-700);
+	--color-pagination-primary-content: var(--color-gray-400);
+	--color-pagination-primary-content-hover: var(--color-white);
 }
