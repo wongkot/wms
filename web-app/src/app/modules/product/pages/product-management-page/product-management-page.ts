@@ -1,3 +1,4 @@
+import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { TableConfig } from '@app/shared/table/models/table-config';
@@ -51,32 +52,42 @@ export class ProductManagementPage {
       },
     ],
   }
+  public readonly productCategories: KeyValue<string, string>[] = [
+    { key: '', value: 'Choose Category' },
+    { key: 'Smart Watches', value: 'Smart Watches' },
+    { key: 'PC', value: 'PC' },
+    { key: 'Smart Phones', value: 'Smart Phones' },
+  ]
 
   constructor() { 
     this.stateService = inject(ProductManagementStateService);
   }
 
   onPageSizeChanged(newPageSize: number) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm());
+    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm(), this.stateService.selectedCategory());
   }
 
   onFirstPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
   }
 
   onPreviousPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
   }
 
   onNextPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
   }
 
   onLastPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
   }
 
   onSearchTermChanged(newSearchTerm: string) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm);
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm, this.stateService.selectedCategory());
+  }
+
+  onSearchCategoryChanged(newSearchCategory: string) {
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), newSearchCategory);
   }
 }

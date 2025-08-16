@@ -18,8 +18,8 @@ export class MockProductService implements ProductService {
     return of(products);
   }
 
-  getPageProducts(page: number, pageSize: number, query: string): Observable<Pagination<Product>> {
-    let pageProducts = this._inMemoryDbService.getPageProducts(page, pageSize, query);
+  getPageProducts(page: number, pageSize: number, query: string, category: string): Observable<Pagination<Product>> {
+    let pageProducts = this._inMemoryDbService.getPageProducts(page, pageSize, query, category);
     return of(pageProducts);
   }
 }

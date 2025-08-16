@@ -121,12 +121,17 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(this.products));
   }
 
-  getPageProducts(page: number, pageSize: number, query: string): Pagination<Product> {
+  getPageProducts(page: number, pageSize: number, query: string, category: string): Pagination<Product> {
     let filteredProducts = this.products;
     if (query) {
       query = query?.toLocaleLowerCase();
       filteredProducts = this.products.filter(product => {
         return product.name.toLocaleLowerCase().includes(query) || product.description?.toLocaleLowerCase().includes(query);
+      });
+    }
+    if (category) {
+      filteredProducts = this.products.filter(product => {
+        return product.category === category;
       });
     }
 
