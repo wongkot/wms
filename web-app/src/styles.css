@@ -64,6 +64,12 @@ Semantic format for naming colors
 	/* Button */
 	--color-button-primary: var(--color-blue-700);
 	--color-button-primary-hover: var(--color-blue-800);
+
+	/* Dropdown */
+	--color-dropdown-primary: var(--color-gray-50);
+	--color-dropdown-primary-border: var(--color-gray-300);
+	--color-dropdown-primary-content: var(--color-gray-900);
+	--color-dropdown-primary-content-placeholder: var(--color-gray-400);
 }
 
 @variant dark {
@@ -120,4 +126,10 @@ Semantic format for naming colors
 	/* Button */
 	--color-button-primary: var(--color-blue-600);
 	--color-button-primary-hover: var(--color-blue-700);
+
+	/* Dropdown */
+	--color-dropdown-primary: var(--color-gray-700);
+	--color-dropdown-primary-border: var(--color-gray-600);
+	--color-dropdown-primary-content: var(--color-white);
+	--color-dropdown-primary-content-placeholder: var(--color-gray-400);
 }
