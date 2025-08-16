@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ProductManagementPage } from '@app/modules/product/pages/product-management-page/product-management-page';
 import { PaginationModule } from '@app/shared/pagination/pagination-module';
+import { SearchBarModule } from '@app/shared/search-bar/search-bar-module';
 import { TableModule } from '@app/shared/table/table-module';
 
 const ROUTES: Routes = [
@@ -16,6 +17,7 @@ const ROUTES: Routes = [
   imports: [
     CommonModule,
     TableModule,
+    SearchBarModule,
     PaginationModule,
     RouterModule.forChild(ROUTES)
   ]

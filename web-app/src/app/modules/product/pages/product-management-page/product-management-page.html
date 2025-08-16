@@ -1,4 +1,7 @@
-<div class="md:h-[82vh]">
+<div class="flex flex-col md:flex-row md:items-center">
+  <app-search-bar (textChanged)="onSearchTermChanged($event)"></app-search-bar>
+</div>
+<div class="md:h-[75vh] mt-4">
   <app-table
   [tableConfig]="tableConfig"
   [dataSource]="stateService.displayProducts().items"></app-table>

@@ -57,22 +57,26 @@ export class ProductManagementPage {
   }
 
   onPageSizeChanged(newPageSize: number) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize);
+    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm());
   }
 
   onFirstPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
   }
 
   onPreviousPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
   }
 
   onNextPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
   }
 
   onLastPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm());
+  }
+
+  onSearchTermChanged(newSearchTerm: string) {
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm);
   }
 }

@@ -4,5 +4,5 @@ import { Observable } from "rxjs";
 
 export interface ProductService {
   getProducts(): Observable<Product[]>;
-  getPageProducts(page: number, pageSize: number): Observable<Pagination<Product>>;
+  getPageProducts(page: number, pageSize: number, query: string): Observable<Pagination<Product>>;
 }

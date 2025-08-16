@@ -33,7 +33,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (item of dataSource; track item) {
+      @for (item of dataSource; track (item.id ? item.id : item)) {
       <tr class="bg-table-row-primary border-b border-table-row-primary-border hover:bg-table-row-primary-hover">
         @for (column of tableConfig.columns; track column) {
           @switch (column.columnType) {
