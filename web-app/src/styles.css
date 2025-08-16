@@ -54,6 +54,16 @@ Semantic format for naming colors
 	--color-pagination-primary-hover: var(--color-gray-900);
 	--color-pagination-primary-content: var(--color-text-gray-400);
 	--color-pagination-primary-content-hover: var(--color-white);
+
+	/* Textbox */
+	--color-textbox-primary: var(--color-gray-50);
+	--color-textbox-primary-border: var(--color-gray-300);
+	--color-textbox-primary-border-focus: var(--color-blue-500);
+	--color-textbox-primary-content-placeholder: var(--color-gray-400);
+
+	/* Button */
+	--color-button-primary: var(--color-blue-700);
+	--color-button-primary-hover: var(--color-blue-800);
 }
 
 @variant dark {
@@ -100,4 +110,14 @@ Semantic format for naming colors
 	--color-pagination-primary-hover: var(--color-gray-700);
 	--color-pagination-primary-content: var(--color-gray-400);
 	--color-pagination-primary-content-hover: var(--color-white);
+
+	/* Textbox */
+	--color-textbox-primary: var(--color-gray-700);
+	--color-textbox-primary-border: var(--color-gray-600);
+	--color-textbox-primary-border-focus: var(--color-blue-500);
+	--color-textbox-primary-content-placeholder: var(--color-gray-400);
+
+	/* Button */
+	--color-button-primary: var(--color-blue-600);
+	--color-button-primary-hover: var(--color-blue-700);
 }
