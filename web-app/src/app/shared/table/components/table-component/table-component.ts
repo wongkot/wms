@@ -19,11 +19,12 @@ export class TableComponent {
     let classes = [];
 
     if (this.sortState().columnProp === columnDataProperty) {
-      classes.push('text-secondary-500');
-      classes.push('hover:text-secondary-400');
+      classes.push('text-primary-content');
+      classes.push('text-bold');
+      classes.push('hover:text-primary');
       classes.push(this.sortState().isAsc ? 'bi-arrow-up' : 'bi-arrow-down');
     } else {
-      classes.push('hover:text-primary-content');
+      classes.push('hover:text-primary');
       classes.push('bi-arrow-down-up');
     }
 
