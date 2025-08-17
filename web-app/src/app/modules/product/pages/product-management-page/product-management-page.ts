@@ -2,6 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { TableConfig } from '@app/shared/table/models/table-config';
+import { TableSortState } from '@app/shared/table/models/table-sort-state';
 
 @Component({
   selector: 'app-product-management',
@@ -20,35 +21,40 @@ export class ProductManagementPage {
         dataProperty: 'imageUrl',
         highlighted: false,
         noWrap: true,
-        columnType: 'image'
+        columnType: 'image',
+        sortable: false,
       },
       {
         headerName: 'Product Name',
         dataProperty: 'name',
         highlighted: true,
         noWrap: true,
-        columnType: 'text'
+        columnType: 'text',
+        sortable: true,
       },
       {
         headerName: 'Category',
         dataProperty: 'category',
         highlighted: false,
         noWrap: true,
-        columnType: 'text'
+        columnType: 'text',
+        sortable: true,
       },
       {
         headerName: 'Description',
         dataProperty: 'description',
         highlighted: false,
         noWrap: true,
-        columnType: 'text'
+        columnType: 'text',
+        sortable: true,
       },
       {
         headerName: 'Unit Price',
         dataProperty: 'unitPrice',
         highlighted: false,
         noWrap: true,
-        columnType: 'price'
+        columnType: 'price',
+        sortable: true,
       },
     ],
   }
@@ -64,30 +70,34 @@ export class ProductManagementPage {
   }
 
   onPageSizeChanged(newPageSize: number) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm(), this.stateService.selectedCategory());
+    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onFirstPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onPreviousPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onNextPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onLastPageClick(newPage: number) {
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory());
+    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onSearchTermChanged(newSearchTerm: string) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm, this.stateService.selectedCategory());
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm, this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onSearchCategoryChanged(newSearchCategory: string) {
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), newSearchCategory);
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), newSearchCategory, this.stateService.currentSortState());
+  }
+
+  onSortChanged(newSort: TableSortState) {
+    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), newSort);
   }
 }

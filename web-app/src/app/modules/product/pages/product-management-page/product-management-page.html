@@ -3,11 +3,18 @@
     <app-search-bar (textChanged)="onSearchTermChanged($event)"></app-search-bar>
     <app-dropdown [options]="productCategories" (selectionChanged)="onSearchCategoryChanged($event)"></app-dropdown>
   </div>
+
+  <!-- Container for buttons -->
+  <!-- <div class="flex flex-col mt-4 gap-4 md:flex-row md:items-center md:justify-end md:mt-0">
+  </div> -->
 </div>
 <div class="md:h-[75vh] mt-4">
   <app-table
-  [tableConfig]="tableConfig"
-  [dataSource]="stateService.displayProducts().items"></app-table>
+    [tableConfig]="tableConfig"
+    [dataSource]="stateService.displayProducts().items"
+    [sortState]="stateService.currentSortState()"
+    (sortStateChange)="onSortChanged($event)">
+  </app-table>
 </div>
 <div class="mt-3">
   <app-pagination

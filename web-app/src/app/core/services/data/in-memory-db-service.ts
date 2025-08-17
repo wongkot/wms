@@ -121,8 +121,8 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(this.products));
   }
 
-  getPageProducts(page: number, pageSize: number, query: string, category: string): Pagination<Product> {
-    let filteredProducts = this.products;
+  getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
+    let filteredProducts = [ ...this.products ];
     if (query) {
       query = query?.toLocaleLowerCase();
       filteredProducts = filteredProducts.filter(product => {
@@ -133,6 +133,24 @@ export class InMemoryDbService {
       filteredProducts = filteredProducts.filter(product => {
         return product.category === category;
       });
+    }
+    let sortData = sort.split(':');
+    let sortColumn = sortData.at(0);
+    let sortDirection = sortData.at(1);
+    if (sortColumn) {
+      let columnType = this.products.at(0) ? typeof(Object(this.products.at(0))[sortColumn]) : 'string';
+      if (columnType == 'number') {
+        filteredProducts = filteredProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
+        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
+      } else {
+        filteredProducts = filteredProducts.sort((p1, p2) => {
+          let value1 = String(Object(p1)[sortColumn] ?? '');
+          let value2 = String(Object(p2)[sortColumn] ?? '');
+
+          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
+        });
+        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
+      }
     }
 
     return this.paginateItems(filteredProducts, page, pageSize);

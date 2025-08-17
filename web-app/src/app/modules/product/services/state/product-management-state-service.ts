@@ -3,6 +3,7 @@ import { Pagination } from '@app/core/models/pagination';
 import { Product } from '@app/modules/product/models/product';
 import { MockProductService } from '@app/modules/product/services/data/mock-product-service';
 import { ProductService } from '@app/modules/product/services/data/product-service';
+import { TableSortState } from '@app/shared/table/models/table-sort-state';
 import { finalize } from 'rxjs';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class ProductManagementStateService {
   private _selectedPage = signal<number>(1);
   private _searchTerm = signal<string>('');
   private _selectedCategory = signal<string>('');
+  private _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
   private _displayProducts = signal<Pagination<Product>>({
     currentPage: this._selectedPage(),
     pageSize: this._selectedPageSize(),
@@ -24,7 +26,7 @@ export class ProductManagementStateService {
 
   constructor() {
     this._productService = inject(MockProductService);
-    this.loadProducts(this._selectedPage(), this._selectedPageSize(), this._searchTerm(), this._selectedCategory());
+    this.loadProducts(this._selectedPage(), this._selectedPageSize(), this._searchTerm(), this._selectedCategory(), this._currentSortState());
   }
 
   public get displayProducts() {
@@ -47,20 +49,25 @@ export class ProductManagementStateService {
     return this._selectedCategory.asReadonly();
   }
 
+  public get currentSortState() {
+    return this._currentSortState.asReadonly();
+  }
+
   /**
    * Load products for display
    */
-  loadProducts(page: number, pageSize: number, query: string, category: string): void {
+  loadProducts(page: number, pageSize: number, query: string, category: string, sort: TableSortState): void {
     this._isLoading.set(true);
     this._errorMessage.set('');
 
-    this._productService.getPageProducts(page, pageSize, query, category).pipe(
+    this._productService.getPageProducts(page, pageSize, query, category, `${sort.columnProp}:${sort.isAsc ? 'asc' : 'desc'}`).pipe(
       finalize(() => { this._isLoading.set(false); }),
     ).subscribe({
       next: (pageProducts: Pagination<Product>) => {
         this._displayProducts.set(pageProducts);
         this._isLoading.set(false);
 
+        this._currentSortState.set(sort);
         if (this._searchTerm() != query) this._searchTerm.set(query);
         if (this._selectedCategory() != category) this._selectedCategory.set(category);
         if (this._selectedPage() != pageProducts.currentPage) this._selectedPage.set(pageProducts.currentPage);
