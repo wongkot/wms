@@ -4,4 +4,5 @@ export interface TableColumnConfig {
   highlighted: boolean;
   noWrap: boolean;
   columnType: 'text' | 'number' | 'date' | 'image' | 'price';
+  sortable: boolean;
 }
