@@ -1,0 +1,77 @@
+<div class="h-full relative overflow-x-auto">
+  <table class="w-full text-sm text-left text-table-header-primary-content">
+    <thead class="text-xs uppercase bg-table-header-primary text-table-header-primary-content">
+      <tr>
+        @for (column of tableConfig().columns; track column) {
+          @switch (column.columnType) {
+            @case ('text') {
+              <th scope="col"
+                  class="px-6 py-3 whitespace-nowrap">
+                {{ column.headerName }}
+                @if (column.sortable) {
+                  <i class="bi ml-2 cursor-pointer" [ngClass]="styleSortableHeader(column.dataProperty)" (click)="onSortChange(column.dataProperty)"></i>
+                }
+              </th>
+            }
+            @case ('price') {
+              <th scope="col"
+                  class="px-6 py-3 whitespace-nowrap">
+                {{ column.headerName }}
+                @if (column.sortable) {
+                  <i class="bi ml-2 cursor-pointer" [ngClass]="styleSortableHeader(column.dataProperty)" (click)="onSortChange(column.dataProperty)"></i>
+                }
+              </th>
+            }
+            @case ('image') {
+              <th scope="col" class="px-16 py-3">
+                <span class="sr-only">Image</span>
+              </th>
+            }
+          }
+        }
+        @if (tableConfig().canEdit)
+        {
+          <th scope="col"
+              class="px-6 py-3">
+            Action
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of dataSource(); track (item.id ? item.id : item)) {
+      <tr class="bg-table-row-primary border-b border-table-row-primary-border hover:bg-table-row-primary-hover">
+        @for (column of tableConfig().columns; track column) {
+          @switch (column.columnType) {
+            @case ('text') {
+              <td [class]="'px-6 py-4'
+                      + (column.noWrap ? ' whitespace-nowrap' : '')
+                      + (column.highlighted ? ' text-table-row-primary-content-focus' : '')">
+                {{ column.dataProperty ? item[column.dataProperty] : '' }}
+              </td>
+            }
+            @case ('price') {
+              <td [class]="'px-6 py-4'
+                      + (column.noWrap ? ' whitespace-nowrap' : '')
+                      + (column.highlighted ? ' text-table-row-primary-content-focus' : '')">
+                {{ column.dataProperty ? '฿' + (item[column.dataProperty] | number) : '' }}
+              </td>
+            }
+            @case ('image') {
+              <td class="px-4 w-20">
+                <img [src]="item[column.dataProperty]" class="w-24 h-24 object-contain">
+              </td>
+            }
+          }
+        }
+        @if (tableConfig().canEdit) {
+          <td class="px-6 py-4">
+            <a
+               class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+          </td>
+        }
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

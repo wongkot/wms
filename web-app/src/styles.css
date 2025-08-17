@@ -37,6 +37,39 @@ Semantic format for naming colors
 	--color-secondary-800: var(--color-blue-800);
 	--color-secondary-900: var(--color-blue-900);
 	--color-secondary-content: var(--color-white);
+
+	/* Table */
+	--color-table-header-primary: var(--color-gray-50);
+	--color-table-header-primary-content: var(--color-gray-700);
+	--color-table-header-primary-content-focus: var(--color-gray-900);
+
+	--color-table-row-primary: var(--color-white);
+	--color-table-row-primary-border: var(--color-gray-200);
+	--color-table-row-primary-hover: var(--color-gray-50);
+	--color-table-row-primary-content-focus: var(--color-gray-900);
+
+	/* Pagination */
+	--color-pagination-primary: var(--color-gray-800);
+	--color-pagination-primary-border: var(--color-gray-700);
+	--color-pagination-primary-hover: var(--color-gray-900);
+	--color-pagination-primary-content: var(--color-text-gray-400);
+	--color-pagination-primary-content-hover: var(--color-white);
+
+	/* Textbox */
+	--color-textbox-primary: var(--color-gray-50);
+	--color-textbox-primary-border: var(--color-gray-300);
+	--color-textbox-primary-border-focus: var(--color-blue-500);
+	--color-textbox-primary-content-placeholder: var(--color-gray-400);
+
+	/* Button */
+	--color-button-primary: var(--color-blue-700);
+	--color-button-primary-hover: var(--color-blue-800);
+
+	/* Dropdown */
+	--color-dropdown-primary: var(--color-gray-50);
+	--color-dropdown-primary-border: var(--color-gray-300);
+	--color-dropdown-primary-content: var(--color-gray-900);
+	--color-dropdown-primary-content-placeholder: var(--color-gray-400);
 }
 
 @variant dark {
@@ -66,4 +99,37 @@ Semantic format for naming colors
 	--color-secondary-800: var(--color-blue-800);
 	--color-secondary-900: var(--color-blue-900);
 	--color-secondary-content: var(--color-white);
+
+	/* Table */
+	--color-table-header-primary: var(--color-gray-700);
+	--color-table-header-primary-content: var(--color-gray-400);
+	--color-table-header-primary-content-focus: var(--color-white);
+
+	--color-table-row-primary: var(--color-gray-800);
+	--color-table-row-primary-border: var(--color-gray-700);
+	--color-table-row-primary-hover: var(--color-gray-600);
+	--color-table-row-primary-content-focus: var(--color-white);
+
+	/* Pagination */
+	--color-pagination-primary: var(--color-gray-800);
+	--color-pagination-primary-border: var(--color-gray-700);
+	--color-pagination-primary-hover: var(--color-gray-700);
+	--color-pagination-primary-content: var(--color-gray-400);
+	--color-pagination-primary-content-hover: var(--color-white);
+
+	/* Textbox */
+	--color-textbox-primary: var(--color-gray-700);
+	--color-textbox-primary-border: var(--color-gray-600);
+	--color-textbox-primary-border-focus: var(--color-blue-500);
+	--color-textbox-primary-content-placeholder: var(--color-gray-400);
+
+	/* Button */
+	--color-button-primary: var(--color-blue-600);
+	--color-button-primary-hover: var(--color-blue-700);
+
+	/* Dropdown */
+	--color-dropdown-primary: var(--color-gray-700);
+	--color-dropdown-primary-border: var(--color-gray-600);
+	--color-dropdown-primary-content: var(--color-white);
+	--color-dropdown-primary-content-placeholder: var(--color-gray-400);
 }
