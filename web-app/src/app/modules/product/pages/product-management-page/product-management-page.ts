@@ -117,4 +117,8 @@ export class ProductManagementPage {
 
     this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), newSort);
   }
+
+  onAddProduct() {
+    // TODO: Navigate to add product page
+  }
 }
