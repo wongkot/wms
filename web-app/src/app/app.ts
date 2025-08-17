@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { initFlowbite } from 'flowbite';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,8 +6,5 @@ import { initFlowbite } from 'flowbite';
   standalone: false,
   styleUrl: './app.css'
 })
-export class App implements OnInit {
-  ngOnInit(): void {
-    initFlowbite();
-  }
+export class App {
 }
