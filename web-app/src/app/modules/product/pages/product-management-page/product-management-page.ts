@@ -70,34 +70,51 @@ export class ProductManagementPage {
   }
 
   onPageSizeChanged(newPageSize: number) {
+    if (newPageSize === this.stateService.selectedPageSize()) return;
+
     this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onFirstPageClick(newPage: number) {
+    if (newPage === this.stateService.selectedPage()) return;
+
     this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onPreviousPageClick(newPage: number) {
+    if (newPage === this.stateService.selectedPage()) return;
+
     this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onNextPageClick(newPage: number) {
+    if (newPage === this.stateService.selectedPage()) return;
+
     this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onLastPageClick(newPage: number) {
+    if (newPage === this.stateService.selectedPage()) return;
+
     this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onSearchTermChanged(newSearchTerm: string) {
+    if (newSearchTerm === this.stateService.searchTerm()) return;
+
     this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm, this.stateService.selectedCategory(), this.stateService.currentSortState());
   }
 
   onSearchCategoryChanged(newSearchCategory: string) {
+    if (newSearchCategory === this.stateService.selectedCategory()) return;
+
     this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), newSearchCategory, this.stateService.currentSortState());
   }
 
   onSortChanged(newSort: TableSortState) {
+    if (newSort.columnProp === this.stateService.currentSortState().columnProp &&
+        newSort.isAsc === this.stateService.currentSortState().isAsc) return;
+
     this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), newSort);
   }
 }
