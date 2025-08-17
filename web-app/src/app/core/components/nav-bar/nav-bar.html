@@ -1,46 +1,53 @@
-<nav class="bg-primary-800">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a routerLink=""
-       class="flex items-center space-x-3">
-      <i class="bi bi-box text-3xl text-primary-content"></i>
-      <span class="self-center text-2xl font-semibold whitespace-nowrap text-primary-content">WMS</span>
-    </a>
-    <button data-collapse-toggle="navbar-default"
-            type="button"
-            class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden text-primary-content hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary-focus"
-            aria-controls="navbar-default"
-            aria-expanded="false">
-      <span class="sr-only">Open main menu</span>
-      <svg class="w-5 h-5"
-           aria-hidden="true"
-           xmlns="http://www.w3.org/2000/svg"
-           fill="none"
-           viewBox="0 0 17 14">
-        <path stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M1 1h15M1 7h15M1 13h15" />
-      </svg>
-    </button>
-    <div class="hidden w-full md:block md:w-auto"
-         id="navbar-default">
-      <ul
-          class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-primary-hover rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0">
+<nav class="bg-base-100 shadow-sm w-full fixed top-0 z-20">
+  <div class="navbar max-w-screen-xl mx-auto p-4 h-18">
+    <!-- Logo -->
+    <div class="navbar-start">
+      <a routerLink=""
+         class="flex items-center space-x-3">
+        <i class="bi bi-box text-2xl"></i>
+        <span class="text-2xl font-semibold whitespace-nowrap">WMS</span>
+      </a>
+    </div>
+
+    <!-- Desktop Menu -->
+    <div class="navbar-end hidden md:flex">
+      <ul class="menu menu-horizontal px-1">
         <li>
           <a routerLink=""
-             routerLinkActive="bg-primary-active md:text-primary-active"
-             [routerLinkActiveOptions]="{exact:true}"
-             class="block py-2 px-3 mb-2 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:mb-0 md:hover:text-primary-active md:hover:bg-transparent"
-             aria-current="page">Dashboard</a>
+             routerLinkActive="text-primary"
+             [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
         </li>
         <li>
           <a routerLink="product"
-             routerLinkActive="bg-primary-active md:text-primary-active"
-             class="block py-2 px-3 text-primary-content hover:bg-primary-active rounded-sm md:bg-transparent md:p-0 md:my-0 md:hover:text-primary-active md:hover:bg-transparent"
-             aria-current="page">Product</a>
+             routerLinkActive="text-primary">Product</a>
         </li>
       </ul>
     </div>
+
+    <!-- Mobile Menu -->
+    <div class="navbar-end md:hidden">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0"
+             role="button"
+             class="btn btn-ghost md:hidden">
+          <i class="bi bi-list text-2xl"></i>
+        </div>
+        <ul tabindex="0"
+            class="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-3 p-2 shadow gap-2">
+          <li>
+            <a routerLink=""
+               routerLinkActive="bg-primary"
+               [routerLinkActiveOptions]="{exact:true}"
+               onclick="document.activeElement.blur()">Dashboard</a>
+          </li>
+          <li>
+            <a routerLink="product"
+               routerLinkActive="bg-primary"
+               onclick="document.activeElement.blur()">Product</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </nav>

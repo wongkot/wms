@@ -59,7 +59,7 @@ export class ProductManagementPage {
     ],
   }
   public readonly productCategories: KeyValue<string, string>[] = [
-    { key: '', value: 'Choose Category' },
+    { key: '', value: 'None' },
     { key: 'Smart Watches', value: 'Smart Watches' },
     { key: 'PC', value: 'PC' },
     { key: 'Smart Phones', value: 'Smart Phones' },

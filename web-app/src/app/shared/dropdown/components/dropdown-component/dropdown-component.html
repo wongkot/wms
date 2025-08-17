@@ -1,8 +1,8 @@
-<form class="h-full flex flex-row" [formGroup]="selectionForm">
-  <select class="bg-dropdown-primary border border-dropdown-primary-border text-dropdown-primary-content text-sm rounded-lg block w-full p-2.5 border-r-dropdown-primary border-r-8"
-    formControlName="option"
-    (change)="onSelectionChanged()"
-  >
+<form [formGroup]="selectionForm">
+  <select class="select w-full focus:border-0" formControlName="option" (change)="onSelectionChanged()">
+    @if (prefix()) {
+      <option selected disabled>{{ prefix() }}</option>
+    }
     @for (option of options(); track option.key) {
       <option [value]="option.key">{{ option.value }}</option>
     }
