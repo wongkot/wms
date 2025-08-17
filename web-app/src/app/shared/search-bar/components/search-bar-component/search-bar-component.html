@@ -1,15 +1,6 @@
-<form class="w-full" [formGroup]="searchForm" (ngSubmit)="onSubmit()">
-  <div class="relative">
-    <input type="search"
-           id="search-dropdown"
-           class="block p-2.5 w-full z-20 text-sm text-primary-content bg-textbox-primary rounded-e-lg rounded-s-lg border-s-2 border border-textbox-primary-border placeholder-textbox-primary-content-placeholder focus:border-textbox-primary-border-focus"
-           placeholder="Search products..."
-           autocomplete="off"
-           formControlName="searchTerm"/>
-    <button type="submit"
-            class="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-primary-content bg-button-primary rounded-e-lg border border-button-primary hover:bg-button-primary-hover cursor-pointer">
-      <i class="bi bi-search"></i>
-      <span class="sr-only">Search</span>
-    </button>
-  </div>
+<form class="w-full join" [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+  <input type="search" placeholder="Search product" class="input input-primary w-full join-item" formControlName="searchTerm"/>
+  <button class="btn btn-primary join-item">
+    <i class="bi bi-search"></i>
+  </button>
 </form>
