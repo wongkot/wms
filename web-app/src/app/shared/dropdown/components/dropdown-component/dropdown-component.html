@@ -1,5 +1,5 @@
 <form [formGroup]="selectionForm">
-  <select class="select select-primary w-full" formControlName="option" (change)="onSelectionChanged()">
+  <select class="select w-full focus:border-0" formControlName="option" (change)="onSelectionChanged()">
     @if (prefix()) {
       <option selected disabled>{{ prefix() }}</option>
     }

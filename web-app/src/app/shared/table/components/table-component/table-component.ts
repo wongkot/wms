@@ -1,5 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
-import { TableColumnConfig } from '@app/shared/table/models/table-column-config';
+import { Component, input, output } from '@angular/core';
 import { TableConfig } from '@app/shared/table/models/table-config';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
 

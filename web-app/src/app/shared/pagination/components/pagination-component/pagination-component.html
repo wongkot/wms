@@ -4,7 +4,7 @@
     <span class="text-primary-content text-sm flex items-center align-middle whitespace-nowrap mr-2">
       Items per page:
     </span>
-    <select class="select select-primary min-w-20"
+    <select class="select focus:border-0 min-w-20"
       (change)="onPageSizeChange($event)"
     >
       @for (pageSize of pageSizes(); track $index) {
