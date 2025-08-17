@@ -125,12 +125,12 @@ export class InMemoryDbService {
     let filteredProducts = this.products;
     if (query) {
       query = query?.toLocaleLowerCase();
-      filteredProducts = this.products.filter(product => {
+      filteredProducts = filteredProducts.filter(product => {
         return product.name.toLocaleLowerCase().includes(query) || product.description?.toLocaleLowerCase().includes(query);
       });
     }
     if (category) {
-      filteredProducts = this.products.filter(product => {
+      filteredProducts = filteredProducts.filter(product => {
         return product.category === category;
       });
     }
