@@ -1,0 +1,17 @@
+<div class="breadcrumbs text-sm">
+  <ul>
+    @for (section of breadcrumbSections(); track section; let isLast = $last) {
+      @if (isLast) {
+        <li>
+          {{ section.name }}
+        </li>
+      } @else {
+        <li>
+          <a [routerLink]="section.navigationUrl">
+            {{ section.name }}
+          </a>
+        </li>
+      }
+    }
+  </ul>
+</div>
