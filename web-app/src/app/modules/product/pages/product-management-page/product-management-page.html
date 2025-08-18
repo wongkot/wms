@@ -4,7 +4,7 @@
     <app-dropdown prefix="Choose category" [options]="productCategories" (selectionChanged)="onSearchCategoryChanged($event)"></app-dropdown>
   </div>
   <div class="flex flex-col mt-4 gap-4 items-end md:flex-row md:items-center md:justify-end md:mt-0">
-    <app-button-icon text="Add Product" iconClass="bi-plus-circle" (onClick)="onAddProduct()"></app-button-icon>
+    <app-button-icon text="Add Product" iconClass="bi-plus-circle" (click)="onAddProduct()"></app-button-icon>
   </div>
 </div>
 <div class="md:h-[75vh] mt-4">

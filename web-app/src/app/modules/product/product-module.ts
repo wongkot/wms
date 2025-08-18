@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ProductAddPage } from '@app/modules/product/pages/product-add-page/product-add-page';
 import { ProductManagementPage } from '@app/modules/product/pages/product-management-page/product-management-page';
 import { ButtonModule } from '@app/shared/button/button-module';
 import { DropdownModule } from '@app/shared/dropdown/dropdown-module';
@@ -10,11 +11,13 @@ import { TableModule } from '@app/shared/table/table-module';
 
 const ROUTES: Routes = [
 	{ path: '', pathMatch: 'full', component: ProductManagementPage },
+	{ path: 'add', pathMatch: 'full', component: ProductAddPage },
 ];
 
 @NgModule({
   declarations: [
-    ProductManagementPage
+    ProductManagementPage,
+    ProductAddPage
   ],
   imports: [
     CommonModule,

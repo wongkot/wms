@@ -9,5 +9,4 @@ import { Component, input, output } from '@angular/core';
 export class ButtonIconComponent {
   text = input<string>('');
   iconClass = input<string>('');
-  onClick = output<void>();
 }

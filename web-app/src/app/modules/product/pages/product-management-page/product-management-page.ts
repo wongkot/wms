@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { TableConfig } from '@app/shared/table/models/table-config';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
@@ -13,6 +14,9 @@ import { TableSortState } from '@app/shared/table/models/table-sort-state';
 })
 export class ProductManagementPage {
   public stateService: ProductManagementStateService;
+  private _routerService = inject(Router);
+  private _route = inject(ActivatedRoute);
+
   public readonly tableConfig: TableConfig = {
     canEdit: true,
     columns: [
@@ -119,6 +123,6 @@ export class ProductManagementPage {
   }
 
   onAddProduct() {
-    // TODO: Navigate to add product page
+    this._routerService.navigate(['add'], { relativeTo: this._route });
   }
 }
