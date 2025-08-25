@@ -1,0 +1,43 @@
+<fieldset class="fieldset">
+  <legend class="fieldset-legend">
+    <div>
+      {{ fieldName() }}
+      @if(required()) {
+        <span class="font-bold text-secondary">*</span>
+      }
+    </div>
+    @if (tooltipMessage()) {
+      <div class="tooltip text-info">
+        <div class="tooltip-content">
+          {{ tooltipMessage() }}
+        </div>
+        <i class="bi bi-info-circle"></i>
+      </div>
+    }
+  </legend>
+  <select class="select w-full focus:border-0"
+          [class.select-error]="inputControl().touched && inputControl().invalid"
+          [formControl]="inputControl()">
+    @if (placeHolder()) {
+      <option disabled value="">{{ placeHolder() }}</option>
+    }
+    @for (option of options(); track option.key) {
+      <option [value]="option.key">{{ option.value }}</option>
+    }
+  </select>
+  @if (inputControl().pending) {
+    <p class="label h-4">
+      <span class="loading loading-dots loading-xs"></span>
+    </p>
+  } @else {
+    <p class="label h-4 text-error">
+      @if(inputControl().touched && inputControl().invalid) {
+        @for (errorMessageKey of errorMessages.keys(); track errorMessageKey) {
+          @if (inputControl().hasError(errorMessageKey)) {
+            {{ this.errorMessages.get(errorMessageKey) }}
+          }
+        }
+      }
+    </p>
+  }
+</fieldset>
