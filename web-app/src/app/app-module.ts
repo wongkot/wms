@@ -1,9 +1,9 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from '@app/app-routing-module';
 import { App } from '@app/app';
+import { AppRoutingModule } from '@app/app-routing-module';
 import { CoreModule } from '@app/core/core-module';
+import { ToastModule } from '@app/shared/toast/toast-module';
 
 @NgModule({
   declarations: [
@@ -13,6 +13,7 @@ import { CoreModule } from '@app/core/core-module';
     BrowserModule,
     AppRoutingModule,
     CoreModule,
+    ToastModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners()
