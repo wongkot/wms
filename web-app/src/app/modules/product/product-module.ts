@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { ProductAddPage } from '@app/modules/product/pages/product-add-page/product-add-page';
+import { ProductEditPage } from '@app/modules/product/pages/product-edit-page/product-edit-page';
 import { ProductManagementPage } from '@app/modules/product/pages/product-management-page/product-management-page';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
 import { ButtonModule } from '@app/shared/button/button-module';
@@ -15,12 +16,14 @@ import { TableModule } from '@app/shared/table/table-module';
 const ROUTES: Routes = [
 	{ path: '', pathMatch: 'full', component: ProductManagementPage },
 	{ path: 'add', component: ProductAddPage },
+	{ path: 'edit/:id', component: ProductEditPage },
 ];
 
 @NgModule({
   declarations: [
     ProductManagementPage,
     ProductAddPage,
+    ProductEditPage,
   ],
   imports: [
     CommonModule,

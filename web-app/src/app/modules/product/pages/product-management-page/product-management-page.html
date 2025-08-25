@@ -12,7 +12,8 @@
     [tableConfig]="tableConfig"
     [dataSource]="stateService.displayProducts().items"
     [sortState]="stateService.currentSortState()"
-    (sortStateChange)="onSortChanged($event)">
+    (sortStateChange)="onSortChanged($event)"
+    (editClick)="onEditProduct($event)">
   </app-table>
 </div>
 <div class="mt-4">

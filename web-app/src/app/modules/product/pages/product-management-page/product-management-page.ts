@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Product } from '@app/modules/product/models/product';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { TableConfig } from '@app/shared/table/models/table-config';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
@@ -124,5 +125,9 @@ export class ProductManagementPage {
 
   onAddProduct() {
     this._routerService.navigate(['add'], { relativeTo: this._route });
+  }
+
+  onEditProduct(product: Product) {
+    this._routerService.navigate(['edit', product.id], { relativeTo: this._route });
   }
 }
