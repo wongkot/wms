@@ -14,6 +14,7 @@ export class TableComponent {
   sortState = input<TableSortState>({ columnProp: '', isAsc: true });
   sortStateChange = output<TableSortState>();
   editClick = output<any>();
+  deleteClick = output<any>();
 
   styleSortableHeader(columnDataProperty: string) {
     let classes = [];
@@ -44,5 +45,9 @@ export class TableComponent {
 
   onEditClick(rowData: any) {
     this.editClick.emit(rowData);
+  }
+
+  onDeleteClick(rowData: any) {
+    this.deleteClick.emit(rowData);
   }
 }

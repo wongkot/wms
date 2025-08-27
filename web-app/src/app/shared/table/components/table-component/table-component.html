@@ -45,10 +45,10 @@
               }
             }
           }
-          @if (tableConfig().canEdit)
+          @if (tableConfig().canEdit || tableConfig().canDelete)
           {
             <th scope="col"
-                class="px-6 py-3">
+                class="px-6 py-3 text-center">
               Action
             </th>
           }
@@ -90,10 +90,18 @@
                 }
               }
             }
-            @if (tableConfig().canEdit) {
-              <td class="px-6 py-4">
-                <button class="btn btn-soft btn-info"
-                        (click)="onEditClick(item)">Edit</button>
+            @if (tableConfig().canEdit || tableConfig().canDelete) {
+              <td class="px-4 py-2">
+                <div class="flex flex-row justify-center items-center gap-4">
+                  @if (tableConfig().canEdit) {
+                  <button class="btn btn-soft btn-info"
+                          (click)="onEditClick(item)">Edit</button>
+                  }
+                  @if (tableConfig().canDelete) {
+                    <button class="btn btn-soft btn-error"
+                            (click)="onDeleteClick(item)">Delete</button>
+                  }
+                </div>
               </td>
             }
           </tr>
