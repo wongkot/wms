@@ -8,15 +8,15 @@
       Back
     </button>
   </div>
-  @if (isFetchingData()) {
+  @if (stateService.isFetchingData()) {
     <div class="flex flex-row justify-center py-5">
       <span class="loading loading-spinner loading-md mr-2"></span>
       Fetching product data
     </div>
-  } @else if (errorMessage()) {
+  } @else if (stateService.errorMessage()) {
     <div class="flex flex-row justify-center py-5 text-error">
       <i class="bi bi-exclamation-circle-fill text-error mr-2"></i>
-      {{ errorMessage() }}
+      {{ stateService.errorMessage() }}
     </div>
   } @else {
     <form [formGroup]="editProductForm"
@@ -54,14 +54,14 @@
                            [inputControl]="getFormControl('description')"></app-text-area-input>
       <app-file-input class="md:col-span-2"
                       fileTypesFilter=".png,.jpg,.jpeg,image/png,image/jpeg"
-                      [initialImageUrl]="initialImageUrl()"
+                      [initialImageUrl]="stateService.initialImageUrl()"
                       (fileUrlChanged)="onProductImageUrlChange($event)"></app-file-input>
     </form>
     <div class="md:flex md:flex-row md:justify-end">
       <button class="btn btn-primary w-full md:w-fit"
-            [disabled]="isSubmitting()"
+            [disabled]="stateService.isSubmitting()"
             (click)="onSubmit()">
-            @if (isSubmitting()) {
+            @if (stateService.isSubmitting()) {
               <span class="loading loading-spinner loading-xs"></span>
             }
             Submit

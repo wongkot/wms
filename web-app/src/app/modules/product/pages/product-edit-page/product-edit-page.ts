@@ -1,21 +1,21 @@
 import { KeyValue } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators, AsyncValidatorFn } from '@angular/forms';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditProduct } from '@app/modules/product/models/edit-product';
-import { MockProductService } from '@app/modules/product/services/data/mock-product-service';
-import { ProductService } from '@app/modules/product/services/data/product-service';
+import { ProductEditStateService } from '@app/modules/product/services/state/product-edit-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
 import { ToastService } from '@app/shared/toast/services/toast-service';
-import { finalize, debounceTime, distinctUntilChanged, switchMap, map, first, delay, take, of } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-edit',
   standalone: false,
   templateUrl: './product-edit-page.html',
-  styleUrl: './product-edit-page.css'
+  styleUrl: './product-edit-page.css',
+  providers: [ProductEditStateService]
 })
-export class ProductEditPage implements OnInit {
+export class ProductEditPage implements OnInit, OnDestroy {
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '../..', name: 'Product' },
     { navigationUrl: '', name: 'Edit Product' },
@@ -31,72 +31,50 @@ export class ProductEditPage implements OnInit {
   readonly customCategoryErrorMessages = new Map<string, string>([
     [ 'required', 'Please select product category' ],
   ]);
-  public editProductForm: FormGroup;
+  public stateService = inject(ProductEditStateService);
+  public editProductForm!: FormGroup;
   private _productId!: number;
-  private _isSubmitting = signal<boolean>(false);
-  private _isFetchingData = signal<boolean>(false);
-  private _errorMessage = signal<string>('');
-  private _initialImageUrl = signal<string>('');
   private _fb = inject(FormBuilder);
-  private _productService: ProductService = inject(MockProductService);
   private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
+  private _subscriptions = new Subscription();
 
-  constructor() {
-		this.editProductForm = this._fb.group({
-			name: new FormControl('', Validators.required, this.isProductNameExistsValidator()),
+  ngOnInit(): void {
+    this._productId = Number(this._route.snapshot.paramMap.get('id'));
+    this.editProductForm = this._fb.group({
+			name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator(this._productId)),
 			category: new FormControl('', Validators.required),
 			description: new FormControl(''),
 			unitPrice: new FormControl('', [Validators.required]),
 			reorderThreshold: new FormControl(''),
 			imageUrl: new FormControl(''),
 		});
-	}
-
-  ngOnInit(): void {
-    this._productId = Number(this._route.snapshot.paramMap.get('id'));
-    this.loadProductInfo(this._productId);
-  }
-
-  private loadProductInfo(productId: number) {
-    this._isFetchingData.set(true);
-    this._productService.getProductById(productId).pipe(
-      finalize(() => this._isFetchingData.set(false))
-    )
-    .subscribe({
+    this._subscriptions.add(this.stateService.productLoadSucess$.subscribe({
       next: (product) => {
-        if (product) {
-          this._initialImageUrl.set(product.imageUrl ?? '');
-          this.editProductForm.setValue({
-            name: product.name,
-			      category: product.category,
-			      description: product.description,
-			      unitPrice: product.unitPrice,
-			      reorderThreshold: product.reorderThreshold ?? null,
-			      imageUrl: product.imageUrl,
-          });
-        } else {
-          this._errorMessage.set(`Unable to find product with id (${productId})`);
-        }
+        this.editProductForm.setValue({
+          name: product.name,
+			    category: product.category,
+			    description: product.description,
+			    unitPrice: product.unitPrice,
+			    reorderThreshold: product.reorderThreshold ?? null,
+			    imageUrl: product.imageUrl,
+        });
       }
-    })
-  }
+    }));
+    this._subscriptions.add(this.stateService.editSuccess$.subscribe({
+      next: () => {
+        this._toastService.showSuccess('Product has been updated');
+        this._routerService.navigate(['product']);
+      }
+    }));
+    this._subscriptions.add(this.stateService.editFailed$.subscribe({
+      next: (message) => {
+        this._toastService.showError(message);
+      }
+    }));
 
-  get isSubmitting() {
-    return this._isSubmitting.asReadonly();
-  }
-
-  get isFetchingData() {
-    return this._isFetchingData.asReadonly();
-  }
-
-  get errorMessage() {
-    return this._errorMessage.asReadonly();
-  }
-
-  get initialImageUrl() {
-    return this._initialImageUrl.asReadonly();
+    this.stateService.loadProductInfo(this._productId);
   }
 
   getFormControl(formControlName: string): FormControl {
@@ -126,39 +104,13 @@ export class ProductEditPage implements OnInit {
       reorderThreshold: this.editProductForm.get('reorderThreshold')?.value,
       imageUrl: this.editProductForm.get('imageUrl')?.value,
     }
-    
-    this._isSubmitting.set(true);
-    this._productService.updateProduct(editProduct).pipe(
-      finalize(() => {
-        this._isSubmitting.set(false);
-      }),
-    )
-    .subscribe({
-      next: () => {
-        this._toastService.showSuccess('Product has been updated');
-        this._routerService.navigate(['product']);
-      },
-      error: (error: Error) => {
-        this._toastService.showError(error.message);
-      }
-    });
+
+    this.stateService.editProduct(editProduct);
   }
 
-  isProductNameExistsValidator(): AsyncValidatorFn {
-    return control => {
-      // Add this check condition to prevent form stuck at pending status
-      // Ref: https://stackoverflow.com/questions/72170790/angular-formcontrol-with-async-validator-stays-in-pending-status
-      if (!control.valueChanges || control.pristine) {
-        return of(null);
-      }
-
-      return control.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap(value => this._productService.hasProductNameFromOtherId(value, this._productId)),
-        map((nameExists: boolean) => (nameExists ? {'nameExists': true} : null)),
-        first()); // Make observable finite
-      }
+  ngOnDestroy(): void {
+    if (this._subscriptions) {
+      this._subscriptions.unsubscribe();
+    }
   }
 }
