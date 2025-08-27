@@ -1,21 +1,21 @@
 import { KeyValue } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { AsyncValidatorFn, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AddProduct } from '@app/modules/product/models/add-product';
-import { MockProductService } from '@app/modules/product/services/data/mock-product-service';
-import { ProductService } from '@app/modules/product/services/data/product-service';
+import { ProductAddStateService } from '@app/modules/product/services/state/product-add-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
 import { ToastService } from '@app/shared/toast/services/toast-service';
-import { debounceTime, distinctUntilChanged, finalize, first, map, switchMap } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-add',
   standalone: false,
   templateUrl: './product-add-page.html',
-  styleUrl: './product-add-page.css'
+  styleUrl: './product-add-page.css',
+  providers: [ProductAddStateService]
 })
-export class ProductAddPage {
+export class ProductAddPage implements OnDestroy {
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '..', name: 'Product' },
     { navigationUrl: '', name: 'Add Product' },
@@ -31,27 +31,29 @@ export class ProductAddPage {
   readonly customCategoryErrorMessages = new Map<string, string>([
     [ 'required', 'Please select product category' ],
   ]);
+  public stateService = inject(ProductAddStateService);
   public addProductForm: FormGroup;
-  private _isSubmitting = signal<boolean>(false);
   private _fb = inject(FormBuilder);
-  private _productService: ProductService = inject(MockProductService);
   private _routerService = inject(Router);
   private _toastService = inject(ToastService);
+  private _addProductSuccess: Subscription;
 
   constructor() {
 		this.addProductForm = this._fb.group({
-			name: new FormControl('', Validators.required, this.isProductNameExistsValidator()),
+			name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator()),
 			category: new FormControl('', Validators.required),
 			description: new FormControl(''),
 			unitPrice: new FormControl('', [Validators.required]),
 			reorderThreshold: new FormControl(''),
 			imageUrl: new FormControl(''),
 		});
+    this._addProductSuccess = this.stateService.addSuccess$.subscribe({
+      next: () => {
+        this._toastService.showSuccess('Product has been added');
+        this._routerService.navigate(['product']);
+      }
+    });
 	}
-
-  get isSubmitting() {
-    return this._isSubmitting.asReadonly();
-  }
 
   getFormControl(formControlName: string): FormControl {
     return this.addProductForm.get(formControlName) as FormControl;
@@ -79,28 +81,13 @@ export class ProductAddPage {
       reorderThreshold: this.addProductForm.get('reorderThreshold')?.value,
       imageUrl: this.addProductForm.get('imageUrl')?.value,
     }
-    
-    this._isSubmitting.set(true);
-    this._productService.addProduct(addProduct).pipe(
-      finalize(() => {
-        this._isSubmitting.set(false);
-      }),
-    )
-    .subscribe({
-      next: () => {
-        this._toastService.showSuccess('Product has been added');
-        this._routerService.navigate(['product']);
-      }
-    });
+
+    this.stateService.addProduct(addProduct);
   }
 
-  isProductNameExistsValidator(): AsyncValidatorFn {
-    return control => control.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap(value => this._productService.hasProductName(value)),
-        map((nameExists: boolean) => (nameExists ? {'nameExists': true} : null)),
-        first()); // Make observable finite
+  ngOnDestroy(): void {
+    if (this._addProductSuccess) {
+      this._addProductSuccess.unsubscribe();
+    }
   }
 }
