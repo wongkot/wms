@@ -94,12 +94,20 @@
               <td class="px-4 py-2">
                 <div class="flex flex-row justify-center items-center gap-4">
                   @if (tableConfig().canEdit) {
-                  <button class="btn btn-soft btn-info"
-                          (click)="onEditClick(item)">Edit</button>
+                    <div class="tooltip" data-tip="Edit">
+                      <button class="btn btn-soft btn-info"
+                          (click)="onEditClick(item)">
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    </div>
                   }
                   @if (tableConfig().canDelete) {
-                    <button class="btn btn-soft btn-error"
-                            (click)="onDeleteClick(item)">Delete</button>
+                    <div class="tooltip" data-tip="Delete">
+                      <button class="btn btn-soft btn-error"
+                            (click)="onDeleteClick(item)">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
                   }
                 </div>
               </td>
