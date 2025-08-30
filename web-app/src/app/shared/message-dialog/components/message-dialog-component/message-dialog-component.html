@@ -1,0 +1,24 @@
+@if (isShown()) {
+  <div class="absolute z-999 top-1/2 left-1/2 p-5 bg-base-100 shadow-sm translate-[-50%] min-w-100 rounded-box"
+       animate.enter="fade-in-animation"
+       animate.leave="fade-out-animation">
+    <div class="flex justify-between items-center">
+      <h3 class="text-lg font-bold">
+        <i [class]="iconClasses()"></i>
+        {{ title() }}
+      </h3>
+      <button class="btn btn-sm btn-circle btn-ghost"
+              (click)="onCloseClick()">✕</button>
+    </div>
+    <div class="py-4 mb-6">
+      {{ message() }}
+    </div>
+    <div class="flex justify-end gap-4">
+      <button class="btn" (click)="onCancelClick()">Cancel</button>
+      <button [class]="buttonClasses()" (click)="onOkClick()">OK</button>
+    </div>
+  </div>
+
+  <div class="absolute w-full h-full bg-black/40 flex justify-center items-center top-0 left-0 bottom-0 right-0 z-998"
+       (click)="onCloseClick()"></div>
+}

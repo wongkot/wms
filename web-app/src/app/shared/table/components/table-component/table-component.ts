@@ -13,6 +13,8 @@ export class TableComponent {
   dataSource = input<any[]>([]);
   sortState = input<TableSortState>({ columnProp: '', isAsc: true });
   sortStateChange = output<TableSortState>();
+  editClick = output<any>();
+  deleteClick = output<any>();
 
   styleSortableHeader(columnDataProperty: string) {
     let classes = [];
@@ -39,5 +41,13 @@ export class TableComponent {
     } else {
       this.sortStateChange.emit({ columnProp: columnDataProperty, isAsc: true });
     }
+  }
+
+  onEditClick(rowData: any) {
+    this.editClick.emit(rowData);
+  }
+
+  onDeleteClick(rowData: any) {
+    this.deleteClick.emit(rowData);
   }
 }

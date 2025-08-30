@@ -1,0 +1,42 @@
+<fieldset class="fieldset">
+  <legend class="fieldset-legend">
+    <div>
+      {{ fieldName() }}
+      @if(required()) {
+        <span class="font-bold text-secondary">*</span>
+      }
+    </div>
+    @if (tooltipMessage()) {
+      <div class="tooltip text-info">
+        <div class="tooltip-content">
+          {{ tooltipMessage() }}
+        </div>
+        <i class="bi bi-info-circle"></i>
+      </div>
+    }
+  </legend>
+  <input type="number"
+         class="input w-full focus:border-0"
+         (input)="onInputChange()"
+         [placeholder]="textPlaceHolder()"
+         [formControl]="inputControl()"
+         [min]="minValue()"
+         [max]="maxValue()"
+         [maxlength]="maxValue().toString().length"
+         [class.input-error]="inputControl().touched && inputControl().invalid"/>  
+  @if (inputControl().pending) {
+    <p class="label h-4">
+      <span class="loading loading-dots loading-xs"></span>
+    </p>
+  } @else {
+    <p class="label h-4 text-error">
+      @if(inputControl().touched && inputControl().invalid) {
+        @for (errorMessageKey of errorMessages.keys(); track errorMessageKey) {
+          @if (inputControl().hasError(errorMessageKey)) {
+            {{ this.errorMessages.get(errorMessageKey) }}
+          }
+        }
+      }
+    </p>
+  }
+</fieldset>

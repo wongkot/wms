@@ -1,0 +1,46 @@
+<fieldset class="fieldset">
+  <legend class="fieldset-legend">
+    <div>
+      {{ fieldName() }}
+      @if(required()) {
+        <span class="font-bold text-secondary">*</span>
+      }
+      @if (tooltipMessage()) {
+        <div class="tooltip text-info ml-1">
+          <div class="tooltip-content">
+            {{ tooltipMessage() }}
+          </div>
+          <i class="bi bi-info-circle"></i>
+        </div>
+      }
+    </div>
+  </legend>
+  <textarea class="textarea w-full focus:border-0"
+            [placeholder]="textPlaceHolder()"
+            [formControl]="inputControl()"
+            [maxlength]="maxCharacters()"
+            [class.input-error]="inputControl().touched && inputControl().invalid"></textarea>
+  
+  <div class="flex flex-row justify-between">
+    @if (inputControl().pending) {
+      <p class="label h-4">
+        <span class="loading loading-dots loading-xs"></span>
+      </p>
+    } @else {
+      <p class="label h-4 text-error">
+        @if(inputControl().touched && inputControl().invalid) {
+          @for (errorMessageKey of errorMessages.keys(); track errorMessageKey) {
+            @if (inputControl().hasError(errorMessageKey)) {
+              {{ this.errorMessages.get(errorMessageKey) }}
+            }
+          }
+        }
+      </p>
+    }
+    @if (showCharacterHint()) {
+      <p class="label h-4">
+        {{ inputControl().value?.length ?? 0 }}/{{ maxCharacters() }}
+      </p>
+    }
+  </div>
+</fieldset>
