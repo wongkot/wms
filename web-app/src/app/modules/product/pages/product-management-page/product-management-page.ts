@@ -1,10 +1,14 @@
 import { KeyValue } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Product } from '@app/modules/product/models/product';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
+import { DialogResult } from '@app/shared/message-dialog/enums/dialog-result';
+import { MessageDialogService } from '@app/shared/message-dialog/services/message-dialog-service';
 import { TableConfig } from '@app/shared/table/models/table-config';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
+import { ToastService } from '@app/shared/toast/services/toast-service';
+import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-management',
@@ -13,13 +17,17 @@ import { TableSortState } from '@app/shared/table/models/table-sort-state';
   styleUrl: './product-management-page.css',
   providers: [ProductManagementStateService]
 })
-export class ProductManagementPage {
+export class ProductManagementPage implements OnDestroy {
   public stateService: ProductManagementStateService;
   private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
+  private _messageDialogService = inject(MessageDialogService);
+  private _toastService = inject(ToastService);
+  private _deleteProductSuccess: Subscription;
 
   public readonly tableConfig: TableConfig = {
     canEdit: true,
+    canDelete: true,
     columns: [
       {
         headerName: 'Image',
@@ -72,6 +80,11 @@ export class ProductManagementPage {
 
   constructor() { 
     this.stateService = inject(ProductManagementStateService);
+    this._deleteProductSuccess = this.stateService.deleteSuccess$.subscribe({
+      next: () => {
+        this._toastService.showSuccess('Product has been deleted');
+      }
+    });
   }
 
   onPageSizeChanged(newPageSize: number) {
@@ -129,5 +142,20 @@ export class ProductManagementPage {
 
   onEditProduct(product: Product) {
     this._routerService.navigate(['edit', product.id], { relativeTo: this._route });
+  }
+
+  onDeleteProduct(product: Product) {
+    this._messageDialogService.showError('Confirmation', 'Do you want to delete selected product?').pipe(
+      filter((result) => result == DialogResult.OK)
+    )
+    .subscribe(() => {
+      this.stateService.deleteProduct(product.id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this._deleteProductSuccess) {
+      this._deleteProductSuccess.unsubscribe();
+    }
   }
 }

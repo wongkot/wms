@@ -13,7 +13,8 @@
     [dataSource]="stateService.displayProducts().items"
     [sortState]="stateService.currentSortState()"
     (sortStateChange)="onSortChanged($event)"
-    (editClick)="onEditProduct($event)">
+    (editClick)="onEditProduct($event)"
+    (deleteClick)="onDeleteProduct($event)">
   </app-table>
 </div>
 <div class="mt-4">

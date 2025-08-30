@@ -4,7 +4,7 @@ import { Product } from '@app/modules/product/models/product';
 import { MockProductService } from '@app/modules/product/services/data/mock-product-service';
 import { ProductService } from '@app/modules/product/services/data/product-service';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
 
 @Injectable()
 export class ProductManagementStateService {
@@ -21,8 +21,9 @@ export class ProductManagementStateService {
     totalItems: 0,
     items: [],
   });
-
   private _productService: ProductService;
+  private _deleteSuccess = new Subject<void>();
+  public readonly deleteSuccess$ = this._deleteSuccess.asObservable();
 
   constructor() {
     this._productService = inject(MockProductService);
@@ -72,9 +73,21 @@ export class ProductManagementStateService {
         if (this._selectedCategory() != category) this._selectedCategory.set(category);
         if (this._selectedPage() != pageProducts.currentPage) this._selectedPage.set(pageProducts.currentPage);
         if (this._selectedPageSize() != pageProducts.pageSize) this._selectedPageSize.set(pageProducts.pageSize);
-      },
-      error: () => {
-        this._isLoading.set(false);
+      }
+    });
+  }
+
+  deleteProduct(id: number): void {
+    this._productService.deleteProduct(id).subscribe({
+      next: () => {
+        this._deleteSuccess.next();
+        this.loadProducts(
+          this._selectedPage(),
+          this._selectedPageSize(),
+          this._searchTerm(),
+          this._selectedCategory(),
+          this._currentSortState(),
+        );
       }
     });
   }

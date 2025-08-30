@@ -265,6 +265,17 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(editProduct));
   }
 
+  deleteProduct(id: number): Product | null {
+    const deleteProduct = this._products.get(id);
+    if (!deleteProduct) {
+      return null;
+    }
+
+    this._products.delete(id);
+
+    return deleteProduct;
+  }
+
   private paginateItems<T>(items: T[], page: number, pageSize: number): Pagination<T> {
     const totalItems = items.length;
     const totalPages = Math.ceil(totalItems / pageSize);

@@ -12,4 +12,5 @@ export interface ProductService {
   getProductById(id: number): Observable<Product | null>;
   addProduct(input: AddProduct): Observable<Product>;
   updateProduct(input: EditProduct): Observable<Product>;
+  deleteProduct(id: number): Observable<Product | null>;
 }

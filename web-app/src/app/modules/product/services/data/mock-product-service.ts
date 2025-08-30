@@ -54,4 +54,8 @@ export class MockProductService implements ProductService {
       return throwError(() => error);
     }
   }
+
+  deleteProduct(id: number): Observable<Product | null> {
+    return of(this._inMemoryDbService.deleteProduct(id));
+  }
 }
