@@ -12,40 +12,40 @@
         <tr>
           @for (column of tableConfig().columns; track column) {
             @switch (column.columnType) {
-              @case ('text') {
-                <th scope="col"
-                    class="px-6 py-3 whitespace-nowrap"
-                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
-                  {{ column.headerName }}
-                  @if (column.sortable) {
-                    <i class="bi ml-2 cursor-pointer"
-                      [ngClass]="styleSortableHeader(column.dataProperty)"
-                      (click)="onSortChange(column.dataProperty)">
-                    </i>
-                  }
-                </th>
-              }
-              @case ('price') {
-                <th scope="col"
-                    class="px-6 py-3 whitespace-nowrap"
-                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
-                  {{ column.headerName }}
-                  @if (column.sortable) {
-                    <i class="bi ml-2 cursor-pointer"
-                      [ngClass]="styleSortableHeader(column.dataProperty)"
-                      (click)="onSortChange(column.dataProperty)">
-                    </i>
-                  }
-                </th>
-              }
               @case ('image') {
                 <th scope="col" class="px-16 py-3">
                   <span class="sr-only">Image</span>
                 </th>
               }
+              @case ('label') {
+                <th scope="col"
+                    class="w-fit"
+                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
+                  {{ column.headerName }}
+                  @if (column.sortable) {
+                    <i class="bi ml-2 cursor-pointer"
+                      [ngClass]="styleSortableHeader(column.dataProperty)"
+                      (click)="onSortChange(column.dataProperty)">
+                    </i>
+                  }
+                </th>
+              }
+              @default {
+                <th scope="col"
+                    class="px-6 py-3 whitespace-nowrap"
+                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
+                  {{ column.headerName }}
+                  @if (column.sortable) {
+                    <i class="bi ml-2 cursor-pointer"
+                      [ngClass]="styleSortableHeader(column.dataProperty)"
+                      (click)="onSortChange(column.dataProperty)">
+                    </i>
+                  }
+                </th>
+              }
             }
           }
-          @if (tableConfig().canEdit || tableConfig().canDelete)
+          @if (tableConfig().canEdit || tableConfig().canDelete || tableConfig().canViewDetail)
           {
             <th scope="col"
                 class="px-6 py-3 text-center">
@@ -59,17 +59,15 @@
           <tr class="hover:bg-base-300">
             @for (column of tableConfig().columns; track column) {
               @switch (column.columnType) {
-                @case ('text') {
+                @case ('number') {
                   <td [class]="'px-6 py-4'
-                          + (column.noWrap ? ' whitespace-nowrap' : '')
-                          + (column.highlighted ? ' text-table-row-primary-content-focus' : '')">
-                    {{ column.dataProperty ? item[column.dataProperty] : '' }}
+                          + (column.noWrap ? ' whitespace-nowrap' : '')">
+                    {{ column.dataProperty ? (item[column.dataProperty] | number) : '' }}
                   </td>
                 }
                 @case ('price') {
                   <td [class]="'px-6 py-4'
-                          + (column.noWrap ? ' whitespace-nowrap' : '')
-                          + (column.highlighted ? ' text-table-row-primary-content-focus' : '')">
+                          + (column.noWrap ? ' whitespace-nowrap' : '')">
                     {{ column.dataProperty ? '฿' + (item[column.dataProperty] | number) : '' }}
                   </td>
                 }
@@ -88,11 +86,34 @@
                     </td>
                   }
                 }
+                @case ('label') {
+                  <td>
+                    <div class="w-fit">
+                      <div [class]="(column.cssClasses ? ' ' + column.cssClasses(item) : '')">
+                        {{ column.dataProperty ? item[column.dataProperty] : '' }}
+                      </div>
+                    </div>
+                  </td>
+                }
+                @default {
+                  <td [class]="'px-6 py-4'
+                          + (column.noWrap ? ' whitespace-nowrap' : '')">
+                    {{ column.dataProperty ? item[column.dataProperty] : '' }}
+                  </td>
+                }
               }
             }
-            @if (tableConfig().canEdit || tableConfig().canDelete) {
+            @if (tableConfig().canEdit || tableConfig().canDelete || tableConfig().canViewDetail) {
               <td class="px-4 py-2">
                 <div class="flex flex-row justify-center items-center gap-4">
+                  @if (tableConfig().canViewDetail) {
+                    <div class="tooltip" data-tip="View Detail">
+                      <button class="btn btn-soft btn-info"
+                          (click)="onViewDetailClick(item)">
+                        <i class="bi bi-box-arrow-in-up-right"></i>
+                      </button>
+                    </div>
+                  }
                   @if (tableConfig().canEdit) {
                     <div class="tooltip" data-tip="Edit">
                       <button class="btn btn-soft btn-info"

@@ -13,6 +13,7 @@ export class TableComponent {
   dataSource = input<any[]>([]);
   sortState = input<TableSortState>({ columnProp: '', isAsc: true });
   sortStateChange = output<TableSortState>();
+  viewDetailClick = output<any>();
   editClick = output<any>();
   deleteClick = output<any>();
 
@@ -41,6 +42,10 @@ export class TableComponent {
     } else {
       this.sortStateChange.emit({ columnProp: columnDataProperty, isAsc: true });
     }
+  }
+
+  onViewDetailClick(rowData: any) {
+    this.viewDetailClick.emit(rowData);
   }
 
   onEditClick(rowData: any) {

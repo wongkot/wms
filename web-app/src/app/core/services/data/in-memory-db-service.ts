@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Pagination } from '@app/core/models/pagination';
+import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
+import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
+import { InventoryProductDb } from '@app/modules/inventory/models/inventory-product-db';
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
@@ -10,16 +13,19 @@ import { Product } from '@app/modules/product/models/product';
 export class InMemoryDbService {
   private _products = new Map<number, Product>();
   private _currentProductId = 1;
+  private _productInventory = new Map<number, InventoryProductDb>();
+  private _displayInventoryStatusMap = new Map<InventoryStatus, string>([
+    [InventoryStatus.OK, 'OK'],
+    [InventoryStatus.Low, 'Low'],
+    [InventoryStatus.OutOfStock, 'Out of stock'],
+  ]);
 
   constructor() {
-    this.initData();
+    this.seedData();
   }
 
-  private initData() {
-    this.generateProducts();
-  }
-
-  private generateProducts() {
+  private seedData() {
+    // Products
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
@@ -28,6 +34,7 @@ export class InMemoryDbService {
         unitPrice: 599,
         category: 'Smart Watches',
         tags: [],
+        reorderThreshold: 40,
         imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
       });
     
@@ -67,6 +74,7 @@ export class InMemoryDbService {
         unitPrice: 599,
         category: 'Smart Watches',
         tags: [],
+        reorderThreshold: 50,
         imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
       });
     
@@ -175,6 +183,22 @@ export class InMemoryDbService {
       });
     
     this._currentProductId++;
+
+    // Product inventory
+    const pickInventoryProductCount = 7; // Number for picking top X products for generating inventory product data
+    const minRandomQuantity = 10;
+    const maxRandomQuantity = 30;
+    const firstXProducts = this._products.size > pickInventoryProductCount ? 
+      [ ...this._products.values() ].slice(0, pickInventoryProductCount)
+      : [ ...this._products.values() ];
+
+    firstXProducts.forEach(product => {
+      this._productInventory.set(product.id, {
+        productId: product.id,
+        quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
+        inventories: [],
+      });
+    });
   }
 
   hasProductName(name: string): boolean {
@@ -273,7 +297,80 @@ export class InMemoryDbService {
 
     this._products.delete(id);
 
+    // Clear all inventory data of associated product 
+    if (this._productInventory.has(id)) {
+      this._productInventory.delete(id);
+    }
+
     return deleteProduct;
+  }
+
+  getInventoryProducts(): InventoryProduct[] {
+    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].map((inventoryProductDb) => {
+      const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
+      const totalPrice = inventoryProductDb.quantity * unitPrice;
+      const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
+      let inventoryStatus = InventoryStatus.OK;
+
+      if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
+        inventoryStatus = InventoryStatus.Low;
+      }
+
+      return {
+        productId: inventoryProductDb.productId,
+        productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
+        category: this._products.get(inventoryProductDb.productId)?.category ?? '',
+        quantity: inventoryProductDb.quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+        reorderThreshold: reorderThreshold,
+        inventoryStatus: inventoryStatus,
+        inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
+        imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
+      };
+    });
+
+    return JSON.parse(JSON.stringify(inventoryProducts));
+  }
+
+  getPageInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<InventoryProduct> {
+    let filteredInventoryProducts = this.getInventoryProducts();
+    if (query) {
+      query = query?.toLocaleLowerCase();
+      filteredInventoryProducts = filteredInventoryProducts.filter(inventoryProduct => {
+        return inventoryProduct.productName.toLocaleLowerCase().includes(query);
+      });
+    }
+    if (category) {
+      filteredInventoryProducts = filteredInventoryProducts.filter(inventoryProduct => {
+        return inventoryProduct.category === category;
+      });
+    }
+    let sortData = sort.split(':');
+    let sortColumn = sortData.at(0);
+    let sortDirection = sortData.at(1);
+    if (sortColumn) {
+      let firstItem = Object(filteredInventoryProducts.at(0));
+      let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
+      if (columnType == 'number') {
+        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
+        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
+      } else {
+        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => {
+          let value1 = String(Object(p1)[sortColumn] ?? '');
+          let value2 = String(Object(p2)[sortColumn] ?? '');
+
+          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
+        });
+        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
+      }
+    }
+
+    return this.paginateItems(filteredInventoryProducts, page, pageSize);
+  }
+
+  private randInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
   private paginateItems<T>(items: T[], page: number, pageSize: number): Pagination<T> {
