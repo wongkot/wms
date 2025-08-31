@@ -17,6 +17,19 @@
                   <span class="sr-only">Image</span>
                 </th>
               }
+              @case ('label') {
+                <th scope="col"
+                    class="w-fit"
+                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
+                  {{ column.headerName }}
+                  @if (column.sortable) {
+                    <i class="bi ml-2 cursor-pointer"
+                      [ngClass]="styleSortableHeader(column.dataProperty)"
+                      (click)="onSortChange(column.dataProperty)">
+                    </i>
+                  }
+                </th>
+              }
               @default {
                 <th scope="col"
                     class="px-6 py-3 whitespace-nowrap"
@@ -72,6 +85,15 @@
                       </div>
                     </td>
                   }
+                }
+                @case ('label') {
+                  <td>
+                    <div class="w-fit">
+                      <div [class]="(column.cssClasses ? ' ' + column.cssClasses(item) : '')">
+                        {{ column.dataProperty ? item[column.dataProperty] : '' }}
+                      </div>
+                    </div>
+                  </td>
                 }
                 @default {
                   <td [class]="'px-6 py-4'

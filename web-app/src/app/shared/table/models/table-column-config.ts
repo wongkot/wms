@@ -3,6 +3,7 @@ export interface TableColumnConfig {
   dataProperty: string;
   highlighted: boolean;
   noWrap: boolean;
-  columnType: 'text' | 'number' | 'date' | 'image' | 'price';
+  columnType: 'text' | 'number' | 'date' | 'image' | 'price' | 'label';
   sortable: boolean;
+  cssClasses?: (data: any) => string;
 }
