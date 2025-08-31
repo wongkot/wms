@@ -297,6 +297,11 @@ export class InMemoryDbService {
 
     this._products.delete(id);
 
+    // Clear all inventory data of associated product 
+    if (this._productInventory.has(id)) {
+      this._productInventory.delete(id);
+    }
+
     return deleteProduct;
   }
 
