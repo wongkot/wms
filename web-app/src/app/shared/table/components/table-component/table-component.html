@@ -45,7 +45,7 @@
               }
             }
           }
-          @if (tableConfig().canEdit || tableConfig().canDelete)
+          @if (tableConfig().canEdit || tableConfig().canDelete || tableConfig().canViewDetail)
           {
             <th scope="col"
                 class="px-6 py-3 text-center">
@@ -103,9 +103,17 @@
                 }
               }
             }
-            @if (tableConfig().canEdit || tableConfig().canDelete) {
+            @if (tableConfig().canEdit || tableConfig().canDelete || tableConfig().canViewDetail) {
               <td class="px-4 py-2">
                 <div class="flex flex-row justify-center items-center gap-4">
+                  @if (tableConfig().canViewDetail) {
+                    <div class="tooltip" data-tip="View Detail">
+                      <button class="btn btn-soft btn-info"
+                          (click)="onViewDetailClick(item)">
+                        <i class="bi bi-box-arrow-in-up-right"></i>
+                      </button>
+                    </div>
+                  }
                   @if (tableConfig().canEdit) {
                     <div class="tooltip" data-tip="Edit">
                       <button class="btn btn-soft btn-info"
