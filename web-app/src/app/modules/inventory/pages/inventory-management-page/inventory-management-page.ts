@@ -153,10 +153,6 @@ export class InventoryManagementPage {
     // TODO: Navigate to inventory inbound page
   }
 
-  onOutboundInventory() {
-    // TODO: Navigate to inventory outbound page
-  }
-
   onViewInventoryProductDetail(product: InventoryProduct) {
     this._routerService.navigate(['detail', product.productId], { relativeTo: this._route });
   }
