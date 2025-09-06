@@ -1,17 +1,31 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { InventoryDetailStateService } from '@app/modules/inventory/services/state/inventory-detail-state-service';
+import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
 
 @Component({
   selector: 'app-inventory-detail',
   standalone: false,
   templateUrl: './inventory-detail-page.html',
-  styleUrl: './inventory-detail-page.css'
+  styleUrl: './inventory-detail-page.css',
+  providers: [InventoryDetailStateService]
 })
 export class InventoryDetailPage implements OnInit {
+  public readonly breadcrumbSections: BreadcrumbSection[] = [
+    { navigationUrl: '../..', name: 'Inventory' },
+    { navigationUrl: '', name: 'Detail' },
+  ];
   private _productId!: number;
+  private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
+  stateService = inject(InventoryDetailStateService);
 
   ngOnInit(): void {
     this._productId = Number(this._route.snapshot.paramMap.get('product-id'));
+    this.stateService.loadInventories(this._productId);
+  }
+
+  onGoBack() {
+    this._routerService.navigate(['inventory']);
   }
 }
