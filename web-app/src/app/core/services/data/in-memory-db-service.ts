@@ -1,11 +1,15 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Pagination } from '@app/core/models/pagination';
+import { DataFormatService } from '@app/core/services/data/data-format-service';
 import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
+import { Inventory } from '@app/modules/inventory/models/inventory';
 import { InventoryProductDb } from '@app/modules/inventory/models/inventory-product-db';
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
+import { formatDate } from '@angular/common';
+import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +23,8 @@ export class InMemoryDbService {
     [InventoryStatus.Low, 'Low'],
     [InventoryStatus.OutOfStock, 'Out of stock'],
   ]);
+  private _currentInventoryId = 1;
+  private _dataFormatService = inject(DataFormatService);
 
   constructor() {
     this.seedData();
@@ -185,18 +191,47 @@ export class InMemoryDbService {
     this._currentProductId++;
 
     // Product inventory
-    const pickInventoryProductCount = 7; // Number for picking top X products for generating inventory product data
-    const minRandomQuantity = 10;
-    const maxRandomQuantity = 30;
+    const pickInventoryProductCount = 7; // Number for picking top X products for generating inventory data
+    const randomInventoryCount = 8;
+    const minRandomQuantity = 2;
+    const maxRandomQuantity = 5;
     const firstXProducts = this._products.size > pickInventoryProductCount ? 
       [ ...this._products.values() ].slice(0, pickInventoryProductCount)
       : [ ...this._products.values() ];
 
     firstXProducts.forEach(product => {
+      let inventories: Inventory[] = [];
+      // Create random inventories of current product
+      // Reverse index key in order to generate lot number from oldest to newest
+      for (let index of [...Array(randomInventoryCount).keys()].reverse()) {
+        const lotDate = new Date();
+        lotDate.setDate(lotDate.getDate() - index);
+
+        // Generate random area
+        const zonePrefix = ZONE_PREFIXES[this.randInt(0, ZONE_PREFIXES.length - 1)];
+        const row = this.randInt(0, AREA_ROWS - 1);
+        const column = this.randInt(0, AREA_COLUMNS - 1);
+
+        const inventory: Inventory = {
+          id: this._currentInventoryId,
+          productId: product.id,
+          lot: this._dataFormatService.formatLotNumber(lotDate),
+          area: this._dataFormatService.formatAreaName(zonePrefix, row, column),
+          quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
+        };
+
+        inventories.push(inventory);
+        this._currentInventoryId++;
+      }
+
+      const totalInventoryQuantity = inventories.reduce((total, current) => {
+        return total + current.quantity;
+      }, 0);
+      // Create inventory product
       this._productInventory.set(product.id, {
         productId: product.id,
-        quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
-        inventories: [],
+        quantity: totalInventoryQuantity,
+        inventories: inventories,
       });
     });
   }
@@ -327,6 +362,7 @@ export class InMemoryDbService {
         inventoryStatus: inventoryStatus,
         inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
         imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
+        inventories: [],
       };
     });
 
@@ -367,6 +403,35 @@ export class InMemoryDbService {
     }
 
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
+  }
+
+  getInventoryProductById(productId: number): InventoryProduct | null {
+    const inventoryProductDb = this._productInventory.get(productId);
+    if (!inventoryProductDb) {
+      return null;
+    }
+
+    const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
+    const totalPrice = inventoryProductDb.quantity * unitPrice;
+    const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
+    let inventoryStatus = InventoryStatus.OK;
+    if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
+      inventoryStatus = InventoryStatus.Low;
+    }
+
+    return {
+      productId: inventoryProductDb.productId,
+      productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
+      category: this._products.get(inventoryProductDb.productId)?.category ?? '',
+      quantity: inventoryProductDb.quantity,
+      unitPrice: unitPrice,
+      totalPrice: totalPrice,
+      reorderThreshold: reorderThreshold,
+      inventoryStatus: inventoryStatus,
+      inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
+      imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
+      inventories: inventoryProductDb.inventories,
+    };
   }
 
   private randInt(min: number, max: number): number {
