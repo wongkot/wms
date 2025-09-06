@@ -12,10 +12,12 @@ export class TableComponent {
   tableConfig = input.required<TableConfig>();
   dataSource = input<any[]>([]);
   sortState = input<TableSortState>({ columnProp: '', isAsc: true });
+  selectedRow = input<any>(null);
   sortStateChange = output<TableSortState>();
   viewDetailClick = output<any>();
   editClick = output<any>();
   deleteClick = output<any>();
+  rowClick = output<any>();
 
   styleSortableHeader(columnDataProperty: string) {
     let classes = [];
@@ -46,6 +48,10 @@ export class TableComponent {
 
   onViewDetailClick(rowData: any) {
     this.viewDetailClick.emit(rowData);
+  }
+
+  onRowClick(rowData: any) {
+    this.rowClick.emit(rowData);
   }
 
   onEditClick(rowData: any) {

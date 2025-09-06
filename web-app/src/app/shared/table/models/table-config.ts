@@ -5,4 +5,6 @@ export interface TableConfig {
   canEdit?: boolean;
   canDelete?: boolean;
   canViewDetail?: boolean;
+  canSelect?: boolean;
+  selectedProperty?: string;
 }
