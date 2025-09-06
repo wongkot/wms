@@ -14,4 +14,8 @@ export class MockInventoryService implements InventoryService {
   getInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Observable<Pagination<InventoryProduct>> {
     return of(this._inMemoryDbService.getPageInventoryProducts(page, pageSize, query, category, sort));
   }
+
+  getInventoryProductById(productId: number): Observable<InventoryProduct | null> {
+    return of(this._inMemoryDbService.getInventoryProductById(productId));
+  }
 }

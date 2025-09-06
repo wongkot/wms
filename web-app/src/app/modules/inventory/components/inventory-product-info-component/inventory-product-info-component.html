@@ -1,0 +1,90 @@
+<div class="w-full h-full inline-flex md:pl-10 md:block">
+  <div class="w-1/2 md:w-full md:h-1/2 overflow-auto">
+    @if(inventoryProductInfo()?.imageUrl) {
+      <div class="md:flex md:justify-center md:items-center">
+        <img class="h-0 md:h-30 w-full object-contain" [src]="inventoryProductInfo()?.imageUrl">
+      </div>
+    } @else {
+      <div class="flex justify-center items-center h-0 md:h-40">
+        <i class="bi bi-card-image text-9xl invisible md:visible"></i>
+      </div>
+    }
+    <h2 class="text-start md:text-center text-2xl font-bold px-2 py-4">{{ inventoryProductInfo()?.productName }}</h2>
+    <hr class="h-px text-base-content/10 bg-base-content/10">
+    <div class="grid grid-cols-2">
+      <div class="text-start p-2">Category</div>
+      <div class="text-start p-2">{{ inventoryProductInfo()?.category }}</div>
+
+      <div class="text-start p-2">Status</div>
+      <div [class]="inventoryStatusClasses()">{{ inventoryProductInfo()?.inventoryStatusName }}</div>
+
+      <div class="text-start p-2">On hand</div>
+      <div class="text-start p-2">{{ inventoryProductInfo()?.quantity | number }}</div>
+      
+      <div class="text-start p-2">Reorder threshold</div>
+      <div class="text-start p-2">{{ (inventoryProductInfo()?.reorderThreshold) ? (inventoryProductInfo()?.reorderThreshold | number) : '-' }}</div>
+    </div>
+  </div>
+  <div class="w-1/2 overflow-hidden pt-4 ml-10 md:ml-0 md:w-full md:h-1/2 inline-flex">
+    <div class="w-full overflow-hidden pr-4">
+      <app-table
+        [tableConfig]="tableConfig"
+        [dataSource]="inventoryProductInfo()?.inventories ?? []"
+        [selectedRow]="stateService.selectedInventory()"
+        [sortState]="stateService.currentSortState()"
+        (sortStateChange)="onSortChanged($event)"
+        (rowClick)="onSelectInventory($event)">
+      </app-table>
+    </div>
+    <div class="min-w-fit flex flex-col items-start gap-4">
+      <div class="tooltip tooltip-left">
+        @if (stateService.selectedInventory()) {
+          <div class="tooltip-content">
+            Inbound
+          </div>
+        }
+        <button
+          class="btn btn-soft btn-success"
+          [disabled]="!stateService.selectedInventory()">
+          <i class="bi bi-plus-circle"></i>
+        </button>
+      </div>
+      <div class="tooltip tooltip-left">
+        @if (stateService.selectedInventory()) {
+          <div class="tooltip-content">
+            Outbound
+          </div>
+        }
+        <button 
+          class="btn btn-soft btn-error"
+          [disabled]="!stateService.selectedInventory()">
+          <i class="bi bi-dash-circle"></i>
+        </button>
+      </div>
+      <div class="tooltip tooltip-left">
+        @if (stateService.selectedInventory()) {
+          <div class="tooltip-content">
+            Inventory Adjustment
+          </div>
+        }
+        <button 
+          class="btn btn-soft btn-info"
+          [disabled]="!stateService.selectedInventory()">
+          <i class="bi bi-pencil-square"></i>
+        </button>
+      </div>
+      <div class="tooltip tooltip-left">
+        @if (stateService.selectedInventory()) {
+          <div class="tooltip-content">
+            Move Area
+          </div>
+        }
+        <button
+          class="btn btn-soft btn-info"
+          [disabled]="!stateService.selectedInventory()">
+          <i class="bi bi-arrow-left-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

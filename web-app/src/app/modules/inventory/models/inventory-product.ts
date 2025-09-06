@@ -1,4 +1,5 @@
 import { InventoryStatus } from "@app/modules/inventory/enums/inventory-status";
+import { Inventory } from "@app/modules/inventory/models/inventory";
 
 export interface InventoryProduct {
   productId: number;
@@ -11,4 +12,5 @@ export interface InventoryProduct {
   inventoryStatusName: string;
   reorderThreshold?: number;
   imageUrl?: string;
+  inventories: Inventory[];
 }

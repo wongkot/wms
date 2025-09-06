@@ -56,7 +56,10 @@
       </thead>
       <tbody>
         @for (item of dataSource(); track (item.id ? item.id : item)) {
-          <tr class="hover:bg-base-300">
+          <tr class="hover:bg-base-300"
+              [class.cursor-pointer]="tableConfig().canSelect"
+              [class.text-primary]="tableConfig().canSelect && selectedRow() && item[tableConfig().selectedProperty ?? ''] == selectedRow()[tableConfig().selectedProperty ?? '']"
+              (click)="onRowClick(item)">
             @for (column of tableConfig().columns; track column) {
               @switch (column.columnType) {
                 @case ('number') {
