@@ -10,6 +10,8 @@ import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
 import { formatDate } from '@angular/common';
 import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
+import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
+import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 
 @Injectable({
   providedIn: 'root'
@@ -320,6 +322,7 @@ export class InMemoryDbService {
     editProduct.unitPrice = input.unitPrice;
     editProduct.category = input.category;
     editProduct.imageUrl = input.imageUrl;
+    editProduct.reorderThreshold = input.reorderThreshold;
 
     return JSON.parse(JSON.stringify(editProduct));
   }
@@ -341,12 +344,14 @@ export class InMemoryDbService {
   }
 
   getInventoryProducts(): InventoryProduct[] {
-    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].map((inventoryProductDb) => {
+    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].filter((inventoryProductDb) => {
+      return inventoryProductDb.quantity > 0;
+    })
+    .map((inventoryProductDb) => {
       const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
       const totalPrice = inventoryProductDb.quantity * unitPrice;
       const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
       let inventoryStatus = InventoryStatus.OK;
-
       if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
         inventoryStatus = InventoryStatus.Low;
       }
@@ -405,9 +410,9 @@ export class InMemoryDbService {
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
   }
 
-  getInventoryProductById(productId: number): InventoryProduct | null {
+  getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
     const inventoryProductDb = this._productInventory.get(productId);
-    if (!inventoryProductDb) {
+    if (!inventoryProductDb || inventoryProductDb.quantity <= 0) {
       return null;
     }
 
@@ -417,6 +422,29 @@ export class InMemoryDbService {
     let inventoryStatus = InventoryStatus.OK;
     if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
       inventoryStatus = InventoryStatus.Low;
+    }
+    let filteredInventories = inventoryProductDb.inventories.filter((inventory) => {
+      return inventory.quantity > 0;
+    });
+    if (sort) {
+      let sortData = sort.split(':');
+      let sortColumn = sortData.at(0);
+      let sortDirection = sortData.at(1);
+      if (sortColumn) {
+        let firstItem = Object(filteredInventories.at(0));
+        let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
+        if (columnType == 'number') {
+          filteredInventories = filteredInventories.sort((i1, i2) => Object(i1)[sortColumn] - Object(i2)[sortColumn]);
+          filteredInventories = sortDirection == 'asc' ? filteredInventories : filteredInventories.reverse();
+        } else {
+          filteredInventories = filteredInventories.sort((i1, i2) => {
+            let value1 = String(Object(i1)[sortColumn] ?? '');
+            let value2 = String(Object(i2)[sortColumn] ?? '');
+            return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
+          });
+          filteredInventories = sortDirection == 'asc' ? filteredInventories : filteredInventories.reverse();
+        }
+      }
     }
 
     return {
@@ -430,8 +458,160 @@ export class InMemoryDbService {
       inventoryStatus: inventoryStatus,
       inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
       imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
-      inventories: inventoryProductDb.inventories,
+      inventories: JSON.parse(JSON.stringify(filteredInventories)),
     };
+  }
+
+  inventoryInbound(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+    const inventoryProduct = this._productInventory.get(input.productId);
+
+    if (inventoryProduct) {
+      const inventory = inventoryProduct.inventories.find(inventory => {
+        return inventory.lot == input.lot && inventory.area == input.area;
+      });
+
+      if (inventory) {
+        inventory.quantity += input.quantity;
+        inventoryProduct.quantity += input.quantity;
+
+        return JSON.parse(JSON.stringify(inventory));
+      } else {
+        const newInventory: Inventory = {
+          id: this._currentInventoryId,
+          productId: input.productId,
+          lot: input.lot,
+          area: input.area,
+          quantity: input.quantity,
+        };
+        this._currentInventoryId++;
+        inventoryProduct.inventories.push(newInventory);
+        inventoryProduct.quantity += input.quantity;
+
+        return JSON.parse(JSON.stringify(newInventory));
+      }
+    } else {
+      const newInventoryProduct: InventoryProductDb = {
+        productId: input.productId,
+        quantity: input.quantity,
+        inventories: [
+          {
+            id: this._currentInventoryId,
+            productId: input.productId,
+            lot: input.lot,
+            area: input.area,
+            quantity: input.quantity,
+          }
+        ],
+      };
+      this._productInventory.set(input.productId, newInventoryProduct);
+      this._currentInventoryId++;
+
+      return JSON.parse(JSON.stringify(newInventoryProduct));
+    }
+  }
+
+  inventoryOutbound(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const inventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!inventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+    if (inventory.quantity < input.quantity) {
+      throw Error(`Outbound quantity (${input.quantity}) exceed inventory limit (${inventory.quantity})`);
+    }
+
+    inventory.quantity -= input.quantity;
+    inventoryProduct.quantity -= input.quantity;
+
+    return JSON.parse(JSON.stringify(inventory));
+  }
+
+  inventoryAdjustment(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const inventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!inventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+    if (input.quantity < 0) {
+      throw Error(`Adjustment quantity must be equal or greater than zero`);
+    }
+    const adjustQuantity = input.quantity - inventory.quantity; // Calculate number of quantity that needs to be add/subtract
+    if (adjustQuantity == 0) {
+      throw Error(`Adjustment quantity cannot be zero`);
+    }
+
+    inventory.quantity += adjustQuantity;
+    inventoryProduct.quantity += adjustQuantity;
+
+    return JSON.parse(JSON.stringify(inventory));
+  }
+
+  inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const currentAreaInventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!currentAreaInventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+
+    currentAreaInventory.quantity -= input.quantity;
+
+    const newAreaInventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.newArea;
+    });
+    if (newAreaInventory) {
+      newAreaInventory.quantity += input.quantity;
+
+      return JSON.parse(JSON.stringify(newAreaInventory));
+    } else {
+      const newInventory: Inventory = {
+        id: this._currentInventoryId,
+        productId: input.productId,
+        lot: input.lot,
+        area: input.newArea,
+        quantity: input.quantity,
+      };
+      this._currentInventoryId++;
+      inventoryProduct.inventories.push(newInventory);
+
+      return JSON.parse(JSON.stringify(newInventory));
+    }
   }
 
   private randInt(min: number, max: number): number {
