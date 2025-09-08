@@ -38,11 +38,12 @@
           [inputControl]="getFormControl('quantity')"></app-number-input>
       </form>
       <div class="flex flex-row justify-between mt-2 gap-4">
-        <button class="btn btn-ghost w-1/3"
+        <button class="btn btn-soft"
                 type="button"
+                [disabled]="stateService.isCallingInventoryOperationApi()"
                 (click)="onCancel()">
                 Cancel</button>
-        <button class="btn btn-primary w-1/3"
+        <button class="btn btn-primary"
                 type="button"
                 [disabled]="stateService.isCallingInventoryOperationApi()"
                 (click)="onSubmit()">
