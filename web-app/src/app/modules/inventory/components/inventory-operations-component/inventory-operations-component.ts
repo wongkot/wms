@@ -1,8 +1,7 @@
-import { KeyValue } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { AREA_COLUMNS, AREA_ROWS, INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND, ZONE_PREFIXES } from '@app/core/constants/app';
-import { DataFormatService } from '@app/core/services/data/data-format-service';
+import { INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND } from '@app/core/constants/app';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryDetailStateService } from '@app/modules/inventory/services/state/inventory-detail-state-service';
@@ -16,20 +15,11 @@ import { InventoryDetailStateService } from '@app/modules/inventory/services/sta
 export class InventoryOperationsComponent {
   stateService = inject(InventoryDetailStateService);
   drawerToggleControl = new FormControl(this.stateService.drawerOpened());
-  private _dataFormatService = inject(DataFormatService);
+  private _utilityService = inject(UtilityService);
   private _fb: FormBuilder = inject(FormBuilder);
   private _quantityBaseValidators = [ Validators.required, Validators.min(1) ];
   private _maxOperationQuantity = 999;
-  public readonly allAreas: KeyValue<string, string>[] = ZONE_PREFIXES.flatMap((zone) => {
-    const zoneAreas: KeyValue<string, string>[] = [];
-    for (let row = 0; row < AREA_ROWS; row++) {
-      for (let column = 0; column < AREA_COLUMNS; column++) {
-        const areaName = this._dataFormatService.formatAreaName(zone, row, column);
-        zoneAreas.push({ key: areaName, value: areaName});
-      }
-    }
-    return zoneAreas;
-  });
+  public readonly allAreas = this._utilityService.getAreasForDropdown();
   readonly customAreaErrorMessages = new Map<string, string>([
     [ 'required', 'Please select area' ],
   ]);

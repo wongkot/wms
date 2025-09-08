@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Pagination } from '@app/core/models/pagination';
-import { DataFormatService } from '@app/core/services/data/data-format-service';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
 import { Inventory } from '@app/modules/inventory/models/inventory';
@@ -26,7 +26,7 @@ export class InMemoryDbService {
     [InventoryStatus.OutOfStock, 'Out of stock'],
   ]);
   private _currentInventoryId = 1;
-  private _dataFormatService = inject(DataFormatService);
+  private _utilityService = inject(UtilityService);
 
   constructor() {
     this.seedData();
@@ -217,8 +217,8 @@ export class InMemoryDbService {
         const inventory: Inventory = {
           id: this._currentInventoryId,
           productId: product.id,
-          lot: this._dataFormatService.formatLotNumber(lotDate),
-          area: this._dataFormatService.formatAreaName(zonePrefix, row, column),
+          lot: this._utilityService.formatLotNumber(lotDate),
+          area: this._utilityService.formatAreaName(zonePrefix, row, column),
           quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
         };
 
@@ -267,20 +267,7 @@ export class InMemoryDbService {
     let sortColumn = sortData.at(0);
     let sortDirection = sortData.at(1);
     if (sortColumn) {
-      let firstItem = Object(this._products.entries().next().value?.[1]);
-      let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
-      if (columnType == 'number') {
-        filteredProducts = filteredProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
-        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
-      } else {
-        filteredProducts = filteredProducts.sort((p1, p2) => {
-          let value1 = String(Object(p1)[sortColumn] ?? '');
-          let value2 = String(Object(p2)[sortColumn] ?? '');
-
-          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-        });
-        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
-      }
+      filteredProducts = this._utilityService.sortArray(filteredProducts, sortColumn, sortDirection == 'asc');
     }
 
     return this.paginateItems(filteredProducts, page, pageSize);
@@ -391,20 +378,7 @@ export class InMemoryDbService {
     let sortColumn = sortData.at(0);
     let sortDirection = sortData.at(1);
     if (sortColumn) {
-      let firstItem = Object(filteredInventoryProducts.at(0));
-      let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
-      if (columnType == 'number') {
-        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
-        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
-      } else {
-        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => {
-          let value1 = String(Object(p1)[sortColumn] ?? '');
-          let value2 = String(Object(p2)[sortColumn] ?? '');
-
-          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-        });
-        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
-      }
+      filteredInventoryProducts = this._utilityService.sortArray(filteredInventoryProducts, sortColumn, sortDirection == 'asc');
     }
 
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
@@ -431,19 +405,7 @@ export class InMemoryDbService {
       let sortColumn = sortData.at(0);
       let sortDirection = sortData.at(1);
       if (sortColumn) {
-        let firstItem = Object(filteredInventories.at(0));
-        let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
-        if (columnType == 'number') {
-          filteredInventories = filteredInventories.sort((i1, i2) => Object(i1)[sortColumn] - Object(i2)[sortColumn]);
-          filteredInventories = sortDirection == 'asc' ? filteredInventories : filteredInventories.reverse();
-        } else {
-          filteredInventories = filteredInventories.sort((i1, i2) => {
-            let value1 = String(Object(i1)[sortColumn] ?? '');
-            let value2 = String(Object(i2)[sortColumn] ?? '');
-            return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-          });
-          filteredInventories = sortDirection == 'asc' ? filteredInventories : filteredInventories.reverse();
-        }
+        filteredInventories = this._utilityService.sortArray(filteredInventories, sortColumn, sortDirection == 'asc');
       }
     }
 

@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND } from '@app/core/constants/app';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { Inventory } from '@app/modules/inventory/models/inventory';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
@@ -21,6 +22,7 @@ export class InventoryDetailStateService {
   private _selectedInventory = signal<Inventory | null>(null);
   private _selectedArea = signal<Set<string>>(new Set<string>());
   private _selectedInventoryOperation = signal<string>('');
+  private _utilityService = inject(UtilityService);
   private _inventoryService: InventoryService = inject(MockInventoryService);
   private _drawerOpened = signal<boolean>(false);
   private _inventoryOperationSuccess = new Subject<void>();
@@ -130,19 +132,7 @@ export class InventoryDetailStateService {
     }
 
     let sortedInventories = [ ...this._inventoryProduct()?.inventories ?? [] ];
-    let firstItem = Object(sortedInventories.at(0));
-    let columnType = firstItem ? typeof(firstItem[sort.columnProp]) : 'string';
-    if (columnType == 'number') {
-      sortedInventories = sortedInventories.sort((i1, i2) => Object(i1)[sort.columnProp] - Object(i2)[sort.columnProp]);
-      sortedInventories = sort.isAsc ? sortedInventories : sortedInventories.reverse();
-    } else {
-      sortedInventories = sortedInventories.sort((i1, i2) => {
-        let value1 = String(Object(i1)[sort.columnProp] ?? '');
-        let value2 = String(Object(i2)[sort.columnProp] ?? '');
-        return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-      });
-      sortedInventories = sort.isAsc ? sortedInventories : sortedInventories.reverse();
-    }
+    sortedInventories = this._utilityService.sortArray(sortedInventories, sort.columnProp, sort.isAsc);
 
     this._currentSortState.set(sort);
     this._inventoryProduct.set({
