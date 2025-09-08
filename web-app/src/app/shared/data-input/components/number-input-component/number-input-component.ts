@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, input } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -20,25 +20,29 @@ export class NumberInputComponent implements AfterViewInit {
   readonly errorMessages = new Map<string, string>([
     [ 'required', 'This field cannot be empty' ],
   ]);
-  private maxLength = this.maxValue().toString().length;
+  private maxLength = computed(() => {
+    return this.maxValue().toString().length;
+  });
+
+  constructor() {
+    effect(() => {
+      this.errorMessages.set('min', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
+      this.errorMessages.set('max', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
+    });
+  }
 
   ngAfterViewInit(): void {
-    this.errorMessages.set('min', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
-    this.errorMessages.set('max', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
-
     this.customErrorMessages().forEach((value, key) => {
       this.errorMessages.set(key, value);
     });
-
-    this.maxLength = this.maxValue().toString().length;
   }
 
   onInputChange() {
     const currentValue = Number(this.inputControl().value);
     const currentLength = currentValue.toString().length;
 
-    if (currentLength > this.maxLength) {
-      this.inputControl().setValue(Number(currentValue.toString().slice(0, this.maxLength)));
+    if (currentLength > this.maxLength()) {
+      this.inputControl().setValue(Number(currentValue.toString().slice(0, this.maxLength())));
     }
   }
 }
