@@ -1,7 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InventoryDetailStateService } from '@app/modules/inventory/services/state/inventory-detail-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
+import { ToastService } from '@app/shared/toast/services/toast-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-inventory-detail',
@@ -10,7 +12,7 @@ import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-secti
   styleUrl: './inventory-detail-page.css',
   providers: [InventoryDetailStateService]
 })
-export class InventoryDetailPage implements OnInit {
+export class InventoryDetailPage implements OnInit, OnDestroy {
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '../..', name: 'Inventory' },
     { navigationUrl: '', name: 'Detail' },
@@ -18,7 +20,17 @@ export class InventoryDetailPage implements OnInit {
   private _productId!: number;
   private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
+  private _inventoryOperationSuccess: Subscription;
+  private _toastService = inject(ToastService);
   stateService = inject(InventoryDetailStateService);
+
+  constructor() {
+    this._inventoryOperationSuccess = this.stateService.inventoryOperationSuccess$.subscribe({
+      next: () => {
+        this._toastService.showSuccess('Inventory has been updated');
+      }
+    });
+	}
 
   ngOnInit(): void {
     this._productId = Number(this._route.snapshot.paramMap.get('product-id'));
@@ -27,5 +39,11 @@ export class InventoryDetailPage implements OnInit {
 
   onGoBack() {
     this._routerService.navigate(['inventory']);
+  }
+
+  ngOnDestroy(): void {
+    if (this._inventoryOperationSuccess) {
+      this._inventoryOperationSuccess.unsubscribe();
+    }
   }
 }

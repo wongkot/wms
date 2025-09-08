@@ -27,7 +27,10 @@
       </app-warehouse-map>
     </div>
     <div class="h-[40vh] md:h-[80vh] md:w-4/10">
-      <app-inventory-product-info [inventoryProductInfo]="stateService.inventoryProduct()"></app-inventory-product-info>
+      <app-inventory-product-info
+        [inventoryProductInfo]="stateService.inventoryProduct()">
+      </app-inventory-product-info>
     </div>
   </div>
 }
+<app-inventory-operations></app-inventory-operations>

@@ -1,4 +1,5 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND } from '@app/core/constants/app';
 import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
 import { Inventory } from '@app/modules/inventory/models/inventory';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
@@ -76,5 +77,25 @@ export class InventoryProductInfoComponent {
     } else {
       this.stateService.selectInventory(row);
     }
+  }
+
+  onInboundClick() {
+    this.stateService.selectInventoryOperation(INVENTORY_OPERATION_INBOUND);
+    this.stateService.openDrawer();
+  }
+
+  onOutboundClick() {
+    this.stateService.selectInventoryOperation(INVENTORY_OPERATION_OUTBOUND);
+    this.stateService.openDrawer();
+  }
+
+  onInventoryAdjustmentClick() {
+    this.stateService.selectInventoryOperation(INVENTORY_OPERATION_ADJUSTMENT);
+    this.stateService.openDrawer();
+  }
+
+  onMoveAreaClick() {
+    this.stateService.selectInventoryOperation(INVENTORY_OPERATION_MOVE_AREA);
+    this.stateService.openDrawer();
   }
 }

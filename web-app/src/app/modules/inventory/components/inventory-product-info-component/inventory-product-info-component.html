@@ -45,7 +45,8 @@
         }
         <button
           class="btn btn-soft btn-success"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onInboundClick()">
           <i class="bi bi-plus-circle"></i>
         </button>
       </div>
@@ -57,7 +58,8 @@
         }
         <button 
           class="btn btn-soft btn-error"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onOutboundClick()">
           <i class="bi bi-dash-circle"></i>
         </button>
       </div>
@@ -69,7 +71,8 @@
         }
         <button 
           class="btn btn-soft btn-info"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onInventoryAdjustmentClick()">
           <i class="bi bi-pencil-square"></i>
         </button>
       </div>
@@ -81,7 +84,8 @@
         }
         <button
           class="btn btn-soft btn-info"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onMoveAreaClick()">
           <i class="bi bi-arrow-left-right"></i>
         </button>
       </div>
