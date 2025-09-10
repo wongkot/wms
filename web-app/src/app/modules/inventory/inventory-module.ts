@@ -6,6 +6,7 @@ import { InventoryOperationsComponent } from '@app/modules/inventory/components/
 import { InventoryProductInfoComponent } from '@app/modules/inventory/components/inventory-product-info-component/inventory-product-info-component';
 import { WarehouseMapComponent } from '@app/modules/inventory/components/warehouse-map-component/warehouse-map-component';
 import { InventoryDetailPage } from '@app/modules/inventory/pages/inventory-detail-page/inventory-detail-page';
+import { InventoryInboundPage } from '@app/modules/inventory/pages/inventory-inbound-page/inventory-inbound-page';
 import { InventoryManagementPage } from '@app/modules/inventory/pages/inventory-management-page/inventory-management-page';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
 import { ButtonModule } from '@app/shared/button/button-module';
@@ -18,6 +19,7 @@ import { TableModule } from '@app/shared/table/table-module';
 const ROUTES: Routes = [
 	{ path: '', pathMatch: 'full', component: InventoryManagementPage },
   { path: 'detail/:product-id', component: InventoryDetailPage },
+  { path: 'inbound', component: InventoryInboundPage },
 ];
 
 @NgModule({
@@ -27,6 +29,7 @@ const ROUTES: Routes = [
     WarehouseMapComponent,
     InventoryProductInfoComponent,
     InventoryOperationsComponent,
+    InventoryInboundPage,
   ],
   imports: [
     CommonModule,

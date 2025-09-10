@@ -150,7 +150,7 @@ export class InventoryManagementPage {
   }
 
   onInboundInventory() {
-    // TODO: Navigate to inventory inbound page
+    this._routerService.navigate(['inbound'], { relativeTo: this._route });
   }
 
   onViewInventoryProductDetail(product: InventoryProduct) {
