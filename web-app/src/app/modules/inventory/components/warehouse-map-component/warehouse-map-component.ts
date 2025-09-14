@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { WarehouseMapState } from '@app/modules/inventory/models/warehouse-map-state';
@@ -13,6 +13,8 @@ export class WarehouseMapComponent {
   private _utilityService = inject(UtilityService);
   warehouseMapState = input<Map<string, WarehouseMapState>>();
   selectedArea = input<Set<string>>(new Set<string>());
+  canSelectArea = input<boolean>(false);
+  selectAreaChanged = output<string>();
   public readonly warehouseAreas: Map<string, string[][]> = new Map(ZONE_PREFIXES.map((zone) => {
     const areas: string[][] = [];
     for (let row = 0; row < AREA_ROWS; row++) {
@@ -31,5 +33,12 @@ export class WarehouseMapComponent {
 
   getAreaName(prefix: string, row: number, column: number): string {
     return this._utilityService.formatAreaName(prefix, row, column);
+  }
+
+  onAreaClick(area: string) {
+    if (! this.canSelectArea()) {
+      return;
+    }
+    this.selectAreaChanged.emit(area);
   }
 }

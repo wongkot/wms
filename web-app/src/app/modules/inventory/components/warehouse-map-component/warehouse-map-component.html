@@ -8,8 +8,10 @@
             <div class="flex flex-row">
               @for (area of areaRow; track area) {
                 <div class="relative text-base-content/70 border border-base-content/40 px-7 py-5 text-nowrap"
+                     [class.cursor-pointer]="canSelectArea()"
                      [class.bg-primary]="(warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0"
-                     [class.bg-secondary]="selectedArea().has(area)">
+                     [class.bg-secondary]="selectedArea().has(area)"
+                     (click)="onAreaClick(area)">
                   {{ area }}
                   @if ((warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0) {
                     <div class="badge badge-sm absolute bottom-1 right-1 w-6"
