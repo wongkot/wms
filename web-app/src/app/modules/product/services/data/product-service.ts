@@ -8,6 +8,7 @@ export interface ProductService {
   hasProductName(name: string): Observable<boolean>;
   hasProductNameFromOtherId(name: string, id: number): Observable<boolean>;
   getProducts(): Observable<Product[]>;
+  getProductNames(query: string, limit: number): Observable<string[]>;
   getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Observable<Pagination<Product>>;
   getProductById(id: number): Observable<Product | null>;
   addProduct(input: AddProduct): Observable<Product>;

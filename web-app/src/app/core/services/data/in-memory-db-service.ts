@@ -12,6 +12,7 @@ import { formatDate } from '@angular/common';
 import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
+import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
 
 @Injectable({
   providedIn: 'root'
@@ -250,6 +251,18 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify([ ...this._products.values() ]));
   }
 
+  getProductNames(query: string, limit: number): string[] {
+    let filteredProductNames = this._utilityService.sortArray([ ...this._products.values() ], 'name', true)
+      .map(product => product.name);
+    if (query) {
+      return filteredProductNames.filter((productName) => {
+        return productName.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+      }).slice(0, limit);
+    } else {
+      return filteredProductNames.slice(0, limit);
+    }
+  }
+
   getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
     let filteredProducts = [ ...this._products.values() ];
     if (query) {
@@ -474,6 +487,22 @@ export class InMemoryDbService {
 
       return JSON.parse(JSON.stringify(newInventoryProduct));
     }
+  }
+
+  inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
+    const product = [ ...this._products.values() ].find((product) => {
+      return product.name == input.productName;
+    });
+    if (!product) {
+      throw Error(`This product with name (${input.productName}) not found`);
+    }
+    
+    return this.inventoryInbound({
+      productId: product.id,
+      lot: input.lot,
+      area: input.area,
+      quantity: input.quantity,
+    });
   }
 
   inventoryOutbound(input: InventoryOperation): Inventory {

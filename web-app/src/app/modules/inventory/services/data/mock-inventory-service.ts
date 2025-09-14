@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Pagination } from '@app/core/models/pagination';
 import { InMemoryDbService } from '@app/core/services/data/in-memory-db-service';
 import { Inventory } from '@app/modules/inventory/models/inventory';
+import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
@@ -25,6 +26,14 @@ export class MockInventoryService implements InventoryService {
   inventoryInbound(input: InventoryOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryInbound(input));
+    } catch (error) {
+      return throwError(() => error);
+    }
+  }
+
+  inventoryInboundWithProductName(input: InventoryInboundOperation): Observable<Inventory> {
+    try {
+      return of(this._inMemoryDbService.inventoryInboundWithProductName(input));
     } catch (error) {
       return throwError(() => error);
     }

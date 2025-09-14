@@ -8,6 +8,7 @@ import { WarehouseMapComponent } from '@app/modules/inventory/components/warehou
 import { InventoryDetailPage } from '@app/modules/inventory/pages/inventory-detail-page/inventory-detail-page';
 import { InventoryInboundPage } from '@app/modules/inventory/pages/inventory-inbound-page/inventory-inbound-page';
 import { InventoryManagementPage } from '@app/modules/inventory/pages/inventory-management-page/inventory-management-page';
+import { AlertModule } from '@app/shared/alert/alert-module';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
 import { ButtonModule } from '@app/shared/button/button-module';
 import { DataInputModule } from '@app/shared/data-input/data-input-module';
@@ -41,6 +42,7 @@ const ROUTES: Routes = [
     BreadcrumbModule,
     ReactiveFormsModule,
     DataInputModule,
+    AlertModule,
     RouterModule.forChild(ROUTES),
   ]
 })
