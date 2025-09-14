@@ -15,12 +15,28 @@
       }
     </div>
   </legend>
-  <input type="text"
+  <div class="relative">
+    <input type="text"
          class="input w-full focus:border-0"
          [placeholder]="textPlaceHolder()"
          [formControl]="inputControl()"
          [maxlength]="maxCharacters()"
-         [class.input-error]="inputControl().touched && inputControl().invalid"/>
+         [class.input-error]="inputControl().touched && inputControl().invalid"
+         (focus)="onFocus()"
+         (blur)="onLostFocus()"
+         (keydown)="onKeydown($event)"/>
+    @if(autocompleteOptions().length > 0 && isFocused()) {
+      <ul class="w-full bg-base-100 border border-base-content overflow-y-auto absolute z-99">
+        @for (option of autocompleteOptions(); track option; let optionIndex = $index) {
+          <!-- Use mousedown event instead of click to make the event trigger before it gets remove from DOM (blur will happened before click event) -->
+          <li class="p-4 cursor-pointer hover:bg-base-200 text-nowrap"
+              [class.text-primary]="optionIndex == currentFocusedItemIndex()"
+              (mousedown)="onAutocompleteItemClick(option)">
+          {{ option }}</li>
+        }
+      </ul>
+    }
+  </div>
   
   <div class="flex flex-row justify-between">
     @if (inputControl().pending) {
