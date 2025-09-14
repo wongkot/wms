@@ -1,0 +1,60 @@
+<div class="drawer">
+  <input type="checkbox" class="drawer-toggle" [formControl]="drawerToggleControl"/>
+  <div class="drawer-side z-999">
+    <label class="drawer-overlay" (click)="onDrawerBackdropClick()"></label>
+    <div class="menu bg-base-200 text-base-content min-h-full w-80 p-8">
+      @if (stateService.inventoryOperationErrorMessage()) {
+        <div class="mb-4">
+          <app-alert
+            type="error"
+            [message]="stateService.inventoryOperationErrorMessage()"
+            (dismissClick)="onDismissErrorMessage()"
+            ></app-alert>
+        </div>
+      }
+      <h2 class="text-2xl pb-4">{{ operationTitle() }}</h2>
+      <form [formGroup]="inventoryOperationForm">
+        <app-select-input fieldName="Area"
+          placeHolder="Select area"
+          [required]="getFormControl('area').enabled"
+          [options]="allAreas"
+          [customErrorMessages]="customAreaErrorMessages"
+          [inputControl]="getFormControl('area')"></app-select-input>
+        <app-text-input fieldName="Lot"
+          textPlaceHolder="Enter lot number"
+          [required]="getFormControl('lot').enabled"
+          [maxCharacters]="50"
+          [showCharacterHint]="getFormControl('lot').enabled"
+          [inputControl]="getFormControl('lot')"></app-text-input>
+        <app-select-input fieldName="New Area"
+          placeHolder="Select new area"
+          [hidden]="!isMoveAreaOperation()"
+          [required]="true"
+          [options]="moveAreas()"
+          [customErrorMessages]="customAreaErrorMessages"
+          [inputControl]="getFormControl('moveArea')"></app-select-input>
+        <app-number-input fieldName="Quantity"
+          textPlaceHolder="Enter quantity"
+          [required]="true"
+          [minValue]="minQuantity()"
+          [maxValue]="maxQuantity()"
+          [inputControl]="getFormControl('quantity')"></app-number-input>
+      </form>
+      <div class="flex flex-row justify-between mt-2 gap-4">
+        <button class="btn btn-soft"
+                type="button"
+                [disabled]="stateService.isCallingInventoryOperationApi()"
+                (click)="onCancel()">
+                Cancel</button>
+        <button class="btn btn-primary"
+                type="button"
+                [disabled]="stateService.isCallingInventoryOperationApi()"
+                (click)="onSubmit()">
+                @if (stateService.isCallingInventoryOperationApi()) {
+                  <span class="loading loading-spinner loading-xs"></span>
+                }
+                Submit</button>
+      </div>
+    </div>
+  </div>
+</div>

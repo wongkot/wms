@@ -1,5 +1,5 @@
-<div class="w-full h-full inline-flex md:pl-10 md:block">
-  <div class="w-1/2 md:w-full md:h-1/2 overflow-auto">
+<div class="w-full h-full md:pl-10 md:block">
+  <div class="md:w-full md:h-1/2 overflow-auto">
     @if(inventoryProductInfo()?.imageUrl) {
       <div class="md:flex md:justify-center md:items-center">
         <img class="h-0 md:h-30 w-full object-contain" [src]="inventoryProductInfo()?.imageUrl">
@@ -25,8 +25,8 @@
       <div class="text-start p-2">{{ (inventoryProductInfo()?.reorderThreshold) ? (inventoryProductInfo()?.reorderThreshold | number) : '-' }}</div>
     </div>
   </div>
-  <div class="w-1/2 overflow-hidden pt-4 ml-10 md:ml-0 md:w-full md:h-1/2 inline-flex">
-    <div class="w-full overflow-hidden pr-4">
+  <div class="overflow-hidden pt-4 md:w-full md:h-1/2 flex flex-row">
+    <div class="h-[50vh] w-full overflow-x-hidden overflow-y-auto mr-4 md:h-full">
       <app-table
         [tableConfig]="tableConfig"
         [dataSource]="inventoryProductInfo()?.inventories ?? []"
@@ -45,7 +45,8 @@
         }
         <button
           class="btn btn-soft btn-success"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onInboundClick()">
           <i class="bi bi-plus-circle"></i>
         </button>
       </div>
@@ -57,7 +58,8 @@
         }
         <button 
           class="btn btn-soft btn-error"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onOutboundClick()">
           <i class="bi bi-dash-circle"></i>
         </button>
       </div>
@@ -69,7 +71,8 @@
         }
         <button 
           class="btn btn-soft btn-info"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onInventoryAdjustmentClick()">
           <i class="bi bi-pencil-square"></i>
         </button>
       </div>
@@ -81,7 +84,8 @@
         }
         <button
           class="btn btn-soft btn-info"
-          [disabled]="!stateService.selectedInventory()">
+          [disabled]="!stateService.selectedInventory()"
+          (click)="onMoveAreaClick()">
           <i class="bi bi-arrow-left-right"></i>
         </button>
       </div>

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Pagination } from '@app/core/models/pagination';
-import { DataFormatService } from '@app/core/services/data/data-format-service';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
 import { Inventory } from '@app/modules/inventory/models/inventory';
@@ -10,6 +10,9 @@ import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
 import { formatDate } from '@angular/common';
 import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
+import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
+import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
+import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +27,7 @@ export class InMemoryDbService {
     [InventoryStatus.OutOfStock, 'Out of stock'],
   ]);
   private _currentInventoryId = 1;
-  private _dataFormatService = inject(DataFormatService);
+  private _utilityService = inject(UtilityService);
 
   constructor() {
     this.seedData();
@@ -215,8 +218,8 @@ export class InMemoryDbService {
         const inventory: Inventory = {
           id: this._currentInventoryId,
           productId: product.id,
-          lot: this._dataFormatService.formatLotNumber(lotDate),
-          area: this._dataFormatService.formatAreaName(zonePrefix, row, column),
+          lot: this._utilityService.formatLotNumber(lotDate),
+          area: this._utilityService.formatAreaName(zonePrefix, row, column),
           quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
         };
 
@@ -248,6 +251,18 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify([ ...this._products.values() ]));
   }
 
+  getProductNames(query: string, limit: number): string[] {
+    let filteredProductNames = this._utilityService.sortArray([ ...this._products.values() ], 'name', true)
+      .map(product => product.name);
+    if (query) {
+      return filteredProductNames.filter((productName) => {
+        return productName.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+      }).slice(0, limit);
+    } else {
+      return filteredProductNames.slice(0, limit);
+    }
+  }
+
   getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
     let filteredProducts = [ ...this._products.values() ];
     if (query) {
@@ -265,20 +280,7 @@ export class InMemoryDbService {
     let sortColumn = sortData.at(0);
     let sortDirection = sortData.at(1);
     if (sortColumn) {
-      let firstItem = Object(this._products.entries().next().value?.[1]);
-      let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
-      if (columnType == 'number') {
-        filteredProducts = filteredProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
-        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
-      } else {
-        filteredProducts = filteredProducts.sort((p1, p2) => {
-          let value1 = String(Object(p1)[sortColumn] ?? '');
-          let value2 = String(Object(p2)[sortColumn] ?? '');
-
-          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-        });
-        filteredProducts = sortDirection == 'asc' ? filteredProducts : filteredProducts.reverse();
-      }
+      filteredProducts = this._utilityService.sortArray(filteredProducts, sortColumn, sortDirection == 'asc');
     }
 
     return this.paginateItems(filteredProducts, page, pageSize);
@@ -320,6 +322,7 @@ export class InMemoryDbService {
     editProduct.unitPrice = input.unitPrice;
     editProduct.category = input.category;
     editProduct.imageUrl = input.imageUrl;
+    editProduct.reorderThreshold = input.reorderThreshold;
 
     return JSON.parse(JSON.stringify(editProduct));
   }
@@ -341,12 +344,14 @@ export class InMemoryDbService {
   }
 
   getInventoryProducts(): InventoryProduct[] {
-    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].map((inventoryProductDb) => {
+    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].filter((inventoryProductDb) => {
+      return inventoryProductDb.quantity > 0;
+    })
+    .map((inventoryProductDb) => {
       const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
       const totalPrice = inventoryProductDb.quantity * unitPrice;
       const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
       let inventoryStatus = InventoryStatus.OK;
-
       if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
         inventoryStatus = InventoryStatus.Low;
       }
@@ -386,28 +391,15 @@ export class InMemoryDbService {
     let sortColumn = sortData.at(0);
     let sortDirection = sortData.at(1);
     if (sortColumn) {
-      let firstItem = Object(filteredInventoryProducts.at(0));
-      let columnType = firstItem ? typeof(firstItem[sortColumn]) : 'string';
-      if (columnType == 'number') {
-        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => Object(p1)[sortColumn] - Object(p2)[sortColumn]);
-        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
-      } else {
-        filteredInventoryProducts = filteredInventoryProducts.sort((p1, p2) => {
-          let value1 = String(Object(p1)[sortColumn] ?? '');
-          let value2 = String(Object(p2)[sortColumn] ?? '');
-
-          return value1.toLocaleLowerCase().localeCompare(value2.toLocaleLowerCase());
-        });
-        filteredInventoryProducts = sortDirection == 'asc' ? filteredInventoryProducts : filteredInventoryProducts.reverse();
-      }
+      filteredInventoryProducts = this._utilityService.sortArray(filteredInventoryProducts, sortColumn, sortDirection == 'asc');
     }
 
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
   }
 
-  getInventoryProductById(productId: number): InventoryProduct | null {
+  getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
     const inventoryProductDb = this._productInventory.get(productId);
-    if (!inventoryProductDb) {
+    if (!inventoryProductDb || inventoryProductDb.quantity <= 0) {
       return null;
     }
 
@@ -417,6 +409,17 @@ export class InMemoryDbService {
     let inventoryStatus = InventoryStatus.OK;
     if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
       inventoryStatus = InventoryStatus.Low;
+    }
+    let filteredInventories = inventoryProductDb.inventories.filter((inventory) => {
+      return inventory.quantity > 0;
+    });
+    if (sort) {
+      let sortData = sort.split(':');
+      let sortColumn = sortData.at(0);
+      let sortDirection = sortData.at(1);
+      if (sortColumn) {
+        filteredInventories = this._utilityService.sortArray(filteredInventories, sortColumn, sortDirection == 'asc');
+      }
     }
 
     return {
@@ -430,8 +433,176 @@ export class InMemoryDbService {
       inventoryStatus: inventoryStatus,
       inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
       imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
-      inventories: inventoryProductDb.inventories,
+      inventories: JSON.parse(JSON.stringify(filteredInventories)),
     };
+  }
+
+  inventoryInbound(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+    const inventoryProduct = this._productInventory.get(input.productId);
+
+    if (inventoryProduct) {
+      const inventory = inventoryProduct.inventories.find(inventory => {
+        return inventory.lot == input.lot && inventory.area == input.area;
+      });
+
+      if (inventory) {
+        inventory.quantity += input.quantity;
+        inventoryProduct.quantity += input.quantity;
+
+        return JSON.parse(JSON.stringify(inventory));
+      } else {
+        const newInventory: Inventory = {
+          id: this._currentInventoryId,
+          productId: input.productId,
+          lot: input.lot,
+          area: input.area,
+          quantity: input.quantity,
+        };
+        this._currentInventoryId++;
+        inventoryProduct.inventories.push(newInventory);
+        inventoryProduct.quantity += input.quantity;
+
+        return JSON.parse(JSON.stringify(newInventory));
+      }
+    } else {
+      const newInventoryProduct: InventoryProductDb = {
+        productId: input.productId,
+        quantity: input.quantity,
+        inventories: [
+          {
+            id: this._currentInventoryId,
+            productId: input.productId,
+            lot: input.lot,
+            area: input.area,
+            quantity: input.quantity,
+          }
+        ],
+      };
+      this._productInventory.set(input.productId, newInventoryProduct);
+      this._currentInventoryId++;
+
+      return JSON.parse(JSON.stringify(newInventoryProduct));
+    }
+  }
+
+  inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
+    const product = [ ...this._products.values() ].find((product) => {
+      return product.name == input.productName;
+    });
+    if (!product) {
+      throw Error(`This product with name (${input.productName}) not found`);
+    }
+    
+    return this.inventoryInbound({
+      productId: product.id,
+      lot: input.lot,
+      area: input.area,
+      quantity: input.quantity,
+    });
+  }
+
+  inventoryOutbound(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const inventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!inventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+    if (inventory.quantity < input.quantity) {
+      throw Error(`Outbound quantity (${input.quantity}) exceed inventory limit (${inventory.quantity})`);
+    }
+
+    inventory.quantity -= input.quantity;
+    inventoryProduct.quantity -= input.quantity;
+
+    return JSON.parse(JSON.stringify(inventory));
+  }
+
+  inventoryAdjustment(input: InventoryOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const inventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!inventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+    if (input.quantity < 0) {
+      throw Error(`Adjustment quantity must be equal or greater than zero`);
+    }
+    const adjustQuantity = input.quantity - inventory.quantity; // Calculate number of quantity that needs to be add/subtract
+    if (adjustQuantity == 0) {
+      throw Error(`Adjustment quantity cannot be zero`);
+    }
+
+    inventory.quantity += adjustQuantity;
+    inventoryProduct.quantity += adjustQuantity;
+
+    return JSON.parse(JSON.stringify(inventory));
+  }
+
+  inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
+    const product = this._products.get(input.productId);
+    if (!product) {
+      throw Error(`This product with id (${input.productId}) not found`);
+    }
+
+    const inventoryProduct = this._productInventory.get(input.productId);
+    if (!inventoryProduct) {
+      throw Error(`This inventory product with id (${input.productId}) not found`);
+    }
+
+    const currentAreaInventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.area;
+    });
+    if (!currentAreaInventory) {
+      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+    }
+
+    currentAreaInventory.quantity -= input.quantity;
+
+    const newAreaInventory = inventoryProduct.inventories.find(inventory => {
+      return inventory.lot == input.lot && inventory.area == input.newArea;
+    });
+    if (newAreaInventory) {
+      newAreaInventory.quantity += input.quantity;
+
+      return JSON.parse(JSON.stringify(newAreaInventory));
+    } else {
+      const newInventory: Inventory = {
+        id: this._currentInventoryId,
+        productId: input.productId,
+        lot: input.lot,
+        area: input.newArea,
+        quantity: input.quantity,
+      };
+      this._currentInventoryId++;
+      inventoryProduct.inventories.push(newInventory);
+
+      return JSON.parse(JSON.stringify(newInventory));
+    }
   }
 
   private randInt(min: number, max: number): number {

@@ -1,12 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
+import { InventoryOperationsComponent } from '@app/modules/inventory/components/inventory-operations-component/inventory-operations-component';
 import { InventoryProductInfoComponent } from '@app/modules/inventory/components/inventory-product-info-component/inventory-product-info-component';
 import { WarehouseMapComponent } from '@app/modules/inventory/components/warehouse-map-component/warehouse-map-component';
 import { InventoryDetailPage } from '@app/modules/inventory/pages/inventory-detail-page/inventory-detail-page';
+import { InventoryInboundPage } from '@app/modules/inventory/pages/inventory-inbound-page/inventory-inbound-page';
 import { InventoryManagementPage } from '@app/modules/inventory/pages/inventory-management-page/inventory-management-page';
+import { AlertModule } from '@app/shared/alert/alert-module';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
 import { ButtonModule } from '@app/shared/button/button-module';
+import { DataInputModule } from '@app/shared/data-input/data-input-module';
 import { DropdownModule } from '@app/shared/dropdown/dropdown-module';
 import { PaginationModule } from '@app/shared/pagination/pagination-module';
 import { SearchBarModule } from '@app/shared/search-bar/search-bar-module';
@@ -15,6 +20,7 @@ import { TableModule } from '@app/shared/table/table-module';
 const ROUTES: Routes = [
 	{ path: '', pathMatch: 'full', component: InventoryManagementPage },
   { path: 'detail/:product-id', component: InventoryDetailPage },
+  { path: 'inbound', component: InventoryInboundPage },
 ];
 
 @NgModule({
@@ -23,6 +29,8 @@ const ROUTES: Routes = [
     InventoryDetailPage,
     WarehouseMapComponent,
     InventoryProductInfoComponent,
+    InventoryOperationsComponent,
+    InventoryInboundPage,
   ],
   imports: [
     CommonModule,
@@ -32,6 +40,9 @@ const ROUTES: Routes = [
     DropdownModule,
     ButtonModule,
     BreadcrumbModule,
+    ReactiveFormsModule,
+    DataInputModule,
+    AlertModule,
     RouterModule.forChild(ROUTES),
   ]
 })
