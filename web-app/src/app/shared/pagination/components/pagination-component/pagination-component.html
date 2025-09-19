@@ -8,7 +8,7 @@
       (change)="onPageSizeChange($event)"
     >
       @for (pageSize of pageSizes(); track $index) {
-        <option [value]="pageSize">
+        <option [value]="pageSize" [selected]="pageSize == selectedPageSize()">
           {{ pageSize }}
         </option>
       }
