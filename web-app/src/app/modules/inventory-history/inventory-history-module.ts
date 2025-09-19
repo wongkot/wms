@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InventoryHistoryPage } from '@app/modules/inventory-history/pages/inventory-history-page/inventory-history-page';
 import { RouterModule, Routes } from '@angular/router';
+import { SearchBarModule } from '@app/shared/search-bar/search-bar-module';
+import { DropdownModule } from '@app/shared/dropdown/dropdown-module';
+import { TableModule } from '@app/shared/table/table-module';
+import { PaginationModule } from '@app/shared/pagination/pagination-module';
 
 const ROUTES: Routes = [
 	{ path: '', pathMatch: 'full', component: InventoryHistoryPage },
@@ -13,6 +17,10 @@ const ROUTES: Routes = [
   ],
   imports: [
     CommonModule,
+    SearchBarModule,
+    DropdownModule,
+    TableModule,
+    PaginationModule,
     RouterModule.forChild(ROUTES),
   ]
 })
