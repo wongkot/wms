@@ -64,14 +64,23 @@
               @switch (column.columnType) {
                 @case ('number') {
                   <td [class]="'px-6 py-4'
-                          + (column.noWrap ? ' whitespace-nowrap' : '')">
+                          + (column.noWrap ? ' whitespace-nowrap' : '')
+                          + (column.cssClasses ? ' ' + column.cssClasses(item) : '')">
                     {{ column.dataProperty ? (item[column.dataProperty] | number) : '' }}
                   </td>
                 }
                 @case ('price') {
                   <td [class]="'px-6 py-4'
-                          + (column.noWrap ? ' whitespace-nowrap' : '')">
+                          + (column.noWrap ? ' whitespace-nowrap' : '')
+                          + (column.cssClasses ? ' ' + column.cssClasses(item) : '')">
                     {{ column.dataProperty ? '฿' + (item[column.dataProperty] | number) : '' }}
+                  </td>
+                }
+                @case ('date') {
+                  <td [class]="'px-6 py-4'
+                          + (column.noWrap ? ' whitespace-nowrap' : '')
+                          + (column.cssClasses ? ' ' + column.cssClasses(item) : '')">
+                    {{ column.dataProperty ? (item[column.dataProperty] | date) : '' }}
                   </td>
                 }
                 @case ('image') {
@@ -100,8 +109,9 @@
                 }
                 @default {
                   <td [class]="'px-6 py-4'
-                          + (column.noWrap ? ' whitespace-nowrap' : '')">
-                    {{ column.dataProperty ? item[column.dataProperty] : '' }}
+                          + (column.noWrap ? ' whitespace-nowrap' : '')
+                          + (column.cssClasses ? ' ' + column.cssClasses(item) : '')">
+                    {{ column.dataProperty ? (column.textFormat ? column.textFormat(item) : item[column.dataProperty]) : '' }}
                   </td>
                 }
               }
