@@ -787,8 +787,15 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventoryHistory));
   }
 
-  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, sort: string): Pagination<InventoryHistory> {
+  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: Date, endDate: Date, sort: string): Pagination<InventoryHistory> {
     let filteredInventoryHistories = this.getInventoryHistories();
+    const actualEndDate = new Date(endDate);
+    actualEndDate.setDate(actualEndDate.getDate() + 1);
+
+    filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
+      const timestamp = new Date(inventoryHistory.timestamp);
+      return timestamp >= startDate && timestamp < actualEndDate;
+    });
     if (query) {
       query = query?.toLocaleLowerCase();
       filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {

@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 import { InventoryHistoryStateService } from '@app/modules/inventory-history/services/state/inventory-history-state-service';
+import { DateRange } from '@app/shared/date-picker/models/date-range';
 import { TableConfig } from '@app/shared/table/models/table-config';
 import { TableSortState } from '@app/shared/table/models/table-sort-state';
 
@@ -170,5 +171,12 @@ export class InventoryHistoryPage {
       newSort.isAsc === this.stateService.currentSortState().isAsc) return;
 
     this.stateService.loadInventoryHistories({ sort: newSort });
+  }
+
+  onDateRangeChange(newDateRange: DateRange) {
+    if (newDateRange.startDate === this.stateService.selectedDateRange().startDate &&
+      newDateRange.endDate === this.stateService.selectedDateRange().endDate) return;
+
+    this.stateService.loadInventoryHistories({ dateRange: newDateRange });
   }
 }
