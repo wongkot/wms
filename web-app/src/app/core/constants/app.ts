@@ -12,4 +12,5 @@ export const INVENTORY_OPERATION_OUTBOUND = 'Outbound';
 export const INVENTORY_OPERATION_ADJUSTMENT = 'Adjustment';
 export const INVENTORY_OPERATION_MOVE_AREA = 'Move Area';
 
-export const DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss'
+export const DATE_FORMAT = 'yyyy-MM-dd';
+export const DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss';
