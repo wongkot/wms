@@ -8,11 +8,13 @@ import { InventoryProductDb } from '@app/modules/inventory/models/inventory-prod
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
-import { formatDate } from '@angular/common';
 import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
+import { InventoryHistoryDb } from '@app/modules/inventory-history/models/inventory-history-db';
+import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
+import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +29,15 @@ export class InMemoryDbService {
     [InventoryStatus.OutOfStock, 'Out of stock'],
   ]);
   private _currentInventoryId = 1;
+  private _inventoryHistory: InventoryHistoryDb[] = [];
+  private _currentInventoryHistoryId = 1;
   private _utilityService = inject(UtilityService);
+  private _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
+    [InventoryOperationType.Inbound, 'Inbound'],
+    [InventoryOperationType.Outbound, 'Outbound'],
+    [InventoryOperationType.Adjustment, 'Adjustment'],
+    [InventoryOperationType.MoveArea, 'MoveArea'],
+  ]);
 
   constructor() {
     this.seedData();
@@ -204,27 +214,81 @@ export class InMemoryDbService {
 
     firstXProducts.forEach(product => {
       let inventories: Inventory[] = [];
+      // Random index that needs to be outbounded from inventory
+      const outboundItemIndex = this.randInt(0, randomInventoryCount - 1);
+
       // Create random inventories of current product
       // Reverse index key in order to generate lot number from oldest to newest
       for (let index of [...Array(randomInventoryCount).keys()].reverse()) {
-        const lotDate = new Date();
-        lotDate.setDate(lotDate.getDate() - index);
+        const timestamp = new Date();
+        timestamp.setMonth(timestamp.getMonth() - index);
+        // Generate random date if the current date is not in this month
+        if (index !== 0) {
+          const lastDayOfMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 0);
+          timestamp.setDate(this.randInt(1, lastDayOfMonth.getDate()));
+          timestamp.setHours(this.randInt(0, 23));
+          timestamp.setMinutes(this.randInt(0, 59));
+          timestamp.setSeconds(this.randInt(0, 59));
+        } else {
+          timestamp.setHours(this.randInt(0, timestamp.getHours()));
+          timestamp.setMinutes(this.randInt(0, timestamp.getMinutes()));
+          timestamp.setSeconds(this.randInt(0, timestamp.getSeconds()));
+        }
 
         // Generate random area
         const zonePrefix = ZONE_PREFIXES[this.randInt(0, ZONE_PREFIXES.length - 1)];
         const row = this.randInt(0, AREA_ROWS - 1);
         const column = this.randInt(0, AREA_COLUMNS - 1);
+        const lot = this._utilityService.formatLotNumber(timestamp);
+        const area = this._utilityService.formatAreaName(zonePrefix, row, column);
+        const quantity = this.randInt(minRandomQuantity, maxRandomQuantity);
 
         const inventory: Inventory = {
           id: this._currentInventoryId,
           productId: product.id,
-          lot: this._utilityService.formatLotNumber(lotDate),
-          area: this._utilityService.formatAreaName(zonePrefix, row, column),
-          quantity: this.randInt(minRandomQuantity, maxRandomQuantity),
+          lot: lot,
+          area: area,
+          quantity: quantity,
         };
-
-        inventories.push(inventory);
         this._currentInventoryId++;
+
+        // Create inventory inbound history
+        const inboundHistory: InventoryHistoryDb = {
+          id: this._currentInventoryHistoryId,
+          timestamp: timestamp,
+          operationType: InventoryOperationType.Inbound,
+          productId: product.id,
+          productName: product.name,
+          lot: lot,
+          area: area,
+          quantity: quantity,
+          beforeQuantity: 0,
+          afterQuantity: quantity,
+        };
+        this._inventoryHistory.push(inboundHistory);
+        this._currentInventoryHistoryId++;
+
+        // Remove inventory using random index
+        if (index == outboundItemIndex) {
+          const outboundTimestamp = new Date(timestamp);
+          outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(1,3)); // Make outbound timestamp newer than inbound timestamp
+          const outboundHistory: InventoryHistoryDb = {
+            id: this._currentInventoryHistoryId,
+            timestamp: outboundTimestamp,
+            operationType: InventoryOperationType.Outbound,
+            productId: product.id,
+            productName: product.name,
+            lot: inventory.lot,
+            area: inventory.area,
+            quantity: inventory.quantity,
+            beforeQuantity: inventory.quantity,
+            afterQuantity: 0,
+          };
+          this._inventoryHistory.push(outboundHistory);
+          this._currentInventoryHistoryId++;
+        } else {
+          inventories.push(inventory);
+        }
       }
 
       const totalInventoryQuantity = inventories.reduce((total, current) => {
@@ -443,6 +507,19 @@ export class InMemoryDbService {
       throw Error(`This product with id (${input.productId}) not found`);
     }
     const inventoryProduct = this._productInventory.get(input.productId);
+    const timestamp = new Date();
+    const inboundHistory: InventoryHistoryDb = {
+      id: this._currentInventoryHistoryId,
+      timestamp: timestamp,
+      operationType: InventoryOperationType.Inbound,
+      productId: product.id,
+      productName: product.name,
+      lot: input.lot,
+      area: input.area,
+      quantity: input.quantity,
+      beforeQuantity: input.quantity,
+      afterQuantity: input.quantity,
+    };
 
     if (inventoryProduct) {
       const inventory = inventoryProduct.inventories.find(inventory => {
@@ -450,11 +527,21 @@ export class InMemoryDbService {
       });
 
       if (inventory) {
+        inboundHistory.beforeQuantity = inventory.quantity;
+        inboundHistory.afterQuantity = inventory.quantity + input.quantity;
+        this._inventoryHistory.push(inboundHistory);
+        this._currentInventoryHistoryId++;
+
         inventory.quantity += input.quantity;
         inventoryProduct.quantity += input.quantity;
 
         return JSON.parse(JSON.stringify(inventory));
       } else {
+        inboundHistory.beforeQuantity = 0;
+        inboundHistory.afterQuantity = input.quantity;
+        this._inventoryHistory.push(inboundHistory);
+        this._currentInventoryHistoryId++;
+
         const newInventory: Inventory = {
           id: this._currentInventoryId,
           productId: input.productId,
@@ -469,6 +556,11 @@ export class InMemoryDbService {
         return JSON.parse(JSON.stringify(newInventory));
       }
     } else {
+      inboundHistory.beforeQuantity = 0;
+      inboundHistory.afterQuantity = input.quantity;
+      this._inventoryHistory.push(inboundHistory);
+      this._currentInventoryHistoryId++;
+
       const newInventoryProduct: InventoryProductDb = {
         productId: input.productId,
         quantity: input.quantity,
@@ -526,6 +618,22 @@ export class InMemoryDbService {
       throw Error(`Outbound quantity (${input.quantity}) exceed inventory limit (${inventory.quantity})`);
     }
 
+    const timestamp = new Date();
+    const outboundHistory: InventoryHistoryDb = {
+      id: this._currentInventoryHistoryId,
+      timestamp: timestamp,
+      operationType: InventoryOperationType.Outbound,
+      productId: product.id,
+      productName: product.name,
+      lot: inventory.lot,
+      area: inventory.area,
+      quantity: inventory.quantity,
+      beforeQuantity: inventory.quantity,
+      afterQuantity: inventory.quantity - input.quantity,
+    };
+    this._inventoryHistory.push(outboundHistory);
+    this._currentInventoryHistoryId++;
+
     inventory.quantity -= input.quantity;
     inventoryProduct.quantity -= input.quantity;
 
@@ -557,6 +665,22 @@ export class InMemoryDbService {
       throw Error(`Adjustment quantity cannot be zero`);
     }
 
+    const timestamp = new Date();
+    const adjustmentHistory: InventoryHistoryDb = {
+      id: this._currentInventoryHistoryId,
+      timestamp: timestamp,
+      operationType: InventoryOperationType.Adjustment,
+      productId: product.id,
+      productName: product.name,
+      lot: inventory.lot,
+      area: inventory.area,
+      quantity: Math.abs(adjustQuantity),
+      beforeQuantity: inventory.quantity,
+      afterQuantity: inventory.quantity + adjustQuantity,
+    };
+    this._inventoryHistory.push(adjustmentHistory);
+    this._currentInventoryHistoryId++;
+
     inventory.quantity += adjustQuantity;
     inventoryProduct.quantity += adjustQuantity;
 
@@ -581,16 +705,62 @@ export class InMemoryDbService {
       throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
     }
 
+    const timestamp = new Date();
+    const moveFromAreaHistory: InventoryHistoryDb = {
+      id: this._currentInventoryHistoryId,
+      timestamp: timestamp,
+      operationType: InventoryOperationType.MoveArea,
+      productId: product.id,
+      productName: product.name,
+      lot: input.lot,
+      area: input.area,
+      quantity: input.quantity,
+      beforeQuantity: currentAreaInventory.quantity,
+      afterQuantity: currentAreaInventory.quantity - input.quantity,
+    };
+    this._inventoryHistory.push(moveFromAreaHistory);
+    this._currentInventoryHistoryId++;
+
     currentAreaInventory.quantity -= input.quantity;
 
     const newAreaInventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.newArea;
     });
     if (newAreaInventory) {
+      const moveToAreaHistory: InventoryHistoryDb = {
+        id: this._currentInventoryHistoryId,
+        timestamp: timestamp,
+        operationType: InventoryOperationType.MoveArea,
+        productId: product.id,
+        productName: product.name,
+        lot: input.lot,
+        area: input.newArea,
+        quantity: input.quantity,
+        beforeQuantity: newAreaInventory.quantity,
+        afterQuantity: newAreaInventory.quantity + input.quantity,
+      };
+      this._inventoryHistory.push(moveToAreaHistory);
+      this._currentInventoryHistoryId++;
+
       newAreaInventory.quantity += input.quantity;
 
       return JSON.parse(JSON.stringify(newAreaInventory));
     } else {
+      const moveToAreaHistory: InventoryHistoryDb = {
+        id: this._currentInventoryHistoryId,
+        timestamp: timestamp,
+        operationType: InventoryOperationType.MoveArea,
+        productId: product.id,
+        productName: product.name,
+        lot: input.lot,
+        area: input.newArea,
+        quantity: input.quantity,
+        beforeQuantity: 0,
+        afterQuantity: input.quantity,
+      };
+      this._inventoryHistory.push(moveToAreaHistory);
+      this._currentInventoryHistoryId++;
+
       const newInventory: Inventory = {
         id: this._currentInventoryId,
         productId: input.productId,
@@ -603,6 +773,48 @@ export class InMemoryDbService {
 
       return JSON.parse(JSON.stringify(newInventory));
     }
+  }
+
+  getInventoryHistories(): InventoryHistory[] {
+    const inventoryHistory: InventoryHistory[] = [ ...this._inventoryHistory ]
+    .map((inventoryHistoryDb) => {
+      return {
+        ...inventoryHistoryDb,
+        operationName: this._displayInventoryOperationMap.get(inventoryHistoryDb.operationType) ?? '',
+      };
+    });
+
+    return JSON.parse(JSON.stringify(inventoryHistory));
+  }
+
+  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: Date, endDate: Date, sort: string): Pagination<InventoryHistory> {
+    let filteredInventoryHistories = this.getInventoryHistories();
+    const actualEndDate = new Date(endDate);
+    actualEndDate.setDate(actualEndDate.getDate() + 1);
+
+    filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
+      const timestamp = new Date(inventoryHistory.timestamp);
+      return timestamp >= startDate && timestamp < actualEndDate;
+    });
+    if (query) {
+      query = query?.toLocaleLowerCase();
+      filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
+        return inventoryHistory.productName.toLocaleLowerCase().includes(query);
+      });
+    }
+    if (operationType != null && operationType != undefined) {
+      filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
+        return inventoryHistory.operationType === operationType;
+      });
+    }
+    let sortData = sort.split(':');
+    let sortColumn = sortData.at(0);
+    let sortDirection = sortData.at(1);
+    if (sortColumn) {
+      filteredInventoryHistories = this._utilityService.sortArray(filteredInventoryHistories, sortColumn, sortDirection == 'asc');
+    }
+
+    return this.paginateItems(filteredInventoryHistories, page, pageSize);
   }
 
   private randInt(min: number, max: number): number {

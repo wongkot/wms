@@ -6,4 +6,5 @@ export interface TableColumnConfig {
   columnType: 'text' | 'number' | 'date' | 'image' | 'price' | 'label';
   sortable: boolean;
   cssClasses?: (data: any) => string;
+  textFormat?: (data: any) => string;
 }
