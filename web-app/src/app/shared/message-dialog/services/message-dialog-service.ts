@@ -1,4 +1,4 @@
-import { ApplicationRef, createComponent, DOCUMENT, inject, Injectable } from '@angular/core';
+import { ApplicationRef, createComponent, DOCUMENT, inject, Injectable, RendererFactory2 } from '@angular/core';
 import { MessageDialogComponent } from '@app/shared/message-dialog/components/message-dialog-component/message-dialog-component';
 import { DialogResult } from '@app/shared/message-dialog/enums/dialog-result';
 import { DialogType } from '@app/shared/message-dialog/enums/dialog-type';
@@ -9,6 +9,8 @@ export class MessageDialogService {
   private _appRef = inject(ApplicationRef);
   private document = inject(DOCUMENT);
   private _dialogNotifier?: Subject<DialogResult>;
+  private _rendererFactory = inject(RendererFactory2);
+  private _renderer = this._rendererFactory.createRenderer(null, null);
 
   showInfo(title: string, message: string) {
     return this.show({
@@ -72,6 +74,9 @@ export class MessageDialogService {
     // Add this component to DOM
     this.document.body.appendChild(componentRef.location.nativeElement);
 
+    // Prevent scrolling when dialog is open
+    this._renderer.addClass(this.document.body, 'overflow-hidden');
+
     // Remove the component after the dialog has been closed
     componentRef.instance.close.subscribe((result) => {
       this.closeDialog(result);
@@ -83,6 +88,8 @@ export class MessageDialogService {
   }
 
   closeDialog(result: DialogResult) {
+    // Enable scrolling when dialog is closed
+    this._renderer.removeClass(this.document.body, 'overflow-hidden');
     this._dialogNotifier?.next(result);
     this._dialogNotifier?.complete();
   }
