@@ -627,7 +627,7 @@ export class InMemoryDbService {
       productName: product.name,
       lot: inventory.lot,
       area: inventory.area,
-      quantity: inventory.quantity,
+      quantity: input.quantity,
       beforeQuantity: inventory.quantity,
       afterQuantity: inventory.quantity - input.quantity,
     };
