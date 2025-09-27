@@ -1,1 +1,91 @@
-<p class="text-primary-content">dashboard works!</p>
+<!-- Inventory stats -->
+<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+  <div class="rounded-box border border-base-content/5">
+    <div class="flex flex-col justify-center align-middle p-4">
+      <div class="text-xl font-bold pb-2">
+        Inbound
+      </div>
+      <div class="text-end"><i class="bi bi-box-arrow-in-down pr-2"></i>
+        {{ stateService.dashboardData().currentMonthTotalInbound ? (stateService.dashboardData().currentMonthTotalInbound | number) : '-' }} Unit
+      </div>
+      @if (stateService.dashboardData().totalInboundPercent === null || stateService.dashboardData().totalInboundPercent === 0) {
+        <div class="text-end">
+          No diff from last month
+        </div>
+      } @else {
+        @if (stateService.dashboardData().totalInboundPercent! > 0) {
+          <div class="text-end text-success">
+            (↑ {{ stateService.dashboardData().totalInboundPercent! > 999 ? '+999' : (stateService.dashboardData().totalInboundPercent! | number:'1.0-2') }}% From last month)
+          </div>
+        } @else {
+          <div class="text-end text-error">
+            (↓ {{ -stateService.dashboardData().totalInboundPercent! > 999 ? '+999' : (-stateService.dashboardData().totalInboundPercent! | number:'1.0-2') }}% From last month)
+          </div>
+        }
+      }
+    </div>
+  </div>
+  <div class="rounded-box border border-base-content/5">
+    <div class="flex flex-col justify-center align-middle p-4">
+      <div class="text-xl font-bold pb-2">
+        Outbound
+      </div>
+      <div class="text-end"><i class="bi bi-box-arrow-up pr-2"></i>
+        {{ stateService.dashboardData().currentMonthTotalOutbound ? (stateService.dashboardData().currentMonthTotalOutbound | number) : '-' }} Unit
+      </div>
+      @if (stateService.dashboardData().totalOutboundPercent === null || stateService.dashboardData().totalOutboundPercent === 0) {
+        <div class="text-end">
+          No diff from last month
+        </div>
+      } @else {
+        @if (stateService.dashboardData().totalOutboundPercent! > 0) {
+          <div class="text-end text-success">
+            (↑ {{ stateService.dashboardData().totalOutboundPercent! > 999 ? '+999' : (stateService.dashboardData().totalOutboundPercent! | number:'1.0-2') }}% From last month)
+          </div>
+        } @else {
+          <div class="text-end text-error">
+            (↓ {{ -stateService.dashboardData().totalOutboundPercent! > 999 ? '+999' : (-stateService.dashboardData().totalOutboundPercent! | number:'1.0-2') }}% From last month)
+          </div>
+        }
+      }
+    </div>
+  </div>
+  <div class="rounded-box border border-base-content/5">
+    <div class="flex flex-col justify-center align-middle p-4">
+      <div class="text-xl font-bold pb-2">
+        Low inventory status
+      </div>
+      @if (stateService.dashboardData().totalLowInventory > 0) {
+        <div>{{ stateService.dashboardData().totalLowInventory | number}} item(s) below threshold<i class=" bi bi-exclamation-triangle-fill text-warning pl-2"></i></div>
+      } @else {
+        <div>All inventory above threshold<i class="bi bi-check-circle-fill text-success pl-2"></i></div>
+      }
+      <div class="flex justify-end">
+        <a class="link select-none" (click)="onGoToInventoryMenuClick()">Go to inventory</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 gap-4 md:grid-cols-3 py-4">
+  <div class="rounded-box border border-base-content/5 pt-4 md:col-span-2">
+    <app-bar-chart [chartInput]="stateService.barChartInput()"></app-bar-chart>
+  </div>
+  <div class="rounded-box border border-base-content/5 pt-4 md:col-span-1">
+    <app-pie-chart [chartInput]="stateService.pieChartInput()"></app-pie-chart>
+  </div>
+</div>
+
+<!-- Recent transactions -->
+<div class="rounded-box border border-base-content/5">
+  <div class="text-center text-xl font-bold p-4">
+    Recent transactions
+  </div>
+  <div class="w-full overflow-x-hidden overflow-y-auto">
+    <app-table
+      [tableConfig]="tableConfig"
+      [dataSource]="stateService.recentHistories()">
+    </app-table>
+  </div>
+</div>
