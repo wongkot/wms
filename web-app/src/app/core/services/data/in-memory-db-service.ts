@@ -8,13 +8,15 @@ import { InventoryProductDb } from '@app/modules/inventory/models/inventory-prod
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
-import { AREA_COLUMNS, AREA_ROWS, ZONE_PREFIXES } from '@app/core/constants/app';
+import { AREA_COLUMNS, AREA_ROWS, DATE_FORMAT, ZONE_PREFIXES } from '@app/core/constants/app';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
 import { InventoryHistoryDb } from '@app/modules/inventory-history/models/inventory-history-db';
 import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
+import { formatDate } from '@angular/common';
+import { InventoryDashboardApiOutput } from '@app/modules/dashboard/models/inventory-dashboard-api-output';
 
 @Injectable({
   providedIn: 'root'
@@ -208,14 +210,13 @@ export class InMemoryDbService {
     const randomInventoryCount = 8;
     const minRandomQuantity = 2;
     const maxRandomQuantity = 5;
+    const randomOutboundProbability = 50; // Probability between 1 - 100
     const firstXProducts = this._products.size > pickInventoryProductCount ? 
       [ ...this._products.values() ].slice(0, pickInventoryProductCount)
       : [ ...this._products.values() ];
 
     firstXProducts.forEach(product => {
       let inventories: Inventory[] = [];
-      // Random index that needs to be outbounded from inventory
-      const outboundItemIndex = this.randInt(0, randomInventoryCount - 1);
 
       // Create random inventories of current product
       // Reverse index key in order to generate lot number from oldest to newest
@@ -268,13 +269,14 @@ export class InMemoryDbService {
         this._inventoryHistory.push(inboundHistory);
         this._currentInventoryHistoryId++;
 
-        // Remove inventory using random index
-        if (index == outboundItemIndex) {
+        // Remove inventory randomly
+        if (this.randInt(1, 100) <= randomOutboundProbability) {
+          const currentTime = new Date();
           const outboundTimestamp = new Date(timestamp);
           outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(1,3)); // Make outbound timestamp newer than inbound timestamp
           const outboundHistory: InventoryHistoryDb = {
             id: this._currentInventoryHistoryId,
-            timestamp: outboundTimestamp,
+            timestamp: outboundTimestamp >= currentTime ? currentTime : outboundTimestamp, // Avoid future timestamp
             operationType: InventoryOperationType.Outbound,
             productId: product.id,
             productName: product.name,
@@ -815,6 +817,105 @@ export class InMemoryDbService {
     }
 
     return this.paginateItems(filteredInventoryHistories, page, pageSize);
+  }
+
+  getRecentInventoryHistories(limit: number): InventoryHistory[] {
+    const sortedInventoryHistories = this._utilityService.sortArray(this.getInventoryHistories(), 'timestamp', false);
+    return sortedInventoryHistories.slice(0, limit);
+  }
+
+  getDashboardData(): InventoryDashboardApiOutput {
+    const totalMonths = 6;
+    const timestamp = new Date();
+    const inboundByMonth = new Map<string, number>();
+    const outboundByMonth = new Map<string, number>();
+
+    for (let offset = totalMonths - 1; offset >= 0; offset--) {
+      const month = new Date(timestamp.getFullYear(), timestamp.getMonth() - offset, 1);
+      inboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
+      outboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
+    }
+
+    for (let inventoryHistory of this._inventoryHistory) {
+      const timestamp = new Date(inventoryHistory.timestamp);
+      const historyMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 1);
+      const monthKey = formatDate(historyMonth, DATE_FORMAT, 'en-Us');
+
+      if (!inboundByMonth.has(monthKey)) { // Check either inbound or outbound map is enough (both have the same key)
+        continue;
+      }
+
+      if (inventoryHistory.operationType == InventoryOperationType.Inbound) {
+        const currentQuantity = inboundByMonth.get(monthKey) ?? 0;
+        inboundByMonth.set(monthKey, currentQuantity + inventoryHistory.quantity);
+      }
+
+      if (inventoryHistory.operationType == InventoryOperationType.Outbound) {
+        const currentQuantity = outboundByMonth.get(monthKey) ?? 0;
+        outboundByMonth.set(monthKey, currentQuantity + inventoryHistory.quantity);
+      }
+
+      if (inventoryHistory.operationType == InventoryOperationType.Adjustment) {
+        const hasNegativeQuantity = inventoryHistory.beforeQuantity > inventoryHistory.afterQuantity;
+        if (hasNegativeQuantity) {
+          const currentQuantity = outboundByMonth.get(monthKey) ?? 0;
+          outboundByMonth.set(monthKey, currentQuantity + inventoryHistory.quantity);
+        } else {
+          const currentQuantity = inboundByMonth.get(monthKey) ?? 0;
+          inboundByMonth.set(monthKey, currentQuantity + inventoryHistory.quantity);
+        }
+      }
+    }
+
+    const totalInboundByMonth = [ ...inboundByMonth.values() ];
+    const totalOutboundByMonth = [ ...outboundByMonth.values() ];
+    const thisMonthTotalInbound = totalInboundByMonth.at(totalMonths - 1) ?? 0;
+    const thisMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 1) ?? 0;
+    const lastMonthTotalInbound = totalInboundByMonth.at(totalMonths - 2) ?? 0;
+    const lastMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 2) ?? 0;
+    const inboundBarChartData: [string, number][] = [ ...inboundByMonth.entries() ].map((keyValue) => {
+      const date = new Date(keyValue[0]);
+      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+
+      return [ monthName, keyValue[1] ];
+    });
+    const outboundBarChartData: [string, number][] = [ ...outboundByMonth.entries() ].map((keyValue) => {
+      const date = new Date(keyValue[0]);
+      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+
+      return [ monthName, keyValue[1] ];
+    });
+
+    const totalInventoryByCategory = new Map<string, number>();
+    let totalLowInventory = 0;
+    for (let productInventory of this._productInventory.values()) {
+      const product = this._products.get(productInventory.productId);
+      if (!product) {
+        continue;
+      }
+
+      if (product.category) {
+        const quantity = totalInventoryByCategory.get(product.category) ?? 0;
+        totalInventoryByCategory.set(product.category, quantity + productInventory.quantity);
+      }
+      if (product.reorderThreshold && productInventory.quantity < product.reorderThreshold) {
+        totalLowInventory++;
+      }
+    }
+    const pieChartData: [string, number][] = [ ...totalInventoryByCategory.entries() ].map((keyValue) => {
+      return [ keyValue[0], keyValue[1] ];
+    });
+
+    return {
+      inboundBarChartSeries: inboundBarChartData,
+      outboundBarChartSeries: outboundBarChartData,
+      pieChartSeries: pieChartData,
+      currentMonthTotalInbound: thisMonthTotalInbound,
+      currentMonthTotalOutbound: thisMonthTotalOutbound,
+      totalInboundPercent: lastMonthTotalInbound ? ((thisMonthTotalInbound - lastMonthTotalInbound) / lastMonthTotalInbound) * 100 : null,
+      totalOutboundPercent: lastMonthTotalOutbound ? ((thisMonthTotalOutbound - lastMonthTotalOutbound) / lastMonthTotalOutbound) * 100 : null,
+      totalLowInventory: totalLowInventory,
+    };
   }
 
   private randInt(min: number, max: number): number {

@@ -7,4 +7,8 @@ export interface TableConfig {
   canViewDetail?: boolean;
   canSelect?: boolean;
   selectedProperty?: string;
+  sharpCornerTopLeft?: boolean;
+  sharpCornerTopRight?: boolean;
+  sharpCornerBottomLeft?: boolean;
+  sharpCornerBottomRight?: boolean;
 }

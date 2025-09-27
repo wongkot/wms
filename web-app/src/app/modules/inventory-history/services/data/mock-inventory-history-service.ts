@@ -14,4 +14,8 @@ export class MockInventoryHistoryService implements InventoryHistoryService {
   getInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: Date, endDate: Date, sort: string): Observable<Pagination<InventoryHistory>> {
     return of(this._inMemoryDbService.getPageInventoryHistories(page, pageSize, query, operationType, startDate, endDate, sort));
   }
+
+  getRecentInventoryHistories(limit: number): Observable<InventoryHistory[]> {
+    return of(this._inMemoryDbService.getRecentInventoryHistories(limit));
+  }
 }
