@@ -1,4 +1,8 @@
-<div class="h-full overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+<div class="h-full overflow-x-auto border border-base-content/5 bg-base-100"
+  [class.rounded-tl-box]="!tableConfig().sharpCornerTopLeft"
+  [class.rounded-tr-box]="!tableConfig().sharpCornerTopRight"
+  [class.rounded-bl-box]="!tableConfig().sharpCornerBottomLeft"
+  [class.rounded-br-box]="!tableConfig().sharpCornerBottomRight">
   @if (dataSource().length <= 0) {
     <div class="flex items-center justify-center h-full">
       <div class="text-2xl p-10 md:p-0">
