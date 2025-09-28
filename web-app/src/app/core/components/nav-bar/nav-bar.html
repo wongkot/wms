@@ -11,23 +11,23 @@
 
     <!-- Desktop Menu -->
     <div class="navbar-end hidden md:flex">
-      <ul class="menu menu-horizontal px-1">
+      <ul class="menu menu-horizontal flex-nowrap items-center">
         <li>
           <a routerLink=""
-             routerLinkActive="text-primary"
+             routerLinkActive="text-primary underline"
              [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
         </li>
         <li>
           <a routerLink="product"
-             routerLinkActive="text-primary">Product</a>
+             routerLinkActive="text-primary underline">Product</a>
         </li>
         <li>
           <a routerLink="inventory"
-             routerLinkActive="text-primary">Inventory</a>
+             routerLinkActive="text-primary underline">Inventory</a>
         </li>
         <li>
           <a routerLink="history"
-             routerLinkActive="text-primary">History</a>
+             routerLinkActive="text-primary underline">History</a>
         </li>
       </ul>
     </div>
@@ -37,30 +37,30 @@
       <div class="dropdown dropdown-end">
         <div tabindex="0"
              role="button"
-             class="btn btn-ghost md:hidden">
+             class="btn btn-ghost">
           <i class="bi bi-list text-2xl"></i>
         </div>
         <ul tabindex="0"
             class="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-3 p-2 shadow gap-2">
           <li>
             <a routerLink=""
-               routerLinkActive="bg-primary"
+               routerLinkActive="bg-primary text-primary-content"
                [routerLinkActiveOptions]="{exact:true}"
                onclick="document.activeElement.blur()">Dashboard</a>
           </li>
           <li>
             <a routerLink="product"
-               routerLinkActive="bg-primary"
+               routerLinkActive="bg-primary text-primary-content"
                onclick="document.activeElement.blur()">Product</a>
           </li>
           <li>
             <a routerLink="inventory"
-               routerLinkActive="bg-primary"
+               routerLinkActive="bg-primary text-primary-content"
                onclick="document.activeElement.blur()">Inventory</a>
           </li>
           <li>
             <a routerLink="history"
-               routerLinkActive="bg-primary"
+               routerLinkActive="bg-primary text-primary-content"
                onclick="document.activeElement.blur()">History</a>
           </li>
         </ul>

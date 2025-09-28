@@ -39,7 +39,7 @@
     color: var(--color-primary-content);
   }
   ::part(selected) {
-    color: var(--color-base-content);
+    color: var(--color-secondary-content);
     background: var(--color-secondary);
     border-radius: var(--radius-field);
   }
