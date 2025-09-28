@@ -10,7 +10,9 @@
                 <div class="relative text-base-content/70 border border-base-content/40 px-7 py-5 text-nowrap"
                      [class.cursor-pointer]="canSelectArea()"
                      [class.bg-primary]="(warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0"
+                     [class.text-primary-content]="(warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0"
                      [class.bg-secondary]="selectedArea().has(area)"
+                     [class.text-secondary-content]="selectedArea().has(area)"
                      (click)="onAreaClick(area)">
                   {{ area }}
                   @if ((warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0) {

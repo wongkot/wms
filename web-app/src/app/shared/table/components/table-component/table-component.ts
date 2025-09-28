@@ -23,7 +23,7 @@ export class TableComponent {
     let classes = [];
 
     if (this.sortState().columnProp === columnDataProperty) {
-      classes.push('text-primary-content');
+      classes.push('text-base-content');
       classes.push('text-bold');
       classes.push('hover:text-primary');
       classes.push(this.sortState().isAsc ? 'bi-arrow-up' : 'bi-arrow-down');

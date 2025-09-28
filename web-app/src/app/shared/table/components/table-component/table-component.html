@@ -24,7 +24,7 @@
               @case ('label') {
                 <th scope="col"
                     class="w-fit"
-                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
+                    [class.text-base-content]="sortState().columnProp === column.dataProperty">
                   {{ column.headerName }}
                   @if (column.sortable) {
                     <i class="bi ml-2 cursor-pointer"
@@ -37,7 +37,7 @@
               @default {
                 <th scope="col"
                     class="px-6 py-3 whitespace-nowrap"
-                    [class.text-primary-content]="sortState().columnProp === column.dataProperty">
+                    [class.text-base-content]="sortState().columnProp === column.dataProperty">
                   {{ column.headerName }}
                   @if (column.sortable) {
                     <i class="bi ml-2 cursor-pointer"
