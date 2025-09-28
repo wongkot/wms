@@ -1,0 +1,31 @@
+<div class="dropdown dropdown-end">
+  <div tabindex="0"
+       role="button"
+       class="btn btn-circle btn-ghost">
+    <i class="bi bi-palette-fill"
+       [class.text-xl]="largeButtonSize()"></i>
+  </div>
+  <ul tabindex="0" class="menu dropdown-content bg-base-200 rounded-box z-1 p-2 w-50 shadow-sm">
+    @for (theme of themeService.allThemes | keyvalue; track theme.key) {
+      <li>
+        <button class="flex flex-row justify-between px-1"
+          (click)="onChangeTheme(theme.key)">
+          <div class="flex flex-row items-center">
+            <div [class]="'p-1 rounded-md shadow-md' + ' ' + theme.value.colorBaseClass">
+              <div class="grid grid-cols-2 gap-0.5">
+                <div [class]="'size-1 rounded-md' + ' ' + theme.value.colorBaseContentClass"></div>
+                <div [class]="'size-1 rounded-md' + ' ' + theme.value.colorPrimaryClass"></div>
+                <div [class]="'size-1 rounded-md' + ' ' + theme.value.colorSecondaryClass"></div>
+                <div [class]="'size-1 rounded-md' + ' ' + theme.value.colorAccentClass"></div>
+              </div>
+            </div>
+            <div class="pl-2">{{ theme.value.displayName }}</div>
+          </div>
+          @if (themeService.currentTheme() == theme.key) {
+            <i class="bi bi-check"></i>
+          }
+        </button>
+      </li>
+    }
+  </ul>
+</div>

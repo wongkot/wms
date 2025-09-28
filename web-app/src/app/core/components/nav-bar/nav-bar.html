@@ -29,11 +29,13 @@
           <a routerLink="history"
              routerLinkActive="text-primary underline">History</a>
         </li>
+        <app-theme-button></app-theme-button>
       </ul>
     </div>
 
     <!-- Mobile Menu -->
     <div class="navbar-end md:hidden">
+      <app-theme-button [largeButtonSize]="true"></app-theme-button>
       <div class="dropdown dropdown-end">
         <div tabindex="0"
              role="button"
