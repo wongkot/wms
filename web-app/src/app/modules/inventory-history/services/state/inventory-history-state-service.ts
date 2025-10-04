@@ -79,8 +79,8 @@ export class InventoryHistoryStateService {
         this._selectedDateRange.set(dateRange);
         if (this._searchTerm() != query) this._searchTerm.set(query);
         if (this._selectedOperationType() != operationType) this._selectedOperationType.set(operationType);
-        if (this._selectedPage() != page) this._selectedPage.set(page);
-        if (this._selectedPageSize() != pageSize) this._selectedPageSize.set(pageSize);
+        if (this._selectedPage() != pageInventoryHistories.currentPage) this._selectedPage.set(pageInventoryHistories.currentPage);
+        if (this._selectedPageSize() != pageInventoryHistories.pageSize) this._selectedPageSize.set(pageInventoryHistories.pageSize);
       }
     });
   }

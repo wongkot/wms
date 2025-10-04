@@ -71,8 +71,8 @@ export class InventoryManagementStateService {
         this._currentSortState.set(sort);
         if (this._searchTerm() != query) this._searchTerm.set(query);
         if (this._selectedCategory() != category) this._selectedCategory.set(category);
-        if (this._selectedPage() != page) this._selectedPage.set(page);
-        if (this._selectedPageSize() != pageSize) this._selectedPageSize.set(pageSize);
+        if (this._selectedPage() != pageInventoryProducts.currentPage) this._selectedPage.set(pageInventoryProducts.currentPage);
+        if (this._selectedPageSize() != pageInventoryProducts.pageSize) this._selectedPageSize.set(pageInventoryProducts.pageSize);
       }
     });
   }
