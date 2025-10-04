@@ -1,0 +1,50 @@
+<div class="dropdown dropdown-end">
+  <div tabindex="0">
+    <button class="btn btn-ghost btn-circle" (focus)="onNotificationButtonFocused()">
+      <div class="indicator">
+        <i class="bi bi-bell-fill"
+          [class.text-xl]="largeButtonSize()"></i>
+        @if (notificationService.hasUnreadNotification()) {
+          <span class="badge badge-xs badge-secondary indicator-item"></span>
+        }
+      </div>
+    </button>
+  </div>
+  <div tabindex="0" class="menu dropdown-content bg-base-200 rounded-box z-1 p-2 w-50 shadow-sm">
+    @if (notificationService.currentNotifications().length <= 0) {
+      <div class="flex justify-center items-center p-4">
+        No notifications
+      </div>
+    } @else {
+      @for (notification of notificationService.currentNotifications(); track notification.timestamp) {
+        <div class="p-2 rounded-md cursor-pointer hover:bg-base-100"
+          (click)="onNotificationClick(notification)">
+          <div class="flex flex-row justify-between items-center">
+            <div>
+              {{ notification.productName }}
+            </div>
+            @if (!notification.read) {
+              <div class="size-2 rounded-md bg-success"></div>
+            }
+          </div>
+          <div>{{ notification.quantityBefore | number }} <i class="bi bi-arrow-right-short"></i> {{ notification.quantityAfter | number }}
+            (
+              <span
+                [class.text-success]="notification.quantityAfter - notification.quantityBefore > 0"
+                [class.text-error]="notification.quantityAfter - notification.quantityBefore < 0">
+                {{((notification.quantityAfter - notification.quantityBefore) > 0 ? '+' : '') + (notification.quantityAfter - notification.quantityBefore | number)}}
+              </span>
+            )
+          </div>
+          <div class="text-xs text-end" [title]="notification.timestamp | date">
+            <small>{{ notification.timestamp | appTimeAgo }}</small>
+          </div>
+        </div>
+      }
+      <button class="btn btn-link"
+           (click)="onClearAllClick()">
+        Clear all
+      </button>
+    }
+  </div>
+</div>

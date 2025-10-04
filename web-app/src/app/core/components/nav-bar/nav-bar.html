@@ -30,12 +30,14 @@
              routerLinkActive="text-primary underline">History</a>
         </li>
         <app-theme-button></app-theme-button>
+        <app-notification-button></app-notification-button>
       </ul>
     </div>
 
     <!-- Mobile Menu -->
     <div class="navbar-end md:hidden">
       <app-theme-button [largeButtonSize]="true"></app-theme-button>
+      <app-notification-button [largeButtonSize]="true"></app-notification-button>
       <div class="dropdown dropdown-end">
         <div tabindex="0"
              role="button"

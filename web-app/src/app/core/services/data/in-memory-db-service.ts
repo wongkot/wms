@@ -17,6 +17,7 @@ import { InventoryOperationType } from '@app/modules/inventory-history/enums/inv
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 import { formatDate } from '@angular/common';
 import { InventoryDashboardApiOutput } from '@app/modules/dashboard/models/inventory-dashboard-api-output';
+import { NotificationService } from '@app/core/services/state/notification-service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,7 @@ export class InMemoryDbService {
   private _inventoryHistory: InventoryHistoryDb[] = [];
   private _currentInventoryHistoryId = 1;
   private _utilityService = inject(UtilityService);
+  private _notificationService = inject(NotificationService);
   private _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
     [InventoryOperationType.Inbound, 'Inbound'],
     [InventoryOperationType.Outbound, 'Outbound'],
@@ -403,6 +405,15 @@ export class InMemoryDbService {
 
     // Clear all inventory data of associated product 
     if (this._productInventory.has(id)) {
+      const inventoryProductBeforeQuantity = this._productInventory.get(id)!.quantity;
+      this._notificationService.notify({
+        productName: deleteProduct.name,
+        quantityBefore: inventoryProductBeforeQuantity,
+        quantityAfter: 0,
+        read: false,
+        timestamp: new Date(),
+      });
+
       this._productInventory.delete(id);
     }
 
@@ -534,8 +545,18 @@ export class InMemoryDbService {
         this._inventoryHistory.push(inboundHistory);
         this._currentInventoryHistoryId++;
 
+        const inventoryProductBeforeQuantity = inventoryProduct.quantity;
+        const inventoryProductAfterQuantity = inventoryProductBeforeQuantity + input.quantity;
         inventory.quantity += input.quantity;
-        inventoryProduct.quantity += input.quantity;
+        inventoryProduct.quantity = inventoryProductAfterQuantity;
+
+        this._notificationService.notify({
+          productName: product.name,
+          quantityBefore: inventoryProductBeforeQuantity,
+          quantityAfter: inventoryProductAfterQuantity,
+          read: false,
+          timestamp: timestamp,
+        });
 
         return JSON.parse(JSON.stringify(inventory));
       } else {
@@ -552,8 +573,19 @@ export class InMemoryDbService {
           quantity: input.quantity,
         };
         this._currentInventoryId++;
+
+        const inventoryProductBeforeQuantity = inventoryProduct.quantity;
+        const inventoryProductAfterQuantity = inventoryProductBeforeQuantity + input.quantity;
         inventoryProduct.inventories.push(newInventory);
-        inventoryProduct.quantity += input.quantity;
+        inventoryProduct.quantity = inventoryProductAfterQuantity;
+
+        this._notificationService.notify({
+          productName: product.name,
+          quantityBefore: inventoryProductBeforeQuantity,
+          quantityAfter: inventoryProductAfterQuantity,
+          read: false,
+          timestamp: timestamp,
+        });
 
         return JSON.parse(JSON.stringify(newInventory));
       }
@@ -578,6 +610,14 @@ export class InMemoryDbService {
       };
       this._productInventory.set(input.productId, newInventoryProduct);
       this._currentInventoryId++;
+
+      this._notificationService.notify({
+        productName: product.name,
+        quantityBefore: 0,
+        quantityAfter: input.quantity,
+        read: false,
+        timestamp: timestamp,
+      });
 
       return JSON.parse(JSON.stringify(newInventoryProduct));
     }
@@ -636,8 +676,18 @@ export class InMemoryDbService {
     this._inventoryHistory.push(outboundHistory);
     this._currentInventoryHistoryId++;
 
+    const inventoryProductBeforeQuantity = inventoryProduct.quantity;
+    const inventoryProductAfterQuantity = inventoryProductBeforeQuantity - input.quantity;
     inventory.quantity -= input.quantity;
-    inventoryProduct.quantity -= input.quantity;
+    inventoryProduct.quantity = inventoryProductAfterQuantity;
+
+    this._notificationService.notify({
+      productName: product.name,
+      quantityBefore: inventoryProductBeforeQuantity,
+      quantityAfter: inventoryProductAfterQuantity,
+      read: false,
+      timestamp: timestamp,
+    });
 
     return JSON.parse(JSON.stringify(inventory));
   }
@@ -683,8 +733,18 @@ export class InMemoryDbService {
     this._inventoryHistory.push(adjustmentHistory);
     this._currentInventoryHistoryId++;
 
+    const inventoryProductBeforeQuantity = inventoryProduct.quantity;
+    const inventoryProductAfterQuantity = inventoryProductBeforeQuantity + adjustQuantity;
     inventory.quantity += adjustQuantity;
-    inventoryProduct.quantity += adjustQuantity;
+    inventoryProduct.quantity = inventoryProductAfterQuantity;
+
+    this._notificationService.notify({
+      productName: product.name,
+      quantityBefore: inventoryProductBeforeQuantity,
+      quantityAfter: inventoryProductAfterQuantity,
+      read: false,
+      timestamp: timestamp,
+    });
 
     return JSON.parse(JSON.stringify(inventory));
   }
