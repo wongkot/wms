@@ -9,6 +9,7 @@ import {
   ApexLegend,
   ApexFill,
   ApexStroke,
+  ApexPlotOptions,
 } from "ng-apexcharts";
 
 @Component({
@@ -120,5 +121,10 @@ export class PieChartComponent {
   });
   readonly stroke: ApexStroke = {
     show: false,
+  };
+  readonly plotOptions: ApexPlotOptions = {
+    pie: {
+      expandOnClick: false,
+    }
   };
 }
