@@ -23,12 +23,18 @@ export class PieChartComponent {
     'var(--color-warning)',
     'var(--color-info)',
     'var(--color-error)',
+    'var(--color-primary)',
+    'var(--color-secondary)',
+    'var(--color-accent)',
   ];
   private _sectionTextColor = [
     'var(--color-success-content)',
     'var(--color-warning-content)',
     'var(--color-info-content)',
     'var(--color-error-content)',
+    'var(--color-primary-content)',
+    'var(--color-secondary-content)',
+    'var(--color-accent-content)',
   ];
   chartInput = input.required<BaseChartInput>();
   series = computed<ApexAxisChartSeries>(() => {
