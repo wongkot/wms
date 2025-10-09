@@ -12,23 +12,13 @@
     <!-- Desktop Menu -->
     <div class="navbar-end hidden md:flex">
       <ul class="menu menu-horizontal flex-nowrap items-center">
-        <li>
-          <a routerLink=""
-             routerLinkActive="text-primary underline"
-             [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
-        </li>
-        <li>
-          <a routerLink="product"
-             routerLinkActive="text-primary underline">Product</a>
-        </li>
-        <li>
-          <a routerLink="inventory"
-             routerLinkActive="text-primary underline">Inventory</a>
-        </li>
-        <li>
-          <a routerLink="history"
-             routerLinkActive="text-primary underline">History</a>
-        </li>
+        @for (navBarMenuItem of navBarMenuItems; track navBarMenuItem) {
+          <li>
+            <a [routerLink]="navBarMenuItem.url"
+               routerLinkActive="text-primary underline"
+               [routerLinkActiveOptions]="{exact:navBarMenuItem.matchExactUrl}">{{ navBarMenuItem.name }}</a>
+          </li>
+        }
         <app-theme-button></app-theme-button>
         <app-notification-button></app-notification-button>
       </ul>
@@ -46,27 +36,14 @@
         </div>
         <ul tabindex="0"
             class="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-3 p-2 shadow gap-2">
-          <li>
-            <a routerLink=""
-               routerLinkActive="bg-primary text-primary-content"
-               [routerLinkActiveOptions]="{exact:true}"
-               onclick="document.activeElement.blur()">Dashboard</a>
-          </li>
-          <li>
-            <a routerLink="product"
-               routerLinkActive="bg-primary text-primary-content"
-               onclick="document.activeElement.blur()">Product</a>
-          </li>
-          <li>
-            <a routerLink="inventory"
-               routerLinkActive="bg-primary text-primary-content"
-               onclick="document.activeElement.blur()">Inventory</a>
-          </li>
-          <li>
-            <a routerLink="history"
-               routerLinkActive="bg-primary text-primary-content"
-               onclick="document.activeElement.blur()">History</a>
-          </li>
+          @for (navBarMenuItem of navBarMenuItems; track navBarMenuItem) {
+            <li>
+              <a [routerLink]="navBarMenuItem.url"
+                 routerLinkActive="bg-primary text-primary-content"
+                 [routerLinkActiveOptions]="{exact:navBarMenuItem.matchExactUrl}"
+                 onclick="document.activeElement.blur()">{{ navBarMenuItem.name }}</a>
+            </li>
+          }
         </ul>
       </div>
     </div>
