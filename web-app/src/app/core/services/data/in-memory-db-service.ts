@@ -8,7 +8,17 @@ import { InventoryProductDb } from '@app/modules/inventory/models/inventory-prod
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
-import { AREA_COLUMNS, AREA_ROWS, DATE_FORMAT, ZONE_PREFIXES } from '@app/core/constants/app';
+import {
+  AREA_COLUMNS,
+  AREA_ROWS,
+  DATE_FORMAT,
+  PRODUCT_CATEGORY_CABLES,
+  PRODUCT_CATEGORY_COMPUTERS,
+  PRODUCT_CATEGORY_MISC,
+  PRODUCT_CATEGORY_NETWORKING,
+  PRODUCT_CATEGORY_PERIPHERALS,
+  ZONE_PREFIXES,
+} from '@app/core/constants/app';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
@@ -48,185 +58,387 @@ export class InMemoryDbService {
   }
 
   private seedData() {
+    let inventoryProductRandomParameters = new Map<number, InventoryProductRandomParam>();
+
     // Products
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'Apple Watch #1',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        reorderThreshold: 40,
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #2',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #3',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #4',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
+        name: 'Notebook',
+        description: 'Quad-Core, 16GB RAM, 512GB SSD, 16 inch, LCD',
+        unitPrice: 15000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
         reorderThreshold: 50,
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
+        imageUrl: './product/images/notebook.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 5,
+      outboundProbability: 40,
+      maxTotalGeneratedQuantity: 40,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #1',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'PC',
+        description: '8-Core, 32GB RAM, 1TB SSD',
+        unitPrice: 22000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        reorderThreshold: 40,
+        imageUrl: './product/images/pc.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 15,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #2',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Server',
+        description: '32-Core, 64GB RAM, 2TB SSDx2, 4TB HDDx2',
+        unitPrice: 35000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/server.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 3,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #3',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Tablet',
+        description: '16GB RAM, 512GB, 12.5 inch, LCD',
+        unitPrice: 17500,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/tablet.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 10,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #4',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Power Strip',
+        description: '6 Sockets, 2m Cable, 1200 W',
+        unitPrice: 1000,
+        category: PRODUCT_CATEGORY_MISC,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/power_strip.png',
+        reorderThreshold: 15,
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 10,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #1',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'NAS',
+        description: '4 Bays, 8TB HDDx4, ARM 4-Core, 2GB RAM',
+        unitPrice: 23500,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/nas.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 2,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #2',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Switching Hub',
+        description: '3x 10/100/1000Mbps Ports, LED Indicator',
+        unitPrice: 500,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/switching_hub.png',
+        reorderThreshold: 5,
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 5,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #3',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Wi-Fi Router',
+        description: '2.4/5GHz, 1200Mbps, 3x Antennas, 4x LAN Ports',
+        unitPrice: 750,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/wifi_router.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 3,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #4',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Headphones (Black)',
+        description: 'Noise Cancelling, USB/Bluetooth',
+        unitPrice: 3500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/headphones_dark.png',
+        reorderThreshold: 15,
       });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 4,
+      outboundProbability: 30,
+      maxTotalGeneratedQuantity: 10,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Headphones (White)',
+        description: 'Noise Cancelling, USB/Bluetooth',
+        unitPrice: 3500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/headphones_light.png',
+        reorderThreshold: 15,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 0,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 0,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Inkjet Printer',
+        description: 'USB/Wi-Fi, 45 ppm, Resolution 4800 x 1200 dpi',
+        unitPrice: 4750,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/inkjet_printer.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 2,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Laser Printer',
+        description: 'USB/Wi-Fi, 100 ppm, Resolution 6400 x 1200 dpi',
+        unitPrice: 16500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/laser_printer.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 1,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Monitor',
+        description: '27 inch, Full HD, IPS, 2x HDMI, 1x DisplayPort',
+        unitPrice: 4500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/monitor.png',
+        reorderThreshold: 10,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 30,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Mouse (Blue)',
+        description: '2.4 GHz Wireless, Optical, 1000 DPI',
+        unitPrice: 950,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/mouse_blue.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 0,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 0,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Mouse (Red)',
+        description: '2.4 GHz Wireless, Optical, 1000 DPI',
+        unitPrice: 950,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/mouse_red.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
     
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Keyboard',
+        description: 'Wired/Wireless, QWERTY, Red Switch',
+        unitPrice: 2500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/keyboard.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Ethernet Cable',
+        description: 'Cat 6, 1m, 1Gbps',
+        unitPrice: 120,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/ethernet_cable.png',
+        reorderThreshold: 20,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 4,
+      maxQuantityPerMonth: 8,
+      outboundProbability: 70,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'USB Cable',
+        description: 'Type-A to Type-A, 0.5m, USB 3.0',
+        unitPrice: 60,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/usb_a.png',
+        reorderThreshold: 20,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 2,
+      maxQuantityPerMonth: 5,
+      outboundProbability: 70,
+      maxTotalGeneratedQuantity: 25,
+    });
+    this._currentProductId++;
+    
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'HDMI Cable',
+        description: 'HDMI 2.0, 2m, 4K @ 60Hz',
+        unitPrice: 100,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/hdmi.png',
+        reorderThreshold: 10,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 3,
+      maxQuantityPerMonth: 6,
+      outboundProbability: 50,
+      maxTotalGeneratedQuantity: 20,
+    });
     this._currentProductId++;
 
     // Product inventory
-    const pickInventoryProductCount = 7; // Number for picking top X products for generating inventory data
-    const randomInventoryCount = 8;
-    const minRandomQuantity = 2;
-    const maxRandomQuantity = 5;
-    const randomOutboundProbability = 50; // Probability between 1 - 100
-    const firstXProducts = this._products.size > pickInventoryProductCount ? 
-      [ ...this._products.values() ].slice(0, pickInventoryProductCount)
-      : [ ...this._products.values() ];
-
-    firstXProducts.forEach(product => {
+    const totalGeneratedMonths = 8;
+    for (let product of [...this._products.values()]) {
       let inventories: Inventory[] = [];
+      let totalQuantity = 0;
+      const randomParams = inventoryProductRandomParameters.get(product.id);
+
+      if (!randomParams || randomParams.maxTotalGeneratedQuantity == 0 || randomParams.maxQuantityPerMonth == 0) {
+        continue;
+      }
 
       // Create random inventories of current product
       // Reverse index key in order to generate lot number from oldest to newest
-      for (let index of [...Array(randomInventoryCount).keys()].reverse()) {
+      for (let monthOffset of [...Array(totalGeneratedMonths).keys()].reverse()) {
+        if (totalQuantity >= randomParams.maxTotalGeneratedQuantity) {
+          continue;
+        }
+        let quantity = this.randInt(randomParams.minQuantityPerMonth, randomParams.maxQuantityPerMonth);
+        if (quantity <= 0) {
+          continue;
+        }
+
         const timestamp = new Date();
-        timestamp.setMonth(timestamp.getMonth() - index);
+        timestamp.setMonth(timestamp.getMonth() - monthOffset);
         // Generate random date if the current date is not in this month
-        if (index !== 0) {
+        if (monthOffset !== 0) {
           const lastDayOfMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 0);
           timestamp.setDate(this.randInt(1, lastDayOfMonth.getDate()));
           timestamp.setHours(this.randInt(0, 23));
@@ -244,8 +456,9 @@ export class InMemoryDbService {
         const column = this.randInt(0, AREA_COLUMNS - 1);
         const lot = this._utilityService.formatLotNumber(timestamp);
         const area = this._utilityService.formatAreaName(zonePrefix, row, column);
-        const quantity = this.randInt(minRandomQuantity, maxRandomQuantity);
-
+        // Prevent quantity exceed maximum total quantity
+        quantity = Math.min(quantity, randomParams.maxTotalGeneratedQuantity - totalQuantity);
+        
         const inventory: Inventory = {
           id: this._currentInventoryId,
           productId: product.id,
@@ -253,6 +466,7 @@ export class InMemoryDbService {
           area: area,
           quantity: quantity,
         };
+        totalQuantity += quantity;
         this._currentInventoryId++;
 
         // Create inventory inbound history
@@ -272,10 +486,12 @@ export class InMemoryDbService {
         this._currentInventoryHistoryId++;
 
         // Remove inventory randomly
-        if (this.randInt(1, 100) <= randomOutboundProbability) {
+        if (this.randInt(1, 100) <= randomParams.outboundProbability) {
           const currentTime = new Date();
           const outboundTimestamp = new Date(timestamp);
-          outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(1,3)); // Make outbound timestamp newer than inbound timestamp
+           // Make outbound timestamp newer than inbound timestamp
+          outboundTimestamp.setMinutes(outboundTimestamp.getMinutes() + this.randInt(1, 59));
+          outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(0, 2));
           const outboundHistory: InventoryHistoryDb = {
             id: this._currentInventoryHistoryId,
             timestamp: outboundTimestamp >= currentTime ? currentTime : outboundTimestamp, // Avoid future timestamp
@@ -288,6 +504,7 @@ export class InMemoryDbService {
             beforeQuantity: inventory.quantity,
             afterQuantity: 0,
           };
+          totalQuantity -= inventory.quantity;
           this._inventoryHistory.push(outboundHistory);
           this._currentInventoryHistoryId++;
         } else {
@@ -295,32 +512,29 @@ export class InMemoryDbService {
         }
       }
 
-      const totalInventoryQuantity = inventories.reduce((total, current) => {
-        return total + current.quantity;
-      }, 0);
       // Create inventory product
       this._productInventory.set(product.id, {
         productId: product.id,
-        quantity: totalInventoryQuantity,
+        quantity: totalQuantity,
         inventories: inventories,
       });
-    });
+    }
   }
 
   hasProductName(name: string): boolean {
-    return [ ...this._products.values() ].some(product => product.name == name);
+    return [...this._products.values()].some(product => product.name == name);
   }
 
   hasProductNameFromOtherId(name: string, id: number): boolean {
-    return [ ...this._products.values() ].some(product => product.name == name && product.id !== id);
+    return [...this._products.values()].some(product => product.name == name && product.id !== id);
   }
 
   getProducts(): Product[] {
-    return JSON.parse(JSON.stringify([ ...this._products.values() ]));
+    return JSON.parse(JSON.stringify([...this._products.values()]));
   }
 
   getProductNames(query: string, limit: number): string[] {
-    let filteredProductNames = this._utilityService.sortArray([ ...this._products.values() ], 'name', true)
+    let filteredProductNames = this._utilityService.sortArray([...this._products.values()], 'name', true)
       .map(product => product.name);
     if (query) {
       return filteredProductNames.filter((productName) => {
@@ -332,7 +546,7 @@ export class InMemoryDbService {
   }
 
   getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
-    let filteredProducts = [ ...this._products.values() ];
+    let filteredProducts = [...this._products.values()];
     if (query) {
       query = query?.toLocaleLowerCase();
       filteredProducts = filteredProducts.filter(product => {
@@ -379,7 +593,7 @@ export class InMemoryDbService {
     if (this.hasProductNameFromOtherId(input.name, input.id)) {
       throw Error('This product name already used');
     }
-    
+
     const editProduct = this._products.get(input.id);
     if (!editProduct) {
       throw Error(`This product with id (${input.id}) not found`);
@@ -421,32 +635,32 @@ export class InMemoryDbService {
   }
 
   getInventoryProducts(): InventoryProduct[] {
-    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].filter((inventoryProductDb) => {
+    const inventoryProducts: InventoryProduct[] = [...this._productInventory.values()].filter((inventoryProductDb) => {
       return inventoryProductDb.quantity > 0;
     })
-    .map((inventoryProductDb) => {
-      const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
-      const totalPrice = inventoryProductDb.quantity * unitPrice;
-      const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
-      let inventoryStatus = InventoryStatus.OK;
-      if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
-        inventoryStatus = InventoryStatus.Low;
-      }
+      .map((inventoryProductDb) => {
+        const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
+        const totalPrice = inventoryProductDb.quantity * unitPrice;
+        const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
+        let inventoryStatus = InventoryStatus.OK;
+        if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
+          inventoryStatus = InventoryStatus.Low;
+        }
 
-      return {
-        productId: inventoryProductDb.productId,
-        productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
-        category: this._products.get(inventoryProductDb.productId)?.category ?? '',
-        quantity: inventoryProductDb.quantity,
-        unitPrice: unitPrice,
-        totalPrice: totalPrice,
-        reorderThreshold: reorderThreshold,
-        inventoryStatus: inventoryStatus,
-        inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
-        imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
-        inventories: [],
-      };
-    });
+        return {
+          productId: inventoryProductDb.productId,
+          productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
+          category: this._products.get(inventoryProductDb.productId)?.category ?? '',
+          quantity: inventoryProductDb.quantity,
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+          reorderThreshold: reorderThreshold,
+          inventoryStatus: inventoryStatus,
+          inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
+          imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
+          inventories: [],
+        };
+      });
 
     return JSON.parse(JSON.stringify(inventoryProducts));
   }
@@ -624,13 +838,13 @@ export class InMemoryDbService {
   }
 
   inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
-    const product = [ ...this._products.values() ].find((product) => {
+    const product = [...this._products.values()].find((product) => {
       return product.name == input.productName;
     });
     if (!product) {
       throw Error(`This product with name (${input.productName}) not found`);
     }
-    
+
     return this.inventoryInbound({
       productId: product.id,
       lot: input.lot,
@@ -838,13 +1052,13 @@ export class InMemoryDbService {
   }
 
   getInventoryHistories(): InventoryHistory[] {
-    const inventoryHistory: InventoryHistory[] = [ ...this._inventoryHistory ]
-    .map((inventoryHistoryDb) => {
-      return {
-        ...inventoryHistoryDb,
-        operationName: this._displayInventoryOperationMap.get(inventoryHistoryDb.operationType) ?? '',
-      };
-    });
+    const inventoryHistory: InventoryHistory[] = [...this._inventoryHistory]
+      .map((inventoryHistoryDb) => {
+        return {
+          ...inventoryHistoryDb,
+          operationName: this._displayInventoryOperationMap.get(inventoryHistoryDb.operationType) ?? '',
+        };
+      });
 
     return JSON.parse(JSON.stringify(inventoryHistory));
   }
@@ -927,23 +1141,23 @@ export class InMemoryDbService {
       }
     }
 
-    const totalInboundByMonth = [ ...inboundByMonth.values() ];
-    const totalOutboundByMonth = [ ...outboundByMonth.values() ];
+    const totalInboundByMonth = [...inboundByMonth.values()];
+    const totalOutboundByMonth = [...outboundByMonth.values()];
     const thisMonthTotalInbound = totalInboundByMonth.at(totalMonths - 1) ?? 0;
     const thisMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 1) ?? 0;
     const lastMonthTotalInbound = totalInboundByMonth.at(totalMonths - 2) ?? 0;
     const lastMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 2) ?? 0;
-    const inboundBarChartData: [string, number][] = [ ...inboundByMonth.entries() ].map((keyValue) => {
+    const inboundBarChartData: [string, number][] = [...inboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
       const monthName = date.toLocaleString('en-Us', { month: 'short' });
 
-      return [ monthName, keyValue[1] ];
+      return [monthName, keyValue[1]];
     });
-    const outboundBarChartData: [string, number][] = [ ...outboundByMonth.entries() ].map((keyValue) => {
+    const outboundBarChartData: [string, number][] = [...outboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
       const monthName = date.toLocaleString('en-Us', { month: 'short' });
 
-      return [ monthName, keyValue[1] ];
+      return [monthName, keyValue[1]];
     });
 
     const totalInventoryByCategory = new Map<string, number>();
@@ -962,8 +1176,8 @@ export class InMemoryDbService {
         totalLowInventory++;
       }
     }
-    const pieChartData: [string, number][] = [ ...totalInventoryByCategory.entries() ].map((keyValue) => {
-      return [ keyValue[0], keyValue[1] ];
+    const pieChartData: [string, number][] = [...totalInventoryByCategory.entries()].map((keyValue) => {
+      return [keyValue[0], keyValue[1]];
     });
 
     return {
@@ -996,4 +1210,11 @@ export class InMemoryDbService {
       items: JSON.parse(JSON.stringify(items.slice(startIndex, endIndex))),
     };
   }
+}
+
+interface InventoryProductRandomParam {
+  minQuantityPerMonth: number;
+  maxQuantityPerMonth: number;
+  maxTotalGeneratedQuantity: number;
+  outboundProbability: number; // Probability between 1 - 100
 }

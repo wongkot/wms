@@ -1,6 +1,6 @@
 import { formatDate, KeyValue } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { ZONE_PREFIXES, AREA_ROWS, AREA_COLUMNS } from '@app/core/constants/app';
+import { ZONE_PREFIXES, AREA_ROWS, AREA_COLUMNS, PRODUCT_CATEGORY_CABLES, PRODUCT_CATEGORY_COMPUTERS, PRODUCT_CATEGORY_MISC, PRODUCT_CATEGORY_NETWORKING, PRODUCT_CATEGORY_PERIPHERALS } from '@app/core/constants/app';
 
 @Injectable({
   'providedIn': 'root'
@@ -35,6 +35,17 @@ export class UtilityService {
     }
 
     return sortedArray;
+  }
+
+  getProductCategoriesForDropdown(): KeyValue<string, string>[] {
+    return [
+      { key: '', value: 'None' },
+      { key: PRODUCT_CATEGORY_CABLES, value: PRODUCT_CATEGORY_CABLES },
+      { key: PRODUCT_CATEGORY_COMPUTERS, value: PRODUCT_CATEGORY_COMPUTERS },
+      { key: PRODUCT_CATEGORY_MISC, value: PRODUCT_CATEGORY_MISC },
+      { key: PRODUCT_CATEGORY_NETWORKING, value: PRODUCT_CATEGORY_NETWORKING },
+      { key: PRODUCT_CATEGORY_PERIPHERALS, value: PRODUCT_CATEGORY_PERIPHERALS },
+    ];
   }
 
   getAreasForDropdown(): KeyValue<string, string>[] {

@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { Product } from '@app/modules/product/models/product';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { DialogResult } from '@app/shared/message-dialog/enums/dialog-result';
@@ -24,6 +25,7 @@ export class ProductManagementPage implements OnDestroy {
   private _messageDialogService = inject(MessageDialogService);
   private _toastService = inject(ToastService);
   private _deleteProductSuccess: Subscription;
+  private _utilityService = inject(UtilityService);
 
   public readonly tableConfig: TableConfig = {
     canEdit: true,
@@ -71,12 +73,7 @@ export class ProductManagementPage implements OnDestroy {
       },
     ],
   }
-  public readonly productCategories: KeyValue<string, string>[] = [
-    { key: '', value: 'None' },
-    { key: 'Smart Watches', value: 'Smart Watches' },
-    { key: 'PC', value: 'PC' },
-    { key: 'Smart Phones', value: 'Smart Phones' },
-  ]
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
 
   constructor() { 
     this.stateService = inject(ProductManagementStateService);

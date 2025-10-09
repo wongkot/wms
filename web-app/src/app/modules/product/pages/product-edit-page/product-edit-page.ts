@@ -2,6 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { ProductEditStateService } from '@app/modules/product/services/state/product-edit-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
@@ -16,21 +17,6 @@ import { Subscription } from 'rxjs';
   providers: [ProductEditStateService]
 })
 export class ProductEditPage implements OnInit, OnDestroy {
-  public readonly breadcrumbSections: BreadcrumbSection[] = [
-    { navigationUrl: '../..', name: 'Product' },
-    { navigationUrl: '', name: 'Edit Product' },
-  ];
-  public readonly productCategories: KeyValue<string, string>[] = [
-    { key: 'Smart Watches', value: 'Smart Watches' },
-    { key: 'PC', value: 'PC' },
-    { key: 'Smart Phones', value: 'Smart Phones' },
-  ];
-  readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameExists', 'This product name is already taken' ],
-  ]);
-  readonly customCategoryErrorMessages = new Map<string, string>([
-    [ 'required', 'Please select product category' ],
-  ]);
   public stateService = inject(ProductEditStateService);
   public editProductForm!: FormGroup;
   private _productId!: number;
@@ -38,7 +24,19 @@ export class ProductEditPage implements OnInit, OnDestroy {
   private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
   private _toastService = inject(ToastService);
+  private _utilityService = inject(UtilityService);
   private _subscriptions = new Subscription();
+  public readonly breadcrumbSections: BreadcrumbSection[] = [
+    { navigationUrl: '../..', name: 'Product' },
+    { navigationUrl: '', name: 'Edit Product' },
+  ];
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
+  readonly customProductNameErrorMessages = new Map<string, string>([
+    [ 'nameExists', 'This product name is already taken' ],
+  ]);
+  readonly customCategoryErrorMessages = new Map<string, string>([
+    [ 'required', 'Please select product category' ],
+  ]);
 
   ngOnInit(): void {
     this._productId = Number(this._route.snapshot.paramMap.get('id'));

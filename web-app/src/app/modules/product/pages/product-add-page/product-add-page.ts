@@ -2,6 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { ProductAddStateService } from '@app/modules/product/services/state/product-add-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
@@ -16,27 +17,24 @@ import { Subscription } from 'rxjs';
   providers: [ProductAddStateService]
 })
 export class ProductAddPage implements OnDestroy {
+  public stateService = inject(ProductAddStateService);
+  public addProductForm: FormGroup;
+  private _fb = inject(FormBuilder);
+  private _routerService = inject(Router);
+  private _toastService = inject(ToastService);
+  private _utilityService = inject(UtilityService);
+  private _addProductSuccess: Subscription;
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '..', name: 'Product' },
     { navigationUrl: '', name: 'Add Product' },
   ];
-  public readonly productCategories: KeyValue<string, string>[] = [
-    { key: 'Smart Watches', value: 'Smart Watches' },
-    { key: 'PC', value: 'PC' },
-    { key: 'Smart Phones', value: 'Smart Phones' },
-  ];
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
   readonly customProductNameErrorMessages = new Map<string, string>([
     [ 'nameExists', 'This product name is already taken' ],
   ]);
   readonly customCategoryErrorMessages = new Map<string, string>([
     [ 'required', 'Please select product category' ],
   ]);
-  public stateService = inject(ProductAddStateService);
-  public addProductForm: FormGroup;
-  private _fb = inject(FormBuilder);
-  private _routerService = inject(Router);
-  private _toastService = inject(ToastService);
-  private _addProductSuccess: Subscription;
 
   constructor() {
 		this.addProductForm = this._fb.group({

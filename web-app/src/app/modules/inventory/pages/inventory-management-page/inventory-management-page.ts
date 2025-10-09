@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryStatus } from '@app/modules/inventory/enums/inventory-status';
 import { InventoryProduct } from '@app/modules/inventory/models/inventory-product';
 import { InventoryManagementStateService } from '@app/modules/inventory/services/state/inventory-management-state-service';
@@ -18,6 +19,7 @@ export class InventoryManagementPage {
   public stateService: InventoryManagementStateService;
   private _routerService = inject(Router);
   private _route = inject(ActivatedRoute);
+  private _utilityService = inject(UtilityService);
 
   public readonly tableConfig: TableConfig = {
     canViewDetail: true,
@@ -89,12 +91,7 @@ export class InventoryManagementPage {
       },
     ],
   }
-  public readonly productCategories: KeyValue<string, string>[] = [
-    { key: '', value: 'None' },
-    { key: 'Smart Watches', value: 'Smart Watches' },
-    { key: 'PC', value: 'PC' },
-    { key: 'Smart Phones', value: 'Smart Phones' },
-  ];
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
 
   constructor() {
     this.stateService = inject(InventoryManagementStateService);
