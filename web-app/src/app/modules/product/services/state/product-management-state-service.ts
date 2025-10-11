@@ -27,7 +27,7 @@ export class ProductManagementStateService {
 
   constructor() {
     this._productService = inject(MockProductService);
-    this.loadProducts(this._selectedPage(), this._selectedPageSize(), this._searchTerm(), this._selectedCategory(), this._currentSortState());
+    this.loadProducts();
   }
 
   public get displayProducts() {
@@ -57,9 +57,15 @@ export class ProductManagementStateService {
   /**
    * Load products for display
    */
-  loadProducts(page: number, pageSize: number, query: string, category: string, sort: TableSortState): void {
+  loadProducts(options?: { page?: number, pageSize?: number, query?: string, category?: string, sort?: TableSortState }): void {
     this._isLoading.set(true);
     this._errorMessage.set('');
+
+    let page = options?.page != undefined ? options.page : this._selectedPage();
+    let pageSize = options?.pageSize != undefined ? options.pageSize : this._selectedPageSize();
+    let query = options?.query != undefined ? options.query : this._searchTerm();
+    let category = options?.category !== undefined ? options.category : this._selectedCategory();
+    let sort = options?.sort != undefined ? options.sort : this._currentSortState();
 
     this._productService.getPageProducts(page, pageSize, query, category, `${sort.columnProp}:${sort.isAsc ? 'asc' : 'desc'}`).pipe(
       finalize(() => { this._isLoading.set(false); }),
@@ -81,13 +87,7 @@ export class ProductManagementStateService {
     this._productService.deleteProduct(id).subscribe({
       next: () => {
         this._deleteSuccess.next();
-        this.loadProducts(
-          this._selectedPage(),
-          this._selectedPageSize(),
-          this._searchTerm(),
-          this._selectedCategory(),
-          this._currentSortState(),
-        );
+        this.loadProducts();
       }
     });
   }
