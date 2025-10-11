@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   styleUrl: './search-bar-component.css'
 })
 export class SearchBarComponent {
+	placeHolder = input<string>('');
   textChanged = output<string>();
 	public searchForm: FormGroup;
 
