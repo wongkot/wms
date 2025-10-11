@@ -1172,7 +1172,7 @@ export class InMemoryDbService {
         const quantity = totalInventoryByCategory.get(product.category) ?? 0;
         totalInventoryByCategory.set(product.category, quantity + productInventory.quantity);
       }
-      if (product.reorderThreshold && productInventory.quantity < product.reorderThreshold) {
+      if (productInventory.quantity > 0 && product.reorderThreshold && productInventory.quantity < product.reorderThreshold) {
         totalLowInventory++;
       }
     }
