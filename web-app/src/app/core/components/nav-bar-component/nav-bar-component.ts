@@ -4,10 +4,10 @@ import { NavBarMenuItem } from '@app/core/models/nav-bar-menu-item';
 @Component({
   selector: 'app-nav-bar',
   standalone: false,
-  templateUrl: './nav-bar.html',
-  styleUrl: './nav-bar.css'
+  templateUrl: './nav-bar-component.html',
+  styleUrl: './nav-bar-component.css'
 })
-export class NavBar {
+export class NavBarComponent {
   readonly navBarMenuItems: NavBarMenuItem[] = [
     {
       name: 'Dashboard',

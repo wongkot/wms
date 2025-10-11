@@ -9,11 +9,11 @@ import { TableConfig } from '@app/shared/table/models/table-config';
 @Component({
   selector: 'app-dashboard',
   standalone: false,
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  templateUrl: './dashboard-page.html',
+  styleUrl: './dashboard-page.css',
   providers: [ DashboardStateService ]
 })
-export class Dashboard {
+export class DashboardPage {
   public stateService: DashboardStateService;
   private _routerService = inject(Router);
 
