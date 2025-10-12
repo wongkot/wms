@@ -28,7 +28,7 @@ export class ProductAddPage implements OnDestroy {
     { navigationUrl: '..', name: 'Product' },
     { navigationUrl: '', name: 'Add Product' },
   ];
-  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
   readonly customProductNameErrorMessages = new Map<string, string>([
     [ 'nameExists', 'This product name is already taken' ],
   ]);

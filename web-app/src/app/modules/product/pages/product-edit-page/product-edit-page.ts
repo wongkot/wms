@@ -30,7 +30,7 @@ export class ProductEditPage implements OnInit, OnDestroy {
     { navigationUrl: '../..', name: 'Product' },
     { navigationUrl: '', name: 'Edit Product' },
   ];
-  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
   readonly customProductNameErrorMessages = new Map<string, string>([
     [ 'nameExists', 'This product name is already taken' ],
   ]);

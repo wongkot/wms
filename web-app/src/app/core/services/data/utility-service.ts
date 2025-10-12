@@ -37,15 +37,19 @@ export class UtilityService {
     return sortedArray;
   }
 
-  getProductCategoriesForDropdown(): KeyValue<string, string>[] {
-    return [
-      { key: '', value: 'None' },
+  getProductCategoriesForDropdown(isFilter: boolean = true): KeyValue<string, string>[] {
+    let dropDownList = [
       { key: PRODUCT_CATEGORY_CABLES, value: PRODUCT_CATEGORY_CABLES },
       { key: PRODUCT_CATEGORY_COMPUTERS, value: PRODUCT_CATEGORY_COMPUTERS },
       { key: PRODUCT_CATEGORY_MISC, value: PRODUCT_CATEGORY_MISC },
       { key: PRODUCT_CATEGORY_NETWORKING, value: PRODUCT_CATEGORY_NETWORKING },
       { key: PRODUCT_CATEGORY_PERIPHERALS, value: PRODUCT_CATEGORY_PERIPHERALS },
     ];
+    if (isFilter) {
+      dropDownList.unshift({ key: '', value: 'None' });
+    }
+
+    return dropDownList;
   }
 
   getAreasForDropdown(): KeyValue<string, string>[] {
