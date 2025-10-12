@@ -79,10 +79,6 @@ export class ProductEditPage implements OnInit, OnDestroy {
     return this.editProductForm.get(formControlName) as FormControl;
   }
 
-  onProductImageUrlChange(newImageUrl: string) {
-    this.editProductForm.get('imageUrl')?.setValue(newImageUrl);
-  }
-
   onGoBack() {
     this._routerService.navigate(['product']);
   }

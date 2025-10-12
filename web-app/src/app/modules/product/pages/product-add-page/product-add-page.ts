@@ -57,10 +57,6 @@ export class ProductAddPage implements OnDestroy {
     return this.addProductForm.get(formControlName) as FormControl;
   }
 
-  onProductImageUrlChange(newImageUrl: string) {
-    this.addProductForm.get('imageUrl')?.setValue(newImageUrl);
-  }
-
   onGoBack() {
     this._routerService.navigate(['product']);
   }

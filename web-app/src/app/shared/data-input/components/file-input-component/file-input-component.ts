@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, computed, input, output, signal } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-file-input',
@@ -7,10 +8,9 @@ import { AfterViewInit, Component, computed, input, output, signal } from '@angu
   styleUrl: './file-input-component.css'
 })
 export class FileInputComponent implements AfterViewInit {
+  inputControl = input.required<FormControl>();
   fileTypesFilter = input<string>('');
   maxFileSizeMb = input<number>(2);
-  initialImageUrl = input<string>('');
-  fileUrlChanged = output<string>();
 
   private _isDragOver = signal<boolean>(false);
   private _fileUrl = signal<string>('');
@@ -34,8 +34,8 @@ export class FileInputComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.initialImageUrl()) {
-      this._fileUrl.set(this.initialImageUrl());
+    if (this.inputControl().getRawValue()) {
+      this._fileUrl.set(this.inputControl().getRawValue());
     }
   }
 
@@ -72,7 +72,7 @@ export class FileInputComponent implements AfterViewInit {
 
   onDeleteImage() {
     this._fileUrl.set('');
-    this.fileUrlChanged.emit('');
+    this.inputControl().setValue('');
   }
 
   private handleFileChange(inputFile: File | null) {
@@ -98,13 +98,13 @@ export class FileInputComponent implements AfterViewInit {
       fileReader.onload = () => {
         const newFileUrl = String(fileReader.result);
         this._fileUrl.set(newFileUrl);
-        this.fileUrlChanged.emit(newFileUrl);
+        this.inputControl().setValue(newFileUrl);
       };
       fileReader.onerror = () => {
         this._errorMessage.set('An error has been occurred while processing the file');
       };
     } else {
-      this.fileUrlChanged.emit('');
+      this.inputControl().setValue('');
     }
   }
 }
