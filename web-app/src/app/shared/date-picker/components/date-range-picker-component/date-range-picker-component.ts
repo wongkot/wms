@@ -22,7 +22,7 @@ export class DateRangePickerComponent implements AfterViewInit {
   dateRangeChanged = output<DateRange>();
 
   ngAfterViewInit(): void {
-    if (this._dateRange().startDate != this.initialDateRange().startDate &&
+    if (this._dateRange().startDate != this.initialDateRange().startDate ||
         this._dateRange().endDate != this.initialDateRange().endDate) {
           this._dateRange.set(this.initialDateRange());
     }
@@ -32,8 +32,8 @@ export class DateRangePickerComponent implements AfterViewInit {
     const target = event.target as HTMLInputElement;
     const dateRange = target.value.split('/');
 
-    const newStartDate = new Date(dateRange[0]);
-    const newEndDate = new Date(dateRange[1]);
+    const newStartDate = dateRange[0];
+    const newEndDate = dateRange[1];
     this._dateRange.set({
       startDate: newStartDate,
       endDate: newEndDate,
@@ -51,8 +51,8 @@ export class DateRangePickerComponent implements AfterViewInit {
     startDate.setMonth(startDate.getMonth() - 1);
 
     return {
-      startDate: startDate,
-      endDate: endDate,
+      startDate: formatDate(startDate, DATE_FORMAT, 'en-US'),
+      endDate: formatDate(endDate, DATE_FORMAT, 'en-US'),
     };
   }
 }

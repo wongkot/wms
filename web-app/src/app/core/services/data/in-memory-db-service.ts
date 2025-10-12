@@ -1063,14 +1063,16 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventoryHistory));
   }
 
-  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: Date, endDate: Date, sort: string): Pagination<InventoryHistory> {
+  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: string, endDate: string, sort: string): Pagination<InventoryHistory> {
     let filteredInventoryHistories = this.getInventoryHistories();
+    const filterStartDate = new Date(startDate);
+    const filterEndDate = new Date(endDate);
     const actualEndDate = new Date(endDate);
     actualEndDate.setDate(actualEndDate.getDate() + 1);
 
     filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
       const timestamp = new Date(inventoryHistory.timestamp);
-      return timestamp >= startDate && timestamp < actualEndDate;
+      return timestamp >= filterStartDate && timestamp < filterEndDate;
     });
     if (query) {
       query = query?.toLocaleLowerCase();
