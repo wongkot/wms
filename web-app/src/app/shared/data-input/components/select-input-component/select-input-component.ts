@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { AfterViewInit, Component, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-select-input',
@@ -18,7 +19,7 @@ export class SelectInputComponent implements AfterViewInit {
   tooltipMessage = input<string>('');
 
   readonly errorMessages = new Map<string, string>([
-    [ 'required', 'Please select an option' ],
+    [ 'required', MESSAGES.INPUT_DROPDOWN_REQUIRED ],
   ]);
   
 

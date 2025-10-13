@@ -1,7 +1,7 @@
-import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MESSAGES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { ProductEditStateService } from '@app/modules/product/services/state/product-edit-state-service';
@@ -32,10 +32,10 @@ export class ProductEditPage implements OnInit, OnDestroy {
   ];
   public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
   readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameExists', 'This product name is already taken' ],
+    [ 'nameExists', MESSAGES.PRODUCT_NAME_EXISTS ],
   ]);
   readonly customCategoryErrorMessages = new Map<string, string>([
-    [ 'required', 'Please select product category' ],
+    [ 'required', MESSAGES.PRODUCT_CATEGORY_REQUIRED ],
   ]);
 
   ngOnInit(): void {
@@ -62,7 +62,7 @@ export class ProductEditPage implements OnInit, OnDestroy {
     }));
     this._subscriptions.add(this.stateService.editSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Product has been updated');
+        this._toastService.showSuccess(MESSAGES.PRODUCT_UPDATED);
         this._routerService.navigate(['product']);
       }
     }));

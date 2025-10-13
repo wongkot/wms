@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, computed, input, output, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MAX_FILE_SIZE_MB, MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-file-input',
@@ -10,7 +11,7 @@ import { FormControl } from '@angular/forms';
 export class FileInputComponent implements AfterViewInit {
   inputControl = input.required<FormControl>();
   fileTypesFilter = input<string>('');
-  maxFileSizeMb = input<number>(2);
+  maxFileSizeMb = input<number>(MAX_FILE_SIZE_MB);
 
   private _isDragOver = signal<boolean>(false);
   private _fileUrl = signal<string>('');
@@ -84,11 +85,11 @@ export class FileInputComponent implements AfterViewInit {
       if (inputFile.size > this._maxFileSize()) {
         const maxFileSizeMb = this._maxFileSize() / this.singleMbSize;
         const currentSizeMb = inputFile.size / this.singleMbSize;
-        this._errorMessage.set(`File size has to be less than ${maxFileSizeMb.toFixed(2)} MB (current size: ${currentSizeMb.toFixed(2)} MB)`);
+        this._errorMessage.set(MESSAGES.INVALID_FILE_SIZE(maxFileSizeMb.toFixed(2), currentSizeMb.toFixed(2)));
         return;
       }
       if (!this.fileTypesFilter().split(',').includes(inputFile.type)) {
-        this._errorMessage.set(`File type "${inputFile.type}" is not a valid type (valid types: ${this.fileTypesFilter()})`);
+        this._errorMessage.set(MESSAGES.INVALID_FILE_TYPE(inputFile.type, this.fileTypesFilter()));
         return;
       }
 
@@ -101,7 +102,7 @@ export class FileInputComponent implements AfterViewInit {
         this.inputControl().setValue(newFileUrl);
       };
       fileReader.onerror = () => {
-        this._errorMessage.set('An error has been occurred while processing the file');
+        this._errorMessage.set(MESSAGES.PROCESS_FILE_ERROR);
       };
     } else {
       this.inputControl().setValue('');

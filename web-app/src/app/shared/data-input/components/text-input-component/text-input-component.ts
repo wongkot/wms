@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, effect, input, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { DEFAULT_MAX_CHARS, MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-text-input',
@@ -12,7 +13,7 @@ export class TextInputComponent implements AfterViewInit {
   required = input<boolean>(false);
   inputControl = input.required<FormControl>();
   showCharacterHint = input<boolean>(false);
-  maxCharacters = input<number>(100);
+  maxCharacters = input<number>(DEFAULT_MAX_CHARS);
   textPlaceHolder = input<string>('');
   customErrorMessages = input<Map<string, string>>(new Map<string, string>());
   tooltipMessage = input<string>('');
@@ -20,7 +21,7 @@ export class TextInputComponent implements AfterViewInit {
   private _isFocused = signal<boolean>(false);
   private _currentFocusedItemIndex = signal<number>(-1);
   readonly errorMessages = new Map<string, string>([
-    [ 'required', 'This field cannot be empty' ],
+    [ 'required', MESSAGES.INPUT_REQUIRED ],
   ]);
 
   public get isFocused () {

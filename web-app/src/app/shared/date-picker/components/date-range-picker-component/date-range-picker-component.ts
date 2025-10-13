@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { AfterViewInit, Component, computed, input, output, signal } from '@angular/core';
-import { DATE_FORMAT } from '@app/core/constants/app';
+import { DATE_FORMAT, DEFAULT_LOCALE } from '@app/core/constants/app';
 import { DateRange } from '@app/shared/date-picker/models/date-range';
 import 'cally';
 
@@ -14,10 +14,10 @@ export class DateRangePickerComponent implements AfterViewInit {
   initialDateRange = input<DateRange>(this.createInitialDateRange());
   private _dateRange = signal<DateRange>(this.initialDateRange());
   displayText = computed(() => {
-    return `${formatDate(this._dateRange().startDate, DATE_FORMAT, 'en-US')} ~ ${formatDate(this._dateRange().endDate, DATE_FORMAT, 'en-US')}`;
+    return `${formatDate(this._dateRange().startDate, DATE_FORMAT, DEFAULT_LOCALE)} ~ ${formatDate(this._dateRange().endDate, DATE_FORMAT, DEFAULT_LOCALE)}`;
   });
   selectedValue = computed(() => {
-    return `${formatDate(this._dateRange().startDate, DATE_FORMAT, 'en-US')}/${formatDate(this._dateRange().endDate, DATE_FORMAT, 'en-US')}`;
+    return `${formatDate(this._dateRange().startDate, DATE_FORMAT, DEFAULT_LOCALE)}/${formatDate(this._dateRange().endDate, DATE_FORMAT, DEFAULT_LOCALE)}`;
   });
   dateRangeChanged = output<DateRange>();
 
@@ -51,8 +51,8 @@ export class DateRangePickerComponent implements AfterViewInit {
     startDate.setMonth(startDate.getMonth() - 1);
 
     return {
-      startDate: formatDate(startDate, DATE_FORMAT, 'en-US'),
-      endDate: formatDate(endDate, DATE_FORMAT, 'en-US'),
+      startDate: formatDate(startDate, DATE_FORMAT, DEFAULT_LOCALE),
+      endDate: formatDate(endDate, DATE_FORMAT, DEFAULT_LOCALE),
     };
   }
 }

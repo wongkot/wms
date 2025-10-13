@@ -1,5 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MESSAGES } from '@app/core/constants/app';
 import { InventoryDetailStateService } from '@app/modules/inventory/services/state/inventory-detail-state-service';
 import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
 import { ToastService } from '@app/shared/toast/services/toast-service';
@@ -27,7 +28,7 @@ export class InventoryDetailPage implements OnInit, OnDestroy {
   constructor() {
     this._inventoryOperationSuccess = this.stateService.inventoryOperationSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Inventory has been updated');
+        this._toastService.showSuccess(MESSAGES.INVENTORY_UPDATED);
       }
     });
 	}

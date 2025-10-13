@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MESSAGES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { Product } from '@app/modules/product/models/product';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
@@ -79,7 +80,7 @@ export class ProductManagementPage implements OnDestroy {
     this.stateService = inject(ProductManagementStateService);
     this._deleteProductSuccess = this.stateService.deleteSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Product has been deleted');
+        this._toastService.showSuccess(MESSAGES.PRODUCT_DELETED);
       }
     });
   }
@@ -142,7 +143,7 @@ export class ProductManagementPage implements OnDestroy {
   }
 
   onDeleteProduct(product: Product) {
-    this._messageDialogService.showError('Confirmation', 'Do you want to delete selected product?').pipe(
+    this._messageDialogService.showError('Confirmation', MESSAGES.CONFIRM_DELETE_PRODUCT).pipe(
       filter((result) => result == DialogResult.OK)
     )
     .subscribe(() => {

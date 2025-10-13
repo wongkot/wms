@@ -12,6 +12,8 @@ import {
   AREA_COLUMNS,
   AREA_ROWS,
   DATE_FORMAT,
+  DEFAULT_LOCALE,
+  MESSAGES,
   PRODUCT_CATEGORY_CABLES,
   PRODUCT_CATEGORY_COMPUTERS,
   PRODUCT_CATEGORY_MISC,
@@ -591,12 +593,12 @@ export class InMemoryDbService {
 
   editProduct(input: EditProduct): Product {
     if (this.hasProductNameFromOtherId(input.name, input.id)) {
-      throw Error('This product name already used');
+      throw Error(MESSAGES.PRODUCT_NAME_EXISTS);
     }
 
     const editProduct = this._products.get(input.id);
     if (!editProduct) {
-      throw Error(`This product with id (${input.id}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.id));
     }
 
     editProduct.name = input.name;
@@ -731,7 +733,7 @@ export class InMemoryDbService {
   inventoryInbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
     const inventoryProduct = this._productInventory.get(input.productId);
     const timestamp = new Date();
@@ -842,7 +844,7 @@ export class InMemoryDbService {
       return product.name == input.productName;
     });
     if (!product) {
-      throw Error(`This product with name (${input.productName}) not found`);
+      throw Error(MESSAGES.PRODUCT_NAME_NOT_FOUND(input.productName));
     }
 
     return this.inventoryInbound({
@@ -856,22 +858,22 @@ export class InMemoryDbService {
   inventoryOutbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!inventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
     if (inventory.quantity < input.quantity) {
-      throw Error(`Outbound quantity (${input.quantity}) exceed inventory limit (${inventory.quantity})`);
+      throw Error(MESSAGES.INVENTORY_OUTBOUND_EXCEED_LIMIT(input.quantity, inventory.quantity));
     }
 
     const timestamp = new Date();
@@ -909,26 +911,26 @@ export class InMemoryDbService {
   inventoryAdjustment(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!inventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
     if (input.quantity < 0) {
-      throw Error(`Adjustment quantity must be equal or greater than zero`);
+      throw Error(MESSAGES.INVENTORY_ADJUSTMENT_QUANTITY_ZERO);
     }
     const adjustQuantity = input.quantity - inventory.quantity; // Calculate number of quantity that needs to be add/subtract
     if (adjustQuantity == 0) {
-      throw Error(`Adjustment quantity cannot be zero`);
+      throw Error(MESSAGES.INVENTORY_ADJUSTMENT_ADJUSTED_QUANTITY_ZERO);
     }
 
     const timestamp = new Date();
@@ -966,19 +968,19 @@ export class InMemoryDbService {
   inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const currentAreaInventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!currentAreaInventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
 
     const timestamp = new Date();
@@ -1108,14 +1110,14 @@ export class InMemoryDbService {
 
     for (let offset = totalMonths - 1; offset >= 0; offset--) {
       const month = new Date(timestamp.getFullYear(), timestamp.getMonth() - offset, 1);
-      inboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
-      outboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
+      inboundByMonth.set(formatDate(month, DATE_FORMAT, DEFAULT_LOCALE), 0);
+      outboundByMonth.set(formatDate(month, DATE_FORMAT, DEFAULT_LOCALE), 0);
     }
 
     for (let inventoryHistory of this._inventoryHistory) {
       const timestamp = new Date(inventoryHistory.timestamp);
       const historyMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 1);
-      const monthKey = formatDate(historyMonth, DATE_FORMAT, 'en-Us');
+      const monthKey = formatDate(historyMonth, DATE_FORMAT, DEFAULT_LOCALE);
 
       if (!inboundByMonth.has(monthKey)) { // Check either inbound or outbound map is enough (both have the same key)
         continue;
@@ -1151,13 +1153,13 @@ export class InMemoryDbService {
     const lastMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 2) ?? 0;
     const inboundBarChartData: [string, number][] = [...inboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
-      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+      const monthName = date.toLocaleString(DEFAULT_LOCALE, { month: 'short' });
 
       return [monthName, keyValue[1]];
     });
     const outboundBarChartData: [string, number][] = [...outboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
-      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+      const monthName = date.toLocaleString(DEFAULT_LOCALE, { month: 'short' });
 
       return [monthName, keyValue[1]];
     });

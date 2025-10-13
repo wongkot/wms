@@ -1,6 +1,6 @@
 import { formatDate, KeyValue } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { ZONE_PREFIXES, AREA_ROWS, AREA_COLUMNS, PRODUCT_CATEGORY_CABLES, PRODUCT_CATEGORY_COMPUTERS, PRODUCT_CATEGORY_MISC, PRODUCT_CATEGORY_NETWORKING, PRODUCT_CATEGORY_PERIPHERALS } from '@app/core/constants/app';
+import { ZONE_PREFIXES, AREA_ROWS, AREA_COLUMNS, PRODUCT_CATEGORY_CABLES, PRODUCT_CATEGORY_COMPUTERS, PRODUCT_CATEGORY_MISC, PRODUCT_CATEGORY_NETWORKING, PRODUCT_CATEGORY_PERIPHERALS, DEFAULT_LOCALE } from '@app/core/constants/app';
 
 @Injectable({
   'providedIn': 'root'
@@ -11,7 +11,7 @@ export class UtilityService {
   }
 
   formatLotNumber(date: Date): string {
-    return formatDate(date, 'yyyyMMdd', 'en-US');
+    return formatDate(date, 'yyyyMMdd', DEFAULT_LOCALE);
   }
 
   sortArray<T = any>(array: T[], sortColumn: any, isAsc: boolean): T[] {

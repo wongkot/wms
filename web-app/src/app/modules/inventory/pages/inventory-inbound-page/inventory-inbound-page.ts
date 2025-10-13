@@ -1,6 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DEFAULT_MAX_INBOUND_QUANTITY, DEFAULT_MIN_INBOUND_QUANTITY, MESSAGES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
 import { InventoryInboundStateService } from '@app/modules/inventory/services/state/inventory-inbound-state-service';
@@ -20,8 +21,8 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
     { navigationUrl: '..', name: 'Inventory' },
     { navigationUrl: '', name: 'Inbound' },
   ];
-  public readonly minQuantity = 1;
-  public readonly maxQuantity = 999;
+  public readonly minQuantity = DEFAULT_MIN_INBOUND_QUANTITY;
+  public readonly maxQuantity = DEFAULT_MAX_INBOUND_QUANTITY;
   private _defaultProductName = '';
   private _routerService = inject(Router);
   private _utilityService = inject(UtilityService);
@@ -37,10 +38,10 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
   });
   public readonly allAreas = this._utilityService.getAreasForDropdown();
   readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameDoesNotExists', 'This product name does not exists' ],
+    [ 'nameDoesNotExists', MESSAGES.PRODUCT_NAME_NOT_EXISTS ],
   ]);
   readonly customAreaErrorMessages = new Map<string, string>([
-    [ 'required', 'Please select area' ],
+    [ 'required', MESSAGES.AREA_REQUIRED ],
   ]);
   
   ngOnInit(): void {
@@ -59,7 +60,7 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
     }));
     this._subscriptions.add(this.stateService.operationSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Inventory has been updated');
+        this._toastService.showSuccess(MESSAGES.INVENTORY_UPDATED);
         this._routerService.navigate(['inventory']);
       }
     }));

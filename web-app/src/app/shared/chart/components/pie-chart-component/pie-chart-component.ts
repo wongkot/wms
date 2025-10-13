@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { DEFAULT_LOCALE } from '@app/core/constants/app';
 import { BaseChartInput } from '@app/shared/chart/models/base-chart-input';
 import {
   ApexAxisChartSeries,
@@ -77,7 +78,7 @@ export class PieChartComponent {
       return `
       <div class="bg-base-300 p-2">
         <span class="text-base-content">
-          ${Number(series[seriesIndex]).toLocaleString('en-US')} (${w.config.labels[seriesIndex]})
+          ${Number(series[seriesIndex]).toLocaleString(DEFAULT_LOCALE)} (${w.config.labels[seriesIndex]})
         </span>
       </div>`;
     }
@@ -106,7 +107,7 @@ export class PieChartComponent {
       highlightDataSeries: false,
     },
     formatter(legendName, { seriesIndex, w }) {
-      return `${legendName} (${Number(w?.config?.series[seriesIndex] ?? 0).toLocaleString('en-Us')})`;
+      return `${legendName} (${Number(w?.config?.series[seriesIndex] ?? 0).toLocaleString(DEFAULT_LOCALE)})`;
     },
   };
   dataLabels = computed<ApexDataLabels>(() => {

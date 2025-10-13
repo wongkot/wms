@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND } from '@app/core/constants/app';
+import { DEFAULT_MIN_INBOUND_QUANTITY, INVENTORY_OPERATION_ADJUSTMENT, INVENTORY_OPERATION_INBOUND, INVENTORY_OPERATION_MOVE_AREA, INVENTORY_OPERATION_OUTBOUND, MESSAGES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
@@ -21,7 +21,7 @@ export class InventoryOperationsComponent {
   private _maxOperationQuantity = 999;
   public readonly allAreas = this._utilityService.getAreasForDropdown();
   readonly customAreaErrorMessages = new Map<string, string>([
-    [ 'required', 'Please select area' ],
+    [ 'required', MESSAGES.AREA_REQUIRED ],
   ]);
   public inventoryOperationForm = this._fb.group({
     lot: new FormControl({ value: '', disabled: true }),
@@ -54,7 +54,7 @@ export class InventoryOperationsComponent {
     return this.stateService.selectedInventory ? [ ...this.allAreas ].filter(area => area.key != this.stateService.selectedInventory()?.area) : this.allAreas;
   });
   minQuantity = computed(() => {
-    let minQuantity = 1; // Most actions must have at least 1 quantity to perform the operation
+    let minQuantity = DEFAULT_MIN_INBOUND_QUANTITY; // Most actions must have at least 1 quantity to perform the operation
     switch (this.stateService.selectedInventoryOperation()) {
       case INVENTORY_OPERATION_ADJUSTMENT:
         minQuantity = 0; // Inventory adjustment can be set to zero (i.e. remove current inventory from the system)

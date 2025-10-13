@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { DEFAULT_LOCALE } from '@app/core/constants/app';
 import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 import { InventoryHistoryStateService } from '@app/modules/inventory-history/services/state/inventory-history-state-service';
@@ -76,11 +77,11 @@ export class InventoryHistoryPage {
         sortable: false,
         textFormat: (data: InventoryHistory) => {
           if (data.afterQuantity > data.beforeQuantity) {
-            return `+${data.quantity.toLocaleString('en-US')}`;
+            return `+${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else if (data.afterQuantity < data.beforeQuantity) {
-            return `-${data.quantity.toLocaleString('en-US')}`;
+            return `-${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else {
-            return data.quantity.toLocaleString('en-US');
+            return data.quantity.toLocaleString(DEFAULT_LOCALE);
           }
         },
         cssClasses: (data: InventoryHistory) => {

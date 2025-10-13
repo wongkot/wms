@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { DEFAULT_LOCALE } from '@app/core/constants/app';
 import { DashboardStateService } from '@app/modules/dashboard/services/state/dashboard-state-service';
 import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
-import { BaseChartInput } from '@app/shared/chart/models/base-chart-input';
 import { TableConfig } from '@app/shared/table/models/table-config';
 
 @Component({
@@ -83,11 +83,11 @@ export class DashboardPage {
         sortable: false,
         textFormat: (data: InventoryHistory) => {
           if (data.afterQuantity > data.beforeQuantity) {
-            return `+${data.quantity.toLocaleString('en-US')}`;
+            return `+${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else if (data.afterQuantity < data.beforeQuantity) {
-            return `-${data.quantity.toLocaleString('en-US')}`;
+            return `-${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else {
-            return data.quantity.toLocaleString('en-US');
+            return data.quantity.toLocaleString(DEFAULT_LOCALE);
           }
         },
         cssClasses: (data: InventoryHistory) => {

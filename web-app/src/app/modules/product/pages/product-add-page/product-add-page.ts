@@ -1,7 +1,7 @@
-import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MESSAGES } from '@app/core/constants/app';
 import { UtilityService } from '@app/core/services/data/utility-service';
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { ProductAddStateService } from '@app/modules/product/services/state/product-add-state-service';
@@ -30,10 +30,10 @@ export class ProductAddPage implements OnDestroy {
   ];
   public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
   readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameExists', 'This product name is already taken' ],
+    [ 'nameExists', MESSAGES.PRODUCT_NAME_EXISTS ],
   ]);
   readonly customCategoryErrorMessages = new Map<string, string>([
-    [ 'required', 'Please select product category' ],
+    [ 'required', MESSAGES.PRODUCT_CATEGORY_REQUIRED ],
   ]);
 
   constructor() {
@@ -47,7 +47,7 @@ export class ProductAddPage implements OnDestroy {
 		});
     this._addProductSuccess = this.stateService.addSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Product has been added');
+        this._toastService.showSuccess(MESSAGES.PRODUCT_ADDED);
         this._routerService.navigate(['product']);
       }
     });

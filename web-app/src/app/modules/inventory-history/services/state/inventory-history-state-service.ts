@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { inject, Injectable, signal } from '@angular/core';
-import { DATE_FORMAT } from '@app/core/constants/app';
+import { DATE_FORMAT, DEFAULT_LOCALE } from '@app/core/constants/app';
 import { Pagination } from '@app/core/models/pagination';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 import { InventoryHistoryService } from '@app/modules/inventory-history/services/data/inventory-history-service';
@@ -94,8 +94,8 @@ export class InventoryHistoryStateService {
     startDate.setMonth(startDate.getMonth() - 2);
 
     return {
-      startDate: formatDate(startDate, DATE_FORMAT, 'en-US'),
-      endDate: formatDate(endDate, DATE_FORMAT, 'en-US'),
+      startDate: formatDate(startDate, DATE_FORMAT, DEFAULT_LOCALE),
+      endDate: formatDate(endDate, DATE_FORMAT, DEFAULT_LOCALE),
     };
   }
 }
