@@ -1190,8 +1190,8 @@ export class InMemoryDbService {
       pieChartSeries: pieChartData,
       currentMonthTotalInbound: thisMonthTotalInbound,
       currentMonthTotalOutbound: thisMonthTotalOutbound,
-      totalInboundPercent: lastMonthTotalInbound ? ((thisMonthTotalInbound - lastMonthTotalInbound) / lastMonthTotalInbound) * 100 : null,
-      totalOutboundPercent: lastMonthTotalOutbound ? ((thisMonthTotalOutbound - lastMonthTotalOutbound) / lastMonthTotalOutbound) * 100 : null,
+      totalInboundPercent: lastMonthTotalInbound > 0 ? ((thisMonthTotalInbound - lastMonthTotalInbound) / lastMonthTotalInbound) * 100 : null,
+      totalOutboundPercent: lastMonthTotalOutbound > 0 ? ((thisMonthTotalOutbound - lastMonthTotalOutbound) / lastMonthTotalOutbound) * 100 : null,
       totalLowInventory: totalLowInventory,
     };
   }
