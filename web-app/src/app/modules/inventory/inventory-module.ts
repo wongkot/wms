@@ -10,7 +10,6 @@ import { InventoryInboundPage } from '@app/modules/inventory/pages/inventory-inb
 import { InventoryManagementPage } from '@app/modules/inventory/pages/inventory-management-page/inventory-management-page';
 import { AlertModule } from '@app/shared/alert/alert-module';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
-import { ButtonModule } from '@app/shared/button/button-module';
 import { DataInputModule } from '@app/shared/data-input/data-input-module';
 import { DropdownModule } from '@app/shared/dropdown/dropdown-module';
 import { PaginationModule } from '@app/shared/pagination/pagination-module';
@@ -38,7 +37,6 @@ const ROUTES: Routes = [
     SearchBarModule,
     PaginationModule,
     DropdownModule,
-    ButtonModule,
     BreadcrumbModule,
     ReactiveFormsModule,
     DataInputModule,

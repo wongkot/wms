@@ -6,7 +6,6 @@ import { ProductAddPage } from '@app/modules/product/pages/product-add-page/prod
 import { ProductEditPage } from '@app/modules/product/pages/product-edit-page/product-edit-page';
 import { ProductManagementPage } from '@app/modules/product/pages/product-management-page/product-management-page';
 import { BreadcrumbModule } from '@app/shared/breadcrumb/breadcrumb-module';
-import { ButtonModule } from '@app/shared/button/button-module';
 import { DataInputModule } from '@app/shared/data-input/data-input-module';
 import { DropdownModule } from '@app/shared/dropdown/dropdown-module';
 import { PaginationModule } from '@app/shared/pagination/pagination-module';
@@ -31,7 +30,6 @@ const ROUTES: Routes = [
     SearchBarModule,
     PaginationModule,
     DropdownModule,
-    ButtonModule,
     BreadcrumbModule,
     DataInputModule,
     ReactiveFormsModule,
