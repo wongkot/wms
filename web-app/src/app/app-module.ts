@@ -14,8 +14,8 @@ import { ToastModule } from '@app/shared/toast/toast-module';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     CoreModule,
+    AppRoutingModule,
     ToastModule,
     MessageDialogModule,
   ],

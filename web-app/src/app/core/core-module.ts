@@ -5,13 +5,15 @@ import { RouterModule } from '@angular/router';
 import { ThemeButtonComponent } from '@app/core/components/theme-button-component/theme-button-component';
 import { NotificationButtonComponent } from '@app/core/components/notification-button-component/notification-button-component';
 import { TimeAgoPipe } from './pipes/time-ago-pipe';
+import { NotFoundPage } from './pages/not-found-page/not-found-page';
 
 @NgModule({
   declarations: [
     NavBarComponent,
     ThemeButtonComponent,
     NotificationButtonComponent,
-    TimeAgoPipe
+    TimeAgoPipe,
+    NotFoundPage
   ],
   imports: [
     CommonModule,
@@ -19,6 +21,7 @@ import { TimeAgoPipe } from './pipes/time-ago-pipe';
   ],
   exports: [
     NavBarComponent,
+    NotFoundPage,
   ]
 })
 export class CoreModule { }
