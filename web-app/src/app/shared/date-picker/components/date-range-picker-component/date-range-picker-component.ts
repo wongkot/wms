@@ -11,24 +11,24 @@ import 'cally';
   styleUrl: './date-range-picker-component.css'
 })
 export class DateRangePickerComponent implements AfterViewInit {
-  initialDateRange = input<DateRange>(this.createInitialDateRange());
-  private _dateRange = signal<DateRange>(this.initialDateRange());
-  displayText = computed(() => {
+  public readonly initialDateRange = input<DateRange>(this.createInitialDateRange());
+  private readonly _dateRange = signal<DateRange>(this.initialDateRange());
+  public readonly displayText = computed(() => {
     return `${formatDate(this._dateRange().startDate, DATE_FORMAT, DEFAULT_LOCALE)} ~ ${formatDate(this._dateRange().endDate, DATE_FORMAT, DEFAULT_LOCALE)}`;
   });
-  selectedValue = computed(() => {
+  public readonly selectedValue = computed(() => {
     return `${formatDate(this._dateRange().startDate, DATE_FORMAT, DEFAULT_LOCALE)}/${formatDate(this._dateRange().endDate, DATE_FORMAT, DEFAULT_LOCALE)}`;
   });
-  dateRangeChanged = output<DateRange>();
+  public readonly dateRangeChanged = output<DateRange>();
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     if (this._dateRange().startDate != this.initialDateRange().startDate ||
-        this._dateRange().endDate != this.initialDateRange().endDate) {
-          this._dateRange.set(this.initialDateRange());
+      this._dateRange().endDate != this.initialDateRange().endDate) {
+      this._dateRange.set(this.initialDateRange());
     }
   }
 
-  onRangeChange(event: Event) {
+  public onRangeChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     const dateRange = target.value.split('/');
 

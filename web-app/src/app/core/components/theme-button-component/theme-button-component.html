@@ -1,10 +1,13 @@
 <div class="dropdown dropdown-end">
+  <!-- Navbar button -->
   <div tabindex="0"
        role="button"
        class="btn btn-circle btn-ghost">
     <i class="bi bi-palette-fill"
        [class.text-xl]="largeButtonSize()"></i>
   </div>
+
+  <!-- Theme list -->
   <ul tabindex="0" class="menu dropdown-content bg-base-200 rounded-box z-1 p-2 w-50 shadow-sm">
     @for (theme of themeService.allThemes | keyvalue; track theme.key) {
       <li>

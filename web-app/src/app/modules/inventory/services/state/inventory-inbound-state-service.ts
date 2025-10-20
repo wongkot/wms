@@ -5,17 +5,17 @@ import { InventoryService } from '@app/modules/inventory/services/data/inventory
 import { MockInventoryService } from '@app/modules/inventory/services/data/mock-inventory-service';
 import { MockProductService } from '@app/modules/product/services/data/mock-product-service';
 import { ProductService } from '@app/modules/product/services/data/product-service';
-import { debounceTime, delay, distinctUntilChanged, finalize, first, map, Subject, switchMap } from 'rxjs';
+import { debounceTime, delay, distinctUntilChanged, finalize, first, map, Subject, Subscription, switchMap } from 'rxjs';
 
 @Injectable()
 export class InventoryInboundStateService {
-  private _selectedArea = signal<Set<string>>(new Set<string>());
-  private _autoCompleteProductName = signal<string[]>([]);
-  private _productService: ProductService = inject(MockProductService);
-  private _inventoryService: InventoryService = inject(MockInventoryService);
-  private _errorMessage = signal<string>('');
-  private _isSubmitting = signal<boolean>(false);
-  private _operationSuccess = new Subject<void>();
+  private readonly _selectedArea = signal<Set<string>>(new Set<string>());
+  private readonly _autoCompleteProductName = signal<string[]>([]);
+  private readonly _productService: ProductService = inject(MockProductService);
+  private readonly _inventoryService: InventoryService = inject(MockInventoryService);
+  private readonly _errorMessage = signal<string>('');
+  private readonly _isSubmitting = signal<boolean>(false);
+  private readonly _operationSuccess = new Subject<void>();
   public readonly operationSuccess$ = this._operationSuccess.asObservable();
 
   public get selectedArea() {
@@ -34,18 +34,18 @@ export class InventoryInboundStateService {
     return this._isSubmitting.asReadonly();
   }
 
-  selectArea(area: string | null) {
-    this._selectedArea.set(new Set<string>(area ? [ area ] : []));
+  public selectArea(area: string | null): void {
+    this._selectedArea.set(new Set<string>(area ? [area] : []));
   }
 
-  getAutocompleteProductNames(searchProductName: string | null) {
+  public getAutocompleteProductNames(searchProductName: string | null): Subscription {
     return this._productService.getProductNames(searchProductName ?? '', 5)
       .subscribe((productNames) => {
         this._autoCompleteProductName.set(productNames);
       });
   }
 
-  inventoryInbound(input: InventoryInboundOperation) {
+  public inventoryInbound(input: InventoryInboundOperation): void {
     this._isSubmitting.set(true);
     this._errorMessage.set('');
     this._inventoryService.inventoryInboundWithProductName(input).pipe(
@@ -61,17 +61,17 @@ export class InventoryInboundStateService {
     });
   }
 
-  closeErrorMessage() {
+  public closeErrorMessage(): void {
     this._errorMessage.set('');
   }
 
-  isProductNameNotExistsValidator(): AsyncValidatorFn {
+  public isProductNameNotExistsValidator(): AsyncValidatorFn {
     return control => control.valueChanges
       .pipe(
         debounceTime(400),
         distinctUntilChanged(),
         switchMap(value => this._productService.hasProductName(value)),
-        map((nameExists: boolean) => (nameExists ? null : {'nameDoesNotExists': true})),
+        map((nameExists: boolean) => (nameExists ? null : { 'nameDoesNotExists': true })),
         first()); // Make observable finite
   }
 }

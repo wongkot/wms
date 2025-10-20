@@ -17,7 +17,7 @@ import { SearchBarModule } from '@app/shared/search-bar/search-bar-module';
 import { TableModule } from '@app/shared/table/table-module';
 
 const ROUTES: Routes = [
-	{ path: '', pathMatch: 'full', component: InventoryManagementPage },
+  { path: '', pathMatch: 'full', component: InventoryManagementPage },
   { path: 'detail/:product-id', component: InventoryDetailPage },
   { path: 'inbound', component: InventoryInboundPage },
 ];

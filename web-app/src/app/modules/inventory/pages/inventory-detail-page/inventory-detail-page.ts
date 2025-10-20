@@ -14,16 +14,16 @@ import { Subscription } from 'rxjs';
   providers: [InventoryDetailStateService]
 })
 export class InventoryDetailPage implements OnInit, OnDestroy {
+  private _productId!: number;
+  private readonly _routerService = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private _inventoryOperationSuccess: Subscription;
+  private readonly _toastService = inject(ToastService);
+  public readonly stateService = inject(InventoryDetailStateService);
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '../..', name: 'Inventory' },
     { navigationUrl: '', name: 'Detail' },
   ];
-  private _productId!: number;
-  private _routerService = inject(Router);
-  private _route = inject(ActivatedRoute);
-  private _inventoryOperationSuccess: Subscription;
-  private _toastService = inject(ToastService);
-  stateService = inject(InventoryDetailStateService);
 
   constructor() {
     this._inventoryOperationSuccess = this.stateService.inventoryOperationSuccess$.subscribe({
@@ -31,18 +31,18 @@ export class InventoryDetailPage implements OnInit, OnDestroy {
         this._toastService.showSuccess(MESSAGES.INVENTORY_UPDATED);
       }
     });
-	}
+  }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this._productId = Number(this._route.snapshot.paramMap.get('product-id'));
     this.stateService.loadInventories(this._productId);
   }
 
-  onGoBack() {
+  public onGoBack(): void {
     this._routerService.navigate(['inventory']);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     if (this._inventoryOperationSuccess) {
       this._inventoryOperationSuccess.unsubscribe();
     }

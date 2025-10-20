@@ -9,15 +9,15 @@ import { DialogType } from '@app/shared/message-dialog/enums/dialog-type';
   styleUrl: './message-dialog-component.css'
 })
 export class MessageDialogComponent {
-  title = signal<string>('');
-  message = signal<string>('');
-  showOkButton = signal<boolean>(true);
-  showCancelButton = signal<boolean>(true);
-  dismissable = signal<boolean>(true);
-  isShown = signal<boolean>(true);
-  type = signal<DialogType>(DialogType.Info);
-  buttonClasses = computed<string>(() => {
-    switch(this.type()) {
+  public readonly title = signal<string>('');
+  public readonly message = signal<string>('');
+  public readonly showOkButton = signal<boolean>(true);
+  public readonly showCancelButton = signal<boolean>(true);
+  public readonly dismissable = signal<boolean>(true);
+  public readonly isShown = signal<boolean>(true);
+  public readonly type = signal<DialogType>(DialogType.Info);
+  public readonly buttonClasses = computed<string>(() => {
+    switch (this.type()) {
       case DialogType.Info:
       default:
         return 'btn btn-info';
@@ -29,8 +29,8 @@ export class MessageDialogComponent {
         return 'btn btn-warning';
     }
   });
-  iconClasses = computed<string>(() => {
-    switch(this.type()) {
+  public readonly iconClasses = computed<string>(() => {
+    switch (this.type()) {
       case DialogType.Info:
       default:
         return 'bi bi-info-circle-fill text-info mr-2';
@@ -42,29 +42,29 @@ export class MessageDialogComponent {
         return 'bi bi-exclamation-triangle-fill text-warning mr-2';
     }
   });
-  close = output<DialogResult>();
-  private _elementRef = inject(ElementRef);
-  private _animationTime = 200; // Time should match with animation time in css file 
+  public readonly close = output<DialogResult>();
+  private readonly _elementRef = inject(ElementRef);
+  private readonly _animationTime = 200; // Time should match with animation time in css file 
 
-  onOkClick() {
+  public onOkClick(): void {
     this.removeElement(() => {
       this.close.emit(DialogResult.OK);
     });
   }
 
-  onCancelClick() {
+  public onCancelClick(): void {
     this.removeElement(() => {
       this.close.emit(DialogResult.Cancel);
     });
   }
 
-  onCloseClick() {
+  public onCloseClick(): void {
     this.removeElement(() => {
       this.close.emit(DialogResult.Cancel);
     });
   }
 
-  removeElement(callback: Function) {
+  public removeElement(callback: Function): void {
     this.isShown.set(false);
     setTimeout(() => {
       callback();

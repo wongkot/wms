@@ -11,21 +11,21 @@ import { finalize } from 'rxjs';
 
 @Injectable()
 export class InventoryHistoryStateService {
-  private _isLoading = signal<boolean>(false);
-  private _errorMessage = signal<string>('');
-  private _selectedPageSize = signal<number>(20);
-  private _selectedPage = signal<number>(1);
-  private _searchTerm = signal<string>('');
-  private _selectedOperationType = signal<number | null>(null);
-  private _currentSortState = signal<TableSortState>({ columnProp: 'timestamp', isAsc: false });
-  private _selectedDateRange = signal<DateRange>(this.createInitialDateRange());
-  private _displayInventoryHistories = signal<Pagination<InventoryHistory>>({
+  private readonly _isLoading = signal<boolean>(false);
+  private readonly _errorMessage = signal<string>('');
+  private readonly _selectedPageSize = signal<number>(20);
+  private readonly _selectedPage = signal<number>(1);
+  private readonly _searchTerm = signal<string>('');
+  private readonly _selectedOperationType = signal<number | null>(null);
+  private readonly _currentSortState = signal<TableSortState>({ columnProp: 'timestamp', isAsc: false });
+  private readonly _selectedDateRange = signal<DateRange>(this.createInitialDateRange());
+  private readonly _displayInventoryHistories = signal<Pagination<InventoryHistory>>({
     currentPage: this._selectedPage(),
     pageSize: this._selectedPageSize(),
     totalItems: 0,
     items: [],
   });
-  private _inventoryHistoryService: InventoryHistoryService = inject(MockInventoryHistoryService);
+  private readonly _inventoryHistoryService: InventoryHistoryService = inject(MockInventoryHistoryService);
 
   constructor() {
     this.loadInventoryHistories()
@@ -59,7 +59,7 @@ export class InventoryHistoryStateService {
     return this._currentSortState.asReadonly();
   }
 
-  loadInventoryHistories(options?: { page?: number, pageSize?: number, query?: string, operationType?: number | null, dateRange?: DateRange, sort?: TableSortState }): void {
+  public loadInventoryHistories(options?: { page?: number, pageSize?: number, query?: string, operationType?: number | null, dateRange?: DateRange, sort?: TableSortState }): void {
     this._isLoading.set(true);
     this._errorMessage.set('');
 

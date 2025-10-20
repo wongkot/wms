@@ -14,11 +14,11 @@ import { TableSortState } from '@app/shared/table/models/table-sort-state';
   styleUrl: './inventory-product-info-component.css'
 })
 export class InventoryProductInfoComponent {
-  public stateService = inject(InventoryDetailStateService);
-  inventoryProductInfo = input<InventoryProduct | null>(null);
-  inventoryStatusClasses = computed(() => {
-    const classList = [ 'badge', 'badge-soft', 'my-2' ];
-    switch(this.inventoryProductInfo()?.inventoryStatus) {
+  public readonly stateService = inject(InventoryDetailStateService);
+  public readonly inventoryProductInfo = input<InventoryProduct | null>(null);
+  public readonly inventoryStatusClasses = computed(() => {
+    const classList = ['badge', 'badge-soft', 'my-2'];
+    switch (this.inventoryProductInfo()?.inventoryStatus) {
       case InventoryStatus.Low:
         classList.push('badge-warning');
         break;
@@ -63,14 +63,14 @@ export class InventoryProductInfoComponent {
     ],
   };
 
-  onSortChanged(newSort: TableSortState) {
+  public onSortChanged(newSort: TableSortState): void {
     if (newSort.columnProp === this.stateService.currentSortState().columnProp &&
       newSort.isAsc === this.stateService.currentSortState().isAsc) return;
 
     this.stateService.sortInventories(newSort);
   }
 
-  onSelectInventory(row: Inventory) {
+  public onSelectInventory(row: Inventory): void {
     if (row.id === this.stateService.selectedInventory()?.id) {
       // Deselect if the same row is clicked
       this.stateService.selectInventory(null);
@@ -79,22 +79,22 @@ export class InventoryProductInfoComponent {
     }
   }
 
-  onInboundClick() {
+  public onInboundClick(): void {
     this.stateService.selectInventoryOperation(INVENTORY_OPERATION_INBOUND);
     this.stateService.openDrawer();
   }
 
-  onOutboundClick() {
+  public onOutboundClick(): void {
     this.stateService.selectInventoryOperation(INVENTORY_OPERATION_OUTBOUND);
     this.stateService.openDrawer();
   }
 
-  onInventoryAdjustmentClick() {
+  public onInventoryAdjustmentClick(): void {
     this.stateService.selectInventoryOperation(INVENTORY_OPERATION_ADJUSTMENT);
     this.stateService.openDrawer();
   }
 
-  onMoveAreaClick() {
+  public onMoveAreaClick(): void {
     this.stateService.selectInventoryOperation(INVENTORY_OPERATION_MOVE_AREA);
     this.stateService.openDrawer();
   }

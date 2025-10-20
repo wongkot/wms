@@ -17,46 +17,46 @@ import { Subscription } from 'rxjs';
   providers: [ProductEditStateService]
 })
 export class ProductEditPage implements OnInit, OnDestroy {
-  public stateService = inject(ProductEditStateService);
-  public editProductForm!: FormGroup;
   private _productId!: number;
-  private _fb = inject(FormBuilder);
-  private _routerService = inject(Router);
-  private _route = inject(ActivatedRoute);
-  private _toastService = inject(ToastService);
-  private _utilityService = inject(UtilityService);
-  private _subscriptions = new Subscription();
+  private readonly _fb = inject(FormBuilder);
+  private readonly _routerService = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _toastService = inject(ToastService);
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _subscriptions = new Subscription();
+  public readonly stateService = inject(ProductEditStateService);
+  public editProductForm!: FormGroup;
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '../..', name: 'Product' },
     { navigationUrl: '', name: 'Edit Product' },
   ];
   public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
-  readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameExists', MESSAGES.PRODUCT_NAME_EXISTS ],
+  public readonly customProductNameErrorMessages = new Map<string, string>([
+    ['nameExists', MESSAGES.PRODUCT_NAME_EXISTS],
   ]);
-  readonly customCategoryErrorMessages = new Map<string, string>([
-    [ 'required', MESSAGES.PRODUCT_CATEGORY_REQUIRED ],
+  public readonly customCategoryErrorMessages = new Map<string, string>([
+    ['required', MESSAGES.PRODUCT_CATEGORY_REQUIRED],
   ]);
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this._productId = Number(this._route.snapshot.paramMap.get('id'));
     this.editProductForm = this._fb.group({
-			name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator(this._productId)),
-			category: new FormControl('', Validators.required),
-			description: new FormControl(''),
-			unitPrice: new FormControl('', [Validators.required]),
-			reorderThreshold: new FormControl(''),
-			imageUrl: new FormControl(''),
-		});
+      name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator(this._productId)),
+      category: new FormControl('', Validators.required),
+      description: new FormControl(''),
+      unitPrice: new FormControl('', [Validators.required]),
+      reorderThreshold: new FormControl(''),
+      imageUrl: new FormControl(''),
+    });
     this._subscriptions.add(this.stateService.productLoadSucess$.subscribe({
       next: (product) => {
         this.editProductForm.setValue({
           name: product.name,
-			    category: product.category,
-			    description: product.description,
-			    unitPrice: product.unitPrice,
-			    reorderThreshold: product.reorderThreshold ?? null,
-			    imageUrl: product.imageUrl,
+          category: product.category,
+          description: product.description,
+          unitPrice: product.unitPrice,
+          reorderThreshold: product.reorderThreshold ?? null,
+          imageUrl: product.imageUrl,
         });
       }
     }));
@@ -75,15 +75,15 @@ export class ProductEditPage implements OnInit, OnDestroy {
     this.stateService.loadProductInfo(this._productId);
   }
 
-  getFormControl(formControlName: string): FormControl {
+  public getFormControl(formControlName: string): FormControl {
     return this.editProductForm.get(formControlName) as FormControl;
   }
 
-  onGoBack() {
+  public onGoBack(): void {
     this._routerService.navigate(['product']);
   }
 
-  onSubmit(): void {
+  public onSubmit(): void {
     if (this.editProductForm.invalid || this.editProductForm.pending) {
       this.editProductForm.markAllAsTouched();
       return;
@@ -102,7 +102,7 @@ export class ProductEditPage implements OnInit, OnDestroy {
     this.stateService.editProduct(editProduct);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     if (this._subscriptions) {
       this._subscriptions.unsubscribe();
     }

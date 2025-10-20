@@ -13,9 +13,9 @@ import { SearchBarModule } from '@app/shared/search-bar/search-bar-module';
 import { TableModule } from '@app/shared/table/table-module';
 
 const ROUTES: Routes = [
-	{ path: '', pathMatch: 'full', component: ProductManagementPage },
-	{ path: 'add', component: ProductAddPage },
-	{ path: 'edit/:id', component: ProductEditPage },
+  { path: '', pathMatch: 'full', component: ProductManagementPage },
+  { path: 'add', component: ProductAddPage },
+  { path: 'edit/:id', component: ProductEditPage },
 ];
 
 @NgModule({

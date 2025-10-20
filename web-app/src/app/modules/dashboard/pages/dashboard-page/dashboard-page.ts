@@ -11,15 +11,11 @@ import { TableConfig } from '@app/shared/table/models/table-config';
   standalone: false,
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',
-  providers: [ DashboardStateService ]
+  providers: [DashboardStateService]
 })
 export class DashboardPage {
-  public stateService: DashboardStateService;
-  private _routerService = inject(Router);
-
-  constructor() {
-    this.stateService = inject(DashboardStateService);
-  }
+  public readonly stateService = inject(DashboardStateService);
+  private readonly _routerService = inject(Router);
 
   public readonly tableConfig: TableConfig = {
     sharpCornerTopLeft: true,
@@ -119,7 +115,7 @@ export class DashboardPage {
     ],
   };
 
-  onGoToInventoryMenuClick() {
+  public onGoToInventoryMenuClick(): void {
     this._routerService.navigate(['inventory']);
   }
 }

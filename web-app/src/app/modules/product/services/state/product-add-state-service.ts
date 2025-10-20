@@ -7,36 +7,36 @@ import { debounceTime, distinctUntilChanged, finalize, first, map, Subject, swit
 
 @Injectable()
 export class ProductAddStateService {
-  private _isSubmitting = signal<boolean>(false);
-  private _productService: ProductService = inject(MockProductService);
-  private _addSuccess = new Subject<void>();
+  private readonly _isSubmitting = signal<boolean>(false);
+  private readonly _productService: ProductService = inject(MockProductService);
+  private readonly _addSuccess = new Subject<void>();
   public readonly addSuccess$ = this._addSuccess.asObservable();
 
-  get isSubmitting() {
+  public get isSubmitting() {
     return this._isSubmitting.asReadonly();
   }
 
-  addProduct(input: AddProduct): void {
+  public addProduct(input: AddProduct): void {
     this._isSubmitting.set(true);
     this._productService.addProduct(input).pipe(
       finalize(() => {
         this._isSubmitting.set(false);
       }),
     )
-    .subscribe({
-      next: () => {
-        this._addSuccess.next();
-      }
-    });
+      .subscribe({
+        next: () => {
+          this._addSuccess.next();
+        }
+      });
   }
 
-  isProductNameExistsValidator(): AsyncValidatorFn {
+  public isProductNameExistsValidator(): AsyncValidatorFn {
     return control => control.valueChanges
       .pipe(
         debounceTime(400),
         distinctUntilChanged(),
         switchMap(value => this._productService.hasProductName(value)),
-        map((nameExists: boolean) => (nameExists ? {'nameExists': true} : null)),
+        map((nameExists: boolean) => (nameExists ? { 'nameExists': true } : null)),
         first()); // Make observable finite
   }
 }

@@ -8,9 +8,9 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class MockDashboardService implements DashboardService {
-  private _inMemoryDbService = inject(InMemoryDbService);
+  private readonly _inMemoryDbService = inject(InMemoryDbService);
 
-  getDashboardData(): Observable<InventoryDashboardApiOutput> {
+  public getDashboardData(): Observable<InventoryDashboardApiOutput> {
     return of(this._inMemoryDbService.getDashboardData());
   }
 }

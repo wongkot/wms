@@ -1,4 +1,5 @@
 <fieldset class="fieldset">
+  <!-- Field header -->
   <legend class="fieldset-legend">
     <div>
       {{ fieldName() }}
@@ -15,6 +16,8 @@
       }
     </div>
   </legend>
+
+  <!-- Input area -->
   <div class="relative">
     <input type="text"
          class="input w-full focus:outline-0"
@@ -38,6 +41,7 @@
     }
   </div>
   
+  <!-- Indicator/error message -->
   <div class="flex flex-row justify-between">
     @if (inputControl().pending) {
       <p class="label h-4">

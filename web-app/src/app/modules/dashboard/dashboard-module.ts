@@ -6,7 +6,7 @@ import { ChartModule } from '@app/shared/chart/chart-module';
 import { TableModule } from '@app/shared/table/table-module';
 
 const ROUTES: Routes = [
-	{ path: '', pathMatch: 'full', component: DashboardPage },
+  { path: '', pathMatch: 'full', component: DashboardPage },
 ];
 
 @NgModule({

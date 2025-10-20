@@ -8,5 +8,5 @@ import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-secti
   styleUrl: './breadcrumb-component.css'
 })
 export class BreadcrumbComponent {
-  breadcrumbSections = input.required<BreadcrumbSection[]>();
+  public readonly breadcrumbSections = input.required<BreadcrumbSection[]>();
 }

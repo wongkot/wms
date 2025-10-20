@@ -14,7 +14,7 @@ import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
   standalone: false,
   templateUrl: './inventory-inbound-page.html',
   styleUrl: './inventory-inbound-page.css',
-  providers: [ InventoryInboundStateService ]
+  providers: [InventoryInboundStateService]
 })
 export class InventoryInboundPage implements OnInit, OnDestroy {
   public readonly breadcrumbSections: BreadcrumbSection[] = [
@@ -23,28 +23,28 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
   ];
   public readonly minQuantity = DEFAULT_MIN_INBOUND_QUANTITY;
   public readonly maxQuantity = DEFAULT_MAX_INBOUND_QUANTITY;
-  private _defaultProductName = '';
-  private _routerService = inject(Router);
-  private _utilityService = inject(UtilityService);
-  private _toastService = inject(ToastService);
-  private _fb: FormBuilder = inject(FormBuilder);
-  private _subscriptions = new Subscription();
-  public stateService = inject(InventoryInboundStateService);
-  public inboundOperationForm: FormGroup = this._fb.group({
+  private readonly _defaultProductName = '';
+  private readonly _routerService = inject(Router);
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _toastService = inject(ToastService);
+  private readonly _fb: FormBuilder = inject(FormBuilder);
+  private readonly _subscriptions = new Subscription();
+  public readonly stateService = inject(InventoryInboundStateService);
+  public readonly inboundOperationForm: FormGroup = this._fb.group({
     productName: new FormControl(this._defaultProductName, Validators.required, this.stateService.isProductNameNotExistsValidator()),
     lot: new FormControl(this._utilityService.formatLotNumber(new Date()), Validators.required),
     area: new FormControl('', Validators.required),
     quantity: new FormControl(1, [Validators.required, Validators.min(this.minQuantity), Validators.max(this.maxQuantity)]),
   });
   public readonly allAreas = this._utilityService.getAreasForDropdown();
-  readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameDoesNotExists', MESSAGES.PRODUCT_NAME_NOT_EXISTS ],
+  public readonly customProductNameErrorMessages = new Map<string, string>([
+    ['nameDoesNotExists', MESSAGES.PRODUCT_NAME_NOT_EXISTS],
   ]);
-  readonly customAreaErrorMessages = new Map<string, string>([
-    [ 'required', MESSAGES.AREA_REQUIRED ],
+  public readonly customAreaErrorMessages = new Map<string, string>([
+    ['required', MESSAGES.AREA_REQUIRED],
   ]);
-  
-  ngOnInit(): void {
+
+  public ngOnInit(): void {
     // Get default autocomplete list
     this.stateService.getAutocompleteProductNames(this._defaultProductName);
 
@@ -55,9 +55,9 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
       debounceTime(400),
       distinctUntilChanged()
     )
-    .subscribe((productName) => {
-      this.stateService.getAutocompleteProductNames(productName);
-    }));
+      .subscribe((productName) => {
+        this.stateService.getAutocompleteProductNames(productName);
+      }));
     this._subscriptions.add(this.stateService.operationSuccess$.subscribe({
       next: () => {
         this._toastService.showSuccess(MESSAGES.INVENTORY_UPDATED);
@@ -66,15 +66,15 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
     }));
   }
 
-  onGoBack() {
+  public onGoBack(): void {
     this._routerService.navigate(['inventory']);
   }
 
-  getFormControl(formControlName: string): FormControl {
+  public getFormControl(formControlName: string): FormControl {
     return this.inboundOperationForm.get(formControlName) as FormControl;
   }
 
-  onSubmit(): void {
+  public onSubmit(): void {
     if (this.inboundOperationForm.invalid || this.inboundOperationForm.pending) {
       this.inboundOperationForm.markAllAsTouched();
       return;
@@ -89,16 +89,16 @@ export class InventoryInboundPage implements OnInit, OnDestroy {
     this.stateService.inventoryInbound(inventoryInboundInput);
   }
 
-  onDismissErrorMessage() {
+  public onDismissErrorMessage(): void {
     this.stateService.closeErrorMessage();
   }
 
-  warehouseMapAreaClick(area: string) {
+  public warehouseMapAreaClick(area: string): void {
     this.stateService.selectArea(area);
     this.inboundOperationForm.get('area')?.setValue(area);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     if (this._subscriptions) {
       this._subscriptions.unsubscribe();
     }

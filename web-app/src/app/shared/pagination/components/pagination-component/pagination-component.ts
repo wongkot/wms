@@ -7,50 +7,48 @@ import { Component, computed, input, output } from '@angular/core';
   styleUrl: './pagination-component.css'
 })
 export class PaginationComponent {
-  pageSizes = input<number[]>([10, 20, 50, 100]);
-  selectedPageSize = input<number>(this.pageSizes().at(0) ?? 10);
-  selectedPage = input<number>(1);
-  totalItems = input<number>(0);
-
-  pageSizeChange = output<number>();
-  toFirstPageClick = output<number>();
-  toPreviousPageClick = output<number>();
-  toNextPageClick = output<number>();
-  toLastPageClick = output<number>();
-
-  totalPages = computed(() => {
+  public readonly pageSizes = input<number[]>([10, 20, 50, 100]);
+  public readonly selectedPageSize = input<number>(this.pageSizes().at(0) ?? 10);
+  public readonly selectedPage = input<number>(1);
+  public readonly totalItems = input<number>(0);
+  public readonly pageSizeChange = output<number>();
+  public readonly toFirstPageClick = output<number>();
+  public readonly toPreviousPageClick = output<number>();
+  public readonly toNextPageClick = output<number>();
+  public readonly toLastPageClick = output<number>();
+  public readonly totalPages = computed(() => {
     return Math.ceil(this.totalItems() / this.selectedPageSize());
   });
-  isFirstPage = computed(() => {
+  public readonly isFirstPage = computed(() => {
     return this.selectedPage() <= 1;
   });
-  isLastPage = computed(() => {
+  public readonly isLastPage = computed(() => {
     return this.selectedPage() >= this.totalPages();
   });
 
-  onPageSizeChange($event: any) {
+  public onPageSizeChange($event: any): void {
     this.pageSizeChange.emit(Number($event.target.value));
   }
 
-  onFirstPageClick() {
+  public onFirstPageClick(): void {
     if (this.isFirstPage()) return;
 
     this.toFirstPageClick.emit(1);
   }
 
-  onPreviousPageClick() {
+  public onPreviousPageClick(): void {
     if (this.isFirstPage()) return;
 
     this.toPreviousPageClick.emit(this.selectedPage() - 1);
   }
 
-  onNextPageClick() {
+  public onNextPageClick(): void {
     if (this.isLastPage()) return;
 
     this.toNextPageClick.emit(this.selectedPage() + 1);
   }
 
-  onLastPageClick() {
+  public onLastPageClick(): void {
     if (this.isLastPage()) return;
 
     this.toLastPageClick.emit(this.totalPages());

@@ -8,9 +8,9 @@ import { Router } from '@angular/router';
   styleUrl: './not-found-page.css'
 })
 export class NotFoundPage {
-  private _routerService = inject(Router);
+  private readonly _routerService = inject(Router);
 
-  onGoToHomepage() {
+  public onGoToHomepage(): void {
     this._routerService.navigate(['']);
   }
 }

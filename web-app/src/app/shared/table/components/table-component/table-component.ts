@@ -9,19 +9,18 @@ import { TableSortState } from '@app/shared/table/models/table-sort-state';
   styleUrl: './table-component.css'
 })
 export class TableComponent {
-  tableConfig = input.required<TableConfig>();
-  dataSource = input<any[]>([]);
-  sortState = input<TableSortState>({ columnProp: '', isAsc: true });
-  selectedRow = input<any>(null);
-  sortStateChange = output<TableSortState>();
-  viewDetailClick = output<any>();
-  editClick = output<any>();
-  deleteClick = output<any>();
-  rowClick = output<any>();
+  public readonly tableConfig = input.required<TableConfig>();
+  public readonly dataSource = input<any[]>([]);
+  public readonly sortState = input<TableSortState>({ columnProp: '', isAsc: true });
+  public readonly selectedRow = input<any>(null);
+  public readonly sortStateChange = output<TableSortState>();
+  public readonly viewDetailClick = output<any>();
+  public readonly editClick = output<any>();
+  public readonly deleteClick = output<any>();
+  public readonly rowClick = output<any>();
 
-  styleSortableHeader(columnDataProperty: string) {
-    let classes = [];
-
+  public styleSortableHeader(columnDataProperty: string): string[] {
+    const classes = [];
     if (this.sortState().columnProp === columnDataProperty) {
       classes.push('text-base-content');
       classes.push('text-bold');
@@ -35,10 +34,10 @@ export class TableComponent {
     return classes;
   }
 
-  onSortChange(columnDataProperty: string) {
+  public onSortChange(columnDataProperty: string): void {
     if (columnDataProperty === this.sortState().columnProp) {
       this.sortStateChange.emit({
-        columnProp: !this.sortState().isAsc ? '': columnDataProperty,
+        columnProp: !this.sortState().isAsc ? '' : columnDataProperty,
         isAsc: !this.sortState().isAsc
       });
     } else {
@@ -46,19 +45,19 @@ export class TableComponent {
     }
   }
 
-  onViewDetailClick(rowData: any) {
+  public onViewDetailClick(rowData: any): void {
     this.viewDetailClick.emit(rowData);
   }
 
-  onRowClick(rowData: any) {
+  public onRowClick(rowData: any): void {
     this.rowClick.emit(rowData);
   }
 
-  onEditClick(rowData: any) {
+  public onEditClick(rowData: any): void {
     this.editClick.emit(rowData);
   }
 
-  onDeleteClick(rowData: any) {
+  public onDeleteClick(rowData: any): void {
     this.deleteClick.emit(rowData);
   }
 }

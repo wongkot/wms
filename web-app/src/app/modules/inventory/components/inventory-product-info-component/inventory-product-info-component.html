@@ -1,4 +1,5 @@
 <div class="w-full h-full md:pl-10 md:block">
+  <!-- Product information -->
   <div class="md:w-full md:h-1/2 overflow-auto">
     @if(inventoryProductInfo()?.imageUrl) {
       <div class="md:flex md:justify-center md:items-center">
@@ -25,6 +26,8 @@
       <div class="text-start p-2">{{ (inventoryProductInfo()?.reorderThreshold) ? (inventoryProductInfo()?.reorderThreshold | number) : '-' }}</div>
     </div>
   </div>
+  
+  <!-- Inventory product table -->
   <div class="overflow-hidden pt-4 md:w-full md:h-1/2 flex flex-row">
     <div class="h-[50vh] w-full overflow-x-hidden overflow-y-auto mr-4 md:h-full">
       <app-table

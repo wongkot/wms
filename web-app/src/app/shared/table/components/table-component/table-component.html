@@ -12,6 +12,7 @@
   }
   @else {
     <table class="table table-pin-rows">
+      <!-- Table header -->
       <thead>
         <tr>
           @for (column of tableConfig().columns; track column) {
@@ -58,6 +59,8 @@
           }
         </tr>
       </thead>
+
+      <!-- Table rows -->
       <tbody>
         @for (item of dataSource(); track (item.id ? item.id : item)) {
           <tr class="hover:bg-base-300"

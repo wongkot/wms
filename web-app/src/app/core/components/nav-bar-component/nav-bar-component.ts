@@ -8,7 +8,7 @@ import { NavBarMenuItem } from '@app/core/models/nav-bar-menu-item';
   styleUrl: './nav-bar-component.css'
 })
 export class NavBarComponent {
-  readonly navBarMenuItems: NavBarMenuItem[] = [
+  public readonly navBarMenuItems: NavBarMenuItem[] = [
     {
       name: 'Dashboard',
       url: '',

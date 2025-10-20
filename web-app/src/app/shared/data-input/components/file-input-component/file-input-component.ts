@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, input, output, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, input, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MAX_FILE_SIZE_MB, MESSAGES } from '@app/core/constants/app';
 
@@ -9,48 +9,48 @@ import { MAX_FILE_SIZE_MB, MESSAGES } from '@app/core/constants/app';
   styleUrl: './file-input-component.css'
 })
 export class FileInputComponent implements AfterViewInit {
-  inputControl = input.required<FormControl>();
-  fileTypesFilter = input<string>('');
-  maxFileSizeMb = input<number>(MAX_FILE_SIZE_MB);
-
-  private _isDragOver = signal<boolean>(false);
-  private _fileUrl = signal<string>('');
-  private _errorMessage = signal<string>('');
-  private _maxFileSize = computed<number>(() => {
-    return this.maxFileSizeMb() * this.singleMbSize;
-  })
-  private readonly singleMbSize = 1048576;
-
-  dragOverStyles = computed<object>(() => {
+  public readonly inputControl = input.required<FormControl>();
+  public readonly fileTypesFilter = input<string>('');
+  public readonly maxFileSizeMb = input<number>(MAX_FILE_SIZE_MB);
+  public readonly dragOverStyles = computed<object>(() => {
     return {
       'bg-base-100': !this._isDragOver(),
       'bg-base-200': this._isDragOver(),
     };
   });
-  get fileUrl() {
+  private readonly _isDragOver = signal<boolean>(false);
+  private readonly _fileUrl = signal<string>('');
+  private readonly _errorMessage = signal<string>('');
+  private readonly _maxFileSize = computed<number>(() => {
+    return this.maxFileSizeMb() * this.singleMbSize;
+  });
+  private readonly singleMbSize = 1048576;
+
+  public get fileUrl() {
     return this._fileUrl.asReadonly();
   }
-  get errorMessage() {
+
+  public get errorMessage() {
     return this._errorMessage.asReadonly();
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     if (this.inputControl().getRawValue()) {
       this._fileUrl.set(this.inputControl().getRawValue());
     }
   }
 
-  onFileChange(event: Event) {
+  public onFileChange(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     const inputFile = inputElement?.files?.item(0) ?? null
-    
+
     this.handleFileChange(inputFile);
 
     // Remove file from input element
     inputElement.value = '';
   }
 
-  onDrop(event: DragEvent) {
+  public onDrop(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -59,24 +59,24 @@ export class FileInputComponent implements AfterViewInit {
     this._isDragOver.set(false);
   }
 
-  onDragOver(event: DragEvent) {
+  public onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this._isDragOver.set(true);
   }
 
-  onDragLeave(event: DragEvent) {
+  public onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this._isDragOver.set(false);
   }
 
-  onDeleteImage() {
+  public onDeleteImage(): void {
     this._fileUrl.set('');
     this.inputControl().setValue('');
   }
 
-  private handleFileChange(inputFile: File | null) {
+  private handleFileChange(inputFile: File | null): void {
     this._errorMessage.set('');
     this._fileUrl.set('');
 

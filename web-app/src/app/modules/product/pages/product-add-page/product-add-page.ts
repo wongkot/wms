@@ -17,51 +17,51 @@ import { Subscription } from 'rxjs';
   providers: [ProductAddStateService]
 })
 export class ProductAddPage implements OnDestroy {
-  public stateService = inject(ProductAddStateService);
-  public addProductForm: FormGroup;
-  private _fb = inject(FormBuilder);
-  private _routerService = inject(Router);
-  private _toastService = inject(ToastService);
-  private _utilityService = inject(UtilityService);
+  private readonly _fb = inject(FormBuilder);
+  private readonly _routerService = inject(Router);
+  private readonly _toastService = inject(ToastService);
+  private readonly _utilityService = inject(UtilityService);
   private _addProductSuccess: Subscription;
+  public readonly stateService = inject(ProductAddStateService);
+  public addProductForm: FormGroup;
   public readonly breadcrumbSections: BreadcrumbSection[] = [
     { navigationUrl: '..', name: 'Product' },
     { navigationUrl: '', name: 'Add Product' },
   ];
   public readonly productCategories = this._utilityService.getProductCategoriesForDropdown(false);
-  readonly customProductNameErrorMessages = new Map<string, string>([
-    [ 'nameExists', MESSAGES.PRODUCT_NAME_EXISTS ],
+  public readonly customProductNameErrorMessages = new Map<string, string>([
+    ['nameExists', MESSAGES.PRODUCT_NAME_EXISTS],
   ]);
-  readonly customCategoryErrorMessages = new Map<string, string>([
-    [ 'required', MESSAGES.PRODUCT_CATEGORY_REQUIRED ],
+  public readonly customCategoryErrorMessages = new Map<string, string>([
+    ['required', MESSAGES.PRODUCT_CATEGORY_REQUIRED],
   ]);
 
   constructor() {
-		this.addProductForm = this._fb.group({
-			name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator()),
-			category: new FormControl('', Validators.required),
-			description: new FormControl(''),
-			unitPrice: new FormControl('', [Validators.required]),
-			reorderThreshold: new FormControl(''),
-			imageUrl: new FormControl(''),
-		});
+    this.addProductForm = this._fb.group({
+      name: new FormControl('', Validators.required, this.stateService.isProductNameExistsValidator()),
+      category: new FormControl('', Validators.required),
+      description: new FormControl(''),
+      unitPrice: new FormControl('', [Validators.required]),
+      reorderThreshold: new FormControl(''),
+      imageUrl: new FormControl(''),
+    });
     this._addProductSuccess = this.stateService.addSuccess$.subscribe({
       next: () => {
         this._toastService.showSuccess(MESSAGES.PRODUCT_ADDED);
         this._routerService.navigate(['product']);
       }
     });
-	}
+  }
 
-  getFormControl(formControlName: string): FormControl {
+  public getFormControl(formControlName: string): FormControl {
     return this.addProductForm.get(formControlName) as FormControl;
   }
 
-  onGoBack() {
+  public onGoBack(): void {
     this._routerService.navigate(['product']);
   }
 
-  onSubmit(): void {
+  public onSubmit(): void {
     if (this.addProductForm.invalid || this.addProductForm.pending) {
       this.addProductForm.markAllAsTouched();
       return;
@@ -79,7 +79,7 @@ export class ProductAddPage implements OnDestroy {
     this.stateService.addProduct(addProduct);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     if (this._addProductSuccess) {
       this._addProductSuccess.unsubscribe();
     }

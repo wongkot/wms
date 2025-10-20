@@ -9,7 +9,7 @@ import { PaginationModule } from '@app/shared/pagination/pagination-module';
 import { DatePickerModule } from '@app/shared/date-picker/date-picker-module';
 
 const ROUTES: Routes = [
-	{ path: '', pathMatch: 'full', component: InventoryHistoryPage },
+  { path: '', pathMatch: 'full', component: InventoryHistoryPage },
 ];
 
 @NgModule({

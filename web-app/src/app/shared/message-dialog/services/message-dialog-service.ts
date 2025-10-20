@@ -6,13 +6,13 @@ import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class MessageDialogService {
-  private _appRef = inject(ApplicationRef);
-  private document = inject(DOCUMENT);
+  private readonly _appRef = inject(ApplicationRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly _rendererFactory = inject(RendererFactory2);
+  private readonly _renderer = this._rendererFactory.createRenderer(null, null);
   private _dialogNotifier?: Subject<DialogResult>;
-  private _rendererFactory = inject(RendererFactory2);
-  private _renderer = this._rendererFactory.createRenderer(null, null);
 
-  showInfo(title: string, message: string) {
+  public showInfo(title: string, message: string): Observable<DialogResult> {
     return this.show({
       title: title,
       message: message,
@@ -23,7 +23,7 @@ export class MessageDialogService {
     });
   }
 
-  showSuccess(title: string, message: string) {
+  public showSuccess(title: string, message: string): Observable<DialogResult> {
     return this.show({
       title: title,
       message: message,
@@ -34,7 +34,7 @@ export class MessageDialogService {
     });
   }
 
-  showWarning(title: string, message: string) {
+  public showWarning(title: string, message: string): Observable<DialogResult> {
     return this.show({
       title: title,
       message: message,
@@ -45,7 +45,7 @@ export class MessageDialogService {
     });
   }
 
-  showError(title: string, message: string) {
+  public showError(title: string, message: string): Observable<DialogResult> {
     return this.show({
       title: title,
       message: message,
@@ -56,7 +56,7 @@ export class MessageDialogService {
     });
   }
 
-  show(options?: { title: string, message: string, type: DialogType, showOkButton: boolean, showCancelButton: boolean, dismissable: boolean }): Observable<DialogResult> {
+  public show(options?: { title: string, message: string, type: DialogType, showOkButton: boolean, showCancelButton: boolean, dismissable: boolean }): Observable<DialogResult> {
     const componentRef = createComponent(MessageDialogComponent, {
       environmentInjector: this._appRef.injector,
     });
@@ -87,7 +87,7 @@ export class MessageDialogService {
     return this._dialogNotifier.asObservable();
   }
 
-  closeDialog(result: DialogResult) {
+  public closeDialog(result: DialogResult): void {
     // Enable scrolling when dialog is closed
     this._renderer.removeClass(this.document.body, 'overflow-hidden');
     this._dialogNotifier?.next(result);

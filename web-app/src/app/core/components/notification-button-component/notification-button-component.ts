@@ -9,18 +9,18 @@ import { NotificationService } from '@app/core/services/state/notification-servi
   styleUrl: './notification-button-component.css'
 })
 export class NotificationButtonComponent {
-  largeButtonSize = input<boolean>(false);
-  notificationService = inject(NotificationService);
+  public readonly largeButtonSize = input<boolean>(false);
+  public readonly notificationService = inject(NotificationService);
 
-  onNotificationClick(notification: ProductQuantityChangedNotification) {
+  public onNotificationClick(notification: ProductQuantityChangedNotification): void {
     this.notificationService.markAsRead(notification);
   }
 
-  onClearAllClick() {
+  public onClearAllClick(): void {
     this.notificationService.clearAll();
   }
 
-  onNotificationButtonFocused() {
+  public onNotificationButtonFocused(): void {
     this.notificationService.refreshDate();
   }
 }

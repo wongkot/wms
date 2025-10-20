@@ -35,10 +35,10 @@ import { NotificationService } from '@app/core/services/state/notification-servi
   providedIn: 'root'
 })
 export class InMemoryDbService {
-  private _products = new Map<number, Product>();
+  private readonly _products = new Map<number, Product>();
   private _currentProductId = 1;
-  private _productInventory = new Map<number, InventoryProductDb>();
-  private _displayInventoryStatusMap = new Map<InventoryStatus, string>([
+  private readonly _productInventory = new Map<number, InventoryProductDb>();
+  private readonly _displayInventoryStatusMap = new Map<InventoryStatus, string>([
     [InventoryStatus.OK, 'OK'],
     [InventoryStatus.Low, 'Low'],
     [InventoryStatus.OutOfStock, 'Out of stock'],
@@ -46,9 +46,9 @@ export class InMemoryDbService {
   private _currentInventoryId = 1;
   private _inventoryHistory: InventoryHistoryDb[] = [];
   private _currentInventoryHistoryId = 1;
-  private _utilityService = inject(UtilityService);
-  private _notificationService = inject(NotificationService);
-  private _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _notificationService = inject(NotificationService);
+  private readonly _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
     [InventoryOperationType.Inbound, 'Inbound'],
     [InventoryOperationType.Outbound, 'Outbound'],
     [InventoryOperationType.Adjustment, 'Adjustment'],
@@ -59,7 +59,7 @@ export class InMemoryDbService {
     this.seedData();
   }
 
-  private seedData() {
+  private seedData(): void {
     let inventoryProductRandomParameters = new Map<number, InventoryProductRandomParam>();
 
     // Products
@@ -339,7 +339,7 @@ export class InMemoryDbService {
       maxTotalGeneratedQuantity: 15,
     });
     this._currentProductId++;
-    
+
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
@@ -395,7 +395,7 @@ export class InMemoryDbService {
       maxTotalGeneratedQuantity: 25,
     });
     this._currentProductId++;
-    
+
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
@@ -460,7 +460,7 @@ export class InMemoryDbService {
         const area = this._utilityService.formatAreaName(zonePrefix, row, column);
         // Prevent quantity exceed maximum total quantity
         quantity = Math.min(quantity, randomParams.maxTotalGeneratedQuantity - totalQuantity);
-        
+
         const inventory: Inventory = {
           id: this._currentInventoryId,
           productId: product.id,
@@ -491,7 +491,7 @@ export class InMemoryDbService {
         if (this.randInt(1, 100) <= randomParams.outboundProbability) {
           const currentTime = new Date();
           const outboundTimestamp = new Date(timestamp);
-           // Make outbound timestamp newer than inbound timestamp
+          // Make outbound timestamp newer than inbound timestamp
           outboundTimestamp.setMinutes(outboundTimestamp.getMinutes() + this.randInt(1, 59));
           outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(0, 2));
           const outboundHistory: InventoryHistoryDb = {
@@ -523,19 +523,19 @@ export class InMemoryDbService {
     }
   }
 
-  hasProductName(name: string): boolean {
+  public hasProductName(name: string): boolean {
     return [...this._products.values()].some(product => product.name == name);
   }
 
-  hasProductNameFromOtherId(name: string, id: number): boolean {
+  public hasProductNameFromOtherId(name: string, id: number): boolean {
     return [...this._products.values()].some(product => product.name == name && product.id !== id);
   }
 
-  getProducts(): Product[] {
+  public getProducts(): Product[] {
     return JSON.parse(JSON.stringify([...this._products.values()]));
   }
 
-  getProductNames(query: string, limit: number): string[] {
+  public getProductNames(query: string, limit: number): string[] {
     let filteredProductNames = this._utilityService.sortArray([...this._products.values()], 'name', true)
       .map(product => product.name);
     if (query) {
@@ -547,7 +547,7 @@ export class InMemoryDbService {
     }
   }
 
-  getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
+  public getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
     let filteredProducts = [...this._products.values()];
     if (query) {
       query = query?.toLocaleLowerCase();
@@ -570,11 +570,11 @@ export class InMemoryDbService {
     return this.paginateItems(filteredProducts, page, pageSize);
   }
 
-  getProductById(id: number): Product | null {
+  public getProductById(id: number): Product | null {
     return this._products.get(id) ?? null;
   }
 
-  addProduct(input: AddProduct): Product {
+  public addProduct(input: AddProduct): Product {
     const addedProduct: Product = {
       id: this._currentProductId,
       name: input.name,
@@ -591,7 +591,7 @@ export class InMemoryDbService {
     return addedProduct;
   }
 
-  editProduct(input: EditProduct): Product {
+  public editProduct(input: EditProduct): Product {
     if (this.hasProductNameFromOtherId(input.name, input.id)) {
       throw Error(MESSAGES.PRODUCT_NAME_EXISTS);
     }
@@ -611,7 +611,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(editProduct));
   }
 
-  deleteProduct(id: number): Product | null {
+  public deleteProduct(id: number): Product | null {
     const deleteProduct = this._products.get(id);
     if (!deleteProduct) {
       return null;
@@ -636,7 +636,7 @@ export class InMemoryDbService {
     return deleteProduct;
   }
 
-  getInventoryProducts(): InventoryProduct[] {
+  public getInventoryProducts(): InventoryProduct[] {
     const inventoryProducts: InventoryProduct[] = [...this._productInventory.values()].filter((inventoryProductDb) => {
       return inventoryProductDb.quantity > 0;
     })
@@ -667,7 +667,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventoryProducts));
   }
 
-  getPageInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<InventoryProduct> {
+  public getPageInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<InventoryProduct> {
     let filteredInventoryProducts = this.getInventoryProducts();
     if (query) {
       query = query?.toLocaleLowerCase();
@@ -690,7 +690,7 @@ export class InMemoryDbService {
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
   }
 
-  getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
+  public getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
     const inventoryProductDb = this._productInventory.get(productId);
     if (!inventoryProductDb || inventoryProductDb.quantity <= 0) {
       return null;
@@ -730,7 +730,7 @@ export class InMemoryDbService {
     };
   }
 
-  inventoryInbound(input: InventoryOperation): Inventory {
+  public inventoryInbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
       throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
@@ -839,7 +839,7 @@ export class InMemoryDbService {
     }
   }
 
-  inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
+  public inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
     const product = [...this._products.values()].find((product) => {
       return product.name == input.productName;
     });
@@ -855,7 +855,7 @@ export class InMemoryDbService {
     });
   }
 
-  inventoryOutbound(input: InventoryOperation): Inventory {
+  public inventoryOutbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
       throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
@@ -908,7 +908,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventory));
   }
 
-  inventoryAdjustment(input: InventoryOperation): Inventory {
+  public inventoryAdjustment(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
       throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
@@ -965,7 +965,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventory));
   }
 
-  inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
+  public inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
       throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
@@ -1053,7 +1053,7 @@ export class InMemoryDbService {
     }
   }
 
-  getInventoryHistories(): InventoryHistory[] {
+  public getInventoryHistories(): InventoryHistory[] {
     const inventoryHistory: InventoryHistory[] = [...this._inventoryHistory]
       .map((inventoryHistoryDb) => {
         return {
@@ -1065,7 +1065,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventoryHistory));
   }
 
-  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: string, endDate: string, sort: string): Pagination<InventoryHistory> {
+  public getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: string, endDate: string, sort: string): Pagination<InventoryHistory> {
     let filteredInventoryHistories = this.getInventoryHistories();
     const filterStartDate = new Date(startDate);
     const filterEndDate = new Date(endDate);
@@ -1097,12 +1097,12 @@ export class InMemoryDbService {
     return this.paginateItems(filteredInventoryHistories, page, pageSize);
   }
 
-  getRecentInventoryHistories(limit: number): InventoryHistory[] {
+  public getRecentInventoryHistories(limit: number): InventoryHistory[] {
     const sortedInventoryHistories = this._utilityService.sortArray(this.getInventoryHistories(), 'timestamp', false);
     return sortedInventoryHistories.slice(0, limit);
   }
 
-  getDashboardData(): InventoryDashboardApiOutput {
+  public getDashboardData(): InventoryDashboardApiOutput {
     const totalMonths = 6;
     const timestamp = new Date();
     const inboundByMonth = new Map<string, number>();

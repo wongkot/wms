@@ -13,23 +13,23 @@ import { InventoryDetailStateService } from '@app/modules/inventory/services/sta
   styleUrl: './inventory-operations-component.css'
 })
 export class InventoryOperationsComponent {
-  stateService = inject(InventoryDetailStateService);
-  drawerToggleControl = new FormControl(this.stateService.drawerOpened());
-  private _utilityService = inject(UtilityService);
-  private _fb: FormBuilder = inject(FormBuilder);
-  private _quantityBaseValidators = [ Validators.required, Validators.min(1) ];
-  private _maxOperationQuantity = 999;
+  public readonly stateService = inject(InventoryDetailStateService);
+  public readonly drawerToggleControl = new FormControl(this.stateService.drawerOpened());
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _fb: FormBuilder = inject(FormBuilder);
+  private readonly _quantityBaseValidators = [Validators.required, Validators.min(1)];
+  private readonly _maxOperationQuantity = 999;
   public readonly allAreas = this._utilityService.getAreasForDropdown();
-  readonly customAreaErrorMessages = new Map<string, string>([
-    [ 'required', MESSAGES.AREA_REQUIRED ],
+  public readonly customAreaErrorMessages = new Map<string, string>([
+    ['required', MESSAGES.AREA_REQUIRED],
   ]);
-  public inventoryOperationForm = this._fb.group({
+  public readonly inventoryOperationForm = this._fb.group({
     lot: new FormControl({ value: '', disabled: true }),
     area: new FormControl({ value: '', disabled: true }),
-    quantity: new FormControl('', [ ...this._quantityBaseValidators ]),
+    quantity: new FormControl('', [...this._quantityBaseValidators]),
     moveArea: new FormControl(''),
   });
-  operationTitle = computed(() => {
+  public readonly operationTitle = computed(() => {
     let title = '';
     switch (this.stateService.selectedInventoryOperation()) {
       case INVENTORY_OPERATION_INBOUND:
@@ -47,13 +47,13 @@ export class InventoryOperationsComponent {
     }
     return title;
   });
-  isMoveAreaOperation = computed(() => {
+  public readonly isMoveAreaOperation = computed(() => {
     return this.stateService.selectedInventoryOperation() == INVENTORY_OPERATION_MOVE_AREA;
   });
-  moveAreas = computed(() => {
-    return this.stateService.selectedInventory ? [ ...this.allAreas ].filter(area => area.key != this.stateService.selectedInventory()?.area) : this.allAreas;
+  public readonly moveAreas = computed(() => {
+    return this.stateService.selectedInventory ? [...this.allAreas].filter(area => area.key != this.stateService.selectedInventory()?.area) : this.allAreas;
   });
-  minQuantity = computed(() => {
+  public readonly minQuantity = computed(() => {
     let minQuantity = DEFAULT_MIN_INBOUND_QUANTITY; // Most actions must have at least 1 quantity to perform the operation
     switch (this.stateService.selectedInventoryOperation()) {
       case INVENTORY_OPERATION_ADJUSTMENT:
@@ -62,7 +62,7 @@ export class InventoryOperationsComponent {
     }
     return minQuantity;
   });
-  maxQuantity = computed(() => {
+  public readonly maxQuantity = computed(() => {
     let maxQuantity = this._maxOperationQuantity;
     switch (this.stateService.selectedInventoryOperation()) {
       case INVENTORY_OPERATION_OUTBOUND:
@@ -146,15 +146,15 @@ export class InventoryOperationsComponent {
     });
   }
 
-  getFormControl(formControlName: string): FormControl {
+  public getFormControl(formControlName: string): FormControl {
     return this.inventoryOperationForm.get(formControlName) as FormControl;
   }
 
-  onDismissErrorMessage() {
+  public onDismissErrorMessage(): void {
     this.stateService.clearInventoryOperationError();
   }
 
-  onDrawerBackdropClick() {
+  public onDrawerBackdropClick(): void {
     if (this.stateService.isCallingInventoryOperationApi()) {
       return;
     }
@@ -163,7 +163,7 @@ export class InventoryOperationsComponent {
     this.stateService.closeDrawer();
   }
 
-  onCancel() {
+  public onCancel(): void {
     if (this.stateService.isCallingInventoryOperationApi()) {
       return;
     }
@@ -172,7 +172,7 @@ export class InventoryOperationsComponent {
     this.stateService.closeDrawer();
   }
 
-  onSubmit() {
+  public onSubmit(): void {
     if (this.stateService.isCallingInventoryOperationApi()) {
       return;
     }

@@ -20,7 +20,7 @@ import {
   styleUrl: './pie-chart-component.css'
 })
 export class PieChartComponent {
-  private _sectionColor = [
+  private readonly _sectionColor = [
     'var(--color-success)',
     'var(--color-warning)',
     'var(--color-info)',
@@ -29,7 +29,7 @@ export class PieChartComponent {
     'var(--color-secondary)',
     'var(--color-accent)',
   ];
-  private _sectionTextColor = [
+  private readonly _sectionTextColor = [
     'var(--color-success-content)',
     'var(--color-warning-content)',
     'var(--color-info-content)',
@@ -38,13 +38,13 @@ export class PieChartComponent {
     'var(--color-secondary-content)',
     'var(--color-accent-content)',
   ];
-  chartInput = input.required<BaseChartInput>();
-  series = computed<ApexAxisChartSeries>(() => {
+  public readonly chartInput = input.required<BaseChartInput>();
+  public readonly series = computed<ApexAxisChartSeries>(() => {
     const serie = this.chartInput().chartSeries.length <= 0 ? [] :
       this.chartInput().chartSeries[0].values;
     return serie.map(xy => xy[1]);
   });
-  chart = computed<ApexChart>(() => {
+  public readonly chart = computed<ApexChart>(() => {
     return {
       height: this.chartInput().chartHeight,
       type: 'pie',
@@ -54,17 +54,17 @@ export class PieChartComponent {
       },
     };
   });
-  fill = computed<ApexFill>(() => {
+  public readonly fill = computed<ApexFill>(() => {
     return {
       colors: this._sectionColor,
     };
   });
-  labels = computed<string[]>(() => {
+  public readonly labels = computed<string[]>(() => {
     const serie = this.chartInput().chartSeries.length <= 0 ? [] :
       this.chartInput().chartSeries[0].values;
     return serie.map(xy => xy[0]);
   });
-  title = computed<ApexTitleSubtitle>(() => {
+  public readonly title = computed<ApexTitleSubtitle>(() => {
     return {
       text: this.chartInput().chartTitle,
       align: 'center',
@@ -73,7 +73,7 @@ export class PieChartComponent {
       }
     };
   });
-  readonly tooltip: ApexTooltip = {
+  public readonly tooltip: ApexTooltip = {
     custom: function ({ series, seriesIndex, w }) {
       return `
       <div class="bg-base-300 p-2">
@@ -82,8 +82,8 @@ export class PieChartComponent {
         </span>
       </div>`;
     }
-  }
-  readonly states: ApexStates = {
+  };
+  public readonly states: ApexStates = {
     hover: {
       filter: {
         type: 'none',
@@ -95,7 +95,7 @@ export class PieChartComponent {
       }
     }
   };
-  readonly legend: ApexLegend = {
+  public readonly legend: ApexLegend = {
     position: 'bottom',
     labels: {
       colors: 'var(--color-base-content)',
@@ -110,7 +110,7 @@ export class PieChartComponent {
       return `${legendName} (${Number(w?.config?.series[seriesIndex] ?? 0).toLocaleString(DEFAULT_LOCALE)})`;
     },
   };
-  dataLabels = computed<ApexDataLabels>(() => {
+  public readonly dataLabels = computed<ApexDataLabels>(() => {
     return {
       dropShadow: {
         enabled: false,
@@ -120,10 +120,10 @@ export class PieChartComponent {
       },
     };
   });
-  readonly stroke: ApexStroke = {
+  public readonly stroke: ApexStroke = {
     show: false,
   };
-  readonly plotOptions: ApexPlotOptions = {
+  public readonly plotOptions: ApexPlotOptions = {
     pie: {
       expandOnClick: false,
     }

@@ -9,16 +9,16 @@ import { BaseChartInput } from '@app/shared/chart/models/base-chart-input';
 
 @Injectable()
 export class DashboardStateService {
-  private _dashboardService: DashboardService = inject(MockDashboardService);
-  private _inventoryHistoryService: InventoryHistoryService = inject(MockInventoryHistoryService);
-  private _dashboardData = signal<InventoryDashboard>({
+  private readonly _dashboardService: DashboardService = inject(MockDashboardService);
+  private readonly _inventoryHistoryService: InventoryHistoryService = inject(MockInventoryHistoryService);
+  private readonly _dashboardData = signal<InventoryDashboard>({
     currentMonthTotalInbound: null,
     currentMonthTotalOutbound: null,
     totalInboundPercent: null,
     totalOutboundPercent: null,
     totalLowInventory: 0,
   });
-  private _barChartInput = signal<BaseChartInput>({
+  private readonly _barChartInput = signal<BaseChartInput>({
     chartTitle: 'Inventory movement in recent 6 months',
     chartHeight: 300,
     chartSeries: [
@@ -36,7 +36,7 @@ export class DashboardStateService {
       },
     ]
   });
-  private _pieChartInput = signal<BaseChartInput>({
+  private readonly _pieChartInput = signal<BaseChartInput>({
     chartTitle: 'Inventory by category',
     chartHeight: 300,
     chartSeries: [
@@ -48,7 +48,7 @@ export class DashboardStateService {
       }
     ]
   });
-  private _recentHistories = signal<InventoryHistory[]>([]);
+  private readonly _recentHistories = signal<InventoryHistory[]>([]);
 
   public get barChartInput() {
     return this._barChartInput.asReadonly();
@@ -71,7 +71,7 @@ export class DashboardStateService {
     this.loadRecentHistories();
   }
 
-  loadDashboardData(): void {
+  private loadDashboardData(): void {
     this._dashboardService.getDashboardData().subscribe({
       next: (dashboardApiOutput) => {
         this._dashboardData.set({
@@ -95,17 +95,17 @@ export class DashboardStateService {
         }));
 
         const pieChartData = this.pieChartInput().chartSeries.at(0);
-        if  (pieChartData) {
+        if (pieChartData) {
           pieChartData.values = dashboardApiOutput.pieChartSeries;
         }
         this._pieChartInput.update((previous) => ({
-          ...previous,         
+          ...previous,
         }));
       }
     });
   }
 
-  loadRecentHistories(): void {
+  private loadRecentHistories(): void {
     this._inventoryHistoryService.getRecentInventoryHistories(5).subscribe({
       next: (inventoryHistory) => {
         this._recentHistories.set(inventoryHistory);

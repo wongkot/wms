@@ -12,6 +12,6 @@ import { DateRangePickerComponent } from '@app/shared/date-picker/components/dat
   exports: [
     DateRangePickerComponent,
   ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DatePickerModule { }
