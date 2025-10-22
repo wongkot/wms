@@ -5,10 +5,9 @@ import { ProductQuantityChangedNotification } from '@app/core/models/product-qua
   'providedIn': 'root'
 })
 export class NotificationService {
-  private _maxNotifications = 5;
-  private _currentNotifications = signal<ProductQuantityChangedNotification[]>([]);
-
-  public hasUnreadNotification = computed(() => {
+  private readonly _maxNotifications = 5;
+  private readonly _currentNotifications = signal<ProductQuantityChangedNotification[]>([]);
+  public readonly hasUnreadNotification = computed(() => {
     return this._currentNotifications().some(notification => !notification.read);
   })
 
@@ -16,7 +15,7 @@ export class NotificationService {
     return this._currentNotifications.asReadonly();
   }
 
-  notify(notification: ProductQuantityChangedNotification, delay: number = 500) {
+  public notify(notification: ProductQuantityChangedNotification, delay: number = 500): void {
     const currentNotifications = this._currentNotifications();
     if (currentNotifications.length >= this._maxNotifications) {
       currentNotifications.pop();
@@ -32,7 +31,7 @@ export class NotificationService {
     }
   }
 
-  markAsRead(notification: ProductQuantityChangedNotification) {
+  public markAsRead(notification: ProductQuantityChangedNotification): void {
     if (notification.read) {
       return;
     }
@@ -41,11 +40,11 @@ export class NotificationService {
     this._currentNotifications.update(previous => [...previous]);
   }
 
-  clearAll() {
+  public clearAll(): void {
     this._currentNotifications.set([]);
   }
 
-  refreshDate() {
+  public refreshDate(): void {
     // Update date object to retrigger time ago pipe
     const notifications = this._currentNotifications();
     notifications.forEach(notificaiton => {

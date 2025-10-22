@@ -1,4 +1,5 @@
 <fieldset class="fieldset">
+  <!-- Field header -->
   <legend class="fieldset-legend">
     <div>
       {{ fieldName() }}
@@ -15,15 +16,19 @@
       </div>
     }
   </legend>
+
+  <!-- Input area -->
   <input type="number"
-         class="input w-full focus:border-0"
+         class="input w-full focus:outline-0"
          (input)="onInputChange()"
          [placeholder]="textPlaceHolder()"
          [formControl]="inputControl()"
          [min]="minValue()"
          [max]="maxValue()"
          [maxlength]="maxValue().toString().length"
-         [class.input-error]="inputControl().touched && inputControl().invalid"/>  
+         [class.input-error]="inputControl().touched && inputControl().invalid"/>
+         
+  <!-- Indicator/error message -->
   @if (inputControl().pending) {
     <p class="label h-4">
       <span class="loading loading-dots loading-xs"></span>

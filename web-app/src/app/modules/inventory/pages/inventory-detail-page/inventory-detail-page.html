@@ -1,3 +1,4 @@
+<!-- Navigation -->
 <div class="flex flex-row justify-between">
   <app-breadcrumb [breadcrumbSections]="breadcrumbSections"></app-breadcrumb>
   <button class="btn btn-soft"
@@ -6,6 +7,8 @@
     Back
   </button>
 </div>
+
+<!-- Inventory warehouse map + detail information -->
 @if (stateService.isFetchingData()) {
   <div class="mx-auto bg-base-100 shadow-md rounded-box border border-base-content/10 p-6 mt-4">
     <div class="flex flex-row justify-center py-5">
@@ -33,4 +36,6 @@
     </div>
   </div>
 }
+
+<!-- Inventory operation (side bar) -->
 <app-inventory-operations></app-inventory-operations>

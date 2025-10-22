@@ -1,6 +1,7 @@
-import { KeyValue } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { MESSAGES } from '@app/core/constants/app';
+import { UtilityService } from '@app/core/services/data/utility-service';
 import { Product } from '@app/modules/product/models/product';
 import { ProductManagementStateService } from '@app/modules/product/services/state/product-management-state-service';
 import { DialogResult } from '@app/shared/message-dialog/enums/dialog-result';
@@ -18,13 +19,13 @@ import { filter, Subscription } from 'rxjs';
   providers: [ProductManagementStateService]
 })
 export class ProductManagementPage implements OnDestroy {
-  public stateService: ProductManagementStateService;
-  private _routerService = inject(Router);
-  private _route = inject(ActivatedRoute);
-  private _messageDialogService = inject(MessageDialogService);
-  private _toastService = inject(ToastService);
+  private readonly _routerService = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _messageDialogService = inject(MessageDialogService);
+  private readonly _toastService = inject(ToastService);
   private _deleteProductSuccess: Subscription;
-
+  private readonly _utilityService = inject(UtilityService);
+  public readonly stateService = inject(ProductManagementStateService);
   public readonly tableConfig: TableConfig = {
     canEdit: true,
     canDelete: true,
@@ -71,89 +72,83 @@ export class ProductManagementPage implements OnDestroy {
       },
     ],
   }
-  public readonly productCategories: KeyValue<string, string>[] = [
-    { key: '', value: 'None' },
-    { key: 'Smart Watches', value: 'Smart Watches' },
-    { key: 'PC', value: 'PC' },
-    { key: 'Smart Phones', value: 'Smart Phones' },
-  ]
+  public readonly productCategories = this._utilityService.getProductCategoriesForDropdown();
 
-  constructor() { 
-    this.stateService = inject(ProductManagementStateService);
+  constructor() {
     this._deleteProductSuccess = this.stateService.deleteSuccess$.subscribe({
       next: () => {
-        this._toastService.showSuccess('Product has been deleted');
+        this._toastService.showSuccess(MESSAGES.PRODUCT_DELETED);
       }
     });
   }
 
-  onPageSizeChanged(newPageSize: number) {
+  public onPageSizeChanged(newPageSize: number): void {
     if (newPageSize === this.stateService.selectedPageSize()) return;
 
-    this.stateService.loadProducts(this.stateService.selectedPage(), newPageSize, this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ pageSize: newPageSize });
   }
 
-  onFirstPageClick(newPage: number) {
+  public onFirstPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ page: newPage });
   }
 
-  onPreviousPageClick(newPage: number) {
+  public onPreviousPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ page: newPage });
   }
 
-  onNextPageClick(newPage: number) {
+  public onNextPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ page: newPage });
   }
 
-  onLastPageClick(newPage: number) {
+  public onLastPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
-    this.stateService.loadProducts(newPage, this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ page: newPage });
   }
 
-  onSearchTermChanged(newSearchTerm: string) {
+  public onSearchTermChanged(newSearchTerm: string): void {
     if (newSearchTerm === this.stateService.searchTerm()) return;
 
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), newSearchTerm, this.stateService.selectedCategory(), this.stateService.currentSortState());
+    this.stateService.loadProducts({ query: newSearchTerm });
   }
 
-  onSearchCategoryChanged(newSearchCategory: string) {
+  public onSearchCategoryChanged(newSearchCategory: string): void {
     if (newSearchCategory === this.stateService.selectedCategory()) return;
 
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), newSearchCategory, this.stateService.currentSortState());
+    this.stateService.loadProducts({ category: newSearchCategory });
   }
 
-  onSortChanged(newSort: TableSortState) {
+  public onSortChanged(newSort: TableSortState): void {
     if (newSort.columnProp === this.stateService.currentSortState().columnProp &&
-        newSort.isAsc === this.stateService.currentSortState().isAsc) return;
+      newSort.isAsc === this.stateService.currentSortState().isAsc) return;
 
-    this.stateService.loadProducts(this.stateService.selectedPage(), this.stateService.selectedPageSize(), this.stateService.searchTerm(), this.stateService.selectedCategory(), newSort);
+    this.stateService.loadProducts({ sort: newSort });
   }
 
-  onAddProduct() {
+  public onAddProduct(): void {
     this._routerService.navigate(['add'], { relativeTo: this._route });
   }
 
-  onEditProduct(product: Product) {
+  public onEditProduct(product: Product): void {
     this._routerService.navigate(['edit', product.id], { relativeTo: this._route });
   }
 
-  onDeleteProduct(product: Product) {
-    this._messageDialogService.showError('Confirmation', 'Do you want to delete selected product?').pipe(
+  public onDeleteProduct(product: Product): void {
+    this._messageDialogService.showError('Confirmation', MESSAGES.CONFIRM_DELETE_PRODUCT).pipe(
       filter((result) => result == DialogResult.OK)
     )
-    .subscribe(() => {
-      this.stateService.deleteProduct(product.id);
-    });
+      .subscribe(() => {
+        this.stateService.deleteProduct(product.id);
+      });
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     if (this._deleteProductSuccess) {
       this._deleteProductSuccess.unsubscribe();
     }

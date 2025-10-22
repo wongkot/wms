@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, computed, effect, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { DEFAULT_MAX_NUMBER, DEFAULT_MIN_NUMBER, MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-number-input',
@@ -8,36 +9,35 @@ import { FormControl } from '@angular/forms';
   styleUrl: './number-input-component.css'
 })
 export class NumberInputComponent implements AfterViewInit {
-  fieldName = input<string>('');
-  required = input<boolean>(false);
-  inputControl = input.required<FormControl>();
-  minValue = input<number>(1);
-  maxValue = input<number>(999);
-  textPlaceHolder = input<string>('');
-  customErrorMessages = input<Map<string, string>>(new Map<string, string>());
-  tooltipMessage = input<string>('');
-
-  readonly errorMessages = new Map<string, string>([
-    [ 'required', 'This field cannot be empty' ],
+  public readonly fieldName = input<string>('');
+  public readonly required = input<boolean>(false);
+  public readonly inputControl = input.required<FormControl>();
+  public readonly minValue = input<number>(DEFAULT_MIN_NUMBER);
+  public readonly maxValue = input<number>(DEFAULT_MAX_NUMBER);
+  public readonly textPlaceHolder = input<string>('');
+  public readonly customErrorMessages = input<Map<string, string>>(new Map<string, string>());
+  public readonly tooltipMessage = input<string>('');
+  public readonly errorMessages = new Map<string, string>([
+    ['required', MESSAGES.INPUT_REQUIRED],
   ]);
-  private maxLength = computed(() => {
+  private readonly maxLength = computed(() => {
     return this.maxValue().toString().length;
   });
 
   constructor() {
     effect(() => {
-      this.errorMessages.set('min', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
-      this.errorMessages.set('max', `Please enter value between ${this.minValue()} - ${this.maxValue()}`);
+      this.errorMessages.set('min', MESSAGES.INVALID_NUMBER_RANGE(this.minValue(), this.maxValue()));
+      this.errorMessages.set('max', MESSAGES.INVALID_NUMBER_RANGE(this.minValue(), this.maxValue()));
     });
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.customErrorMessages().forEach((value, key) => {
       this.errorMessages.set(key, value);
     });
   }
 
-  onInputChange() {
+  public onInputChange(): void {
     const currentValue = Number(this.inputControl().value);
     const currentLength = currentValue.toString().length;
 

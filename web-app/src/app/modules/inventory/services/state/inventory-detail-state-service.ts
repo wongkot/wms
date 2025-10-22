@@ -13,21 +13,21 @@ import { delay, finalize, Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class InventoryDetailStateService {
-  private _isFetchingData = signal<boolean>(false);
-  private _errorMessage = signal<string>('');
-  private _isCallingInventoryOperationApi = signal<boolean>(false);
-  private _inventoryOperationErrorMessage = signal<string>('');
-  private _inventoryProduct = signal<InventoryProduct | null>(null);
-  private _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
-  private _selectedInventory = signal<Inventory | null>(null);
-  private _selectedArea = signal<Set<string>>(new Set<string>());
-  private _selectedInventoryOperation = signal<string>('');
-  private _utilityService = inject(UtilityService);
-  private _inventoryService: InventoryService = inject(MockInventoryService);
-  private _drawerOpened = signal<boolean>(false);
-  private _inventoryOperationSuccess = new Subject<void>();
+  private readonly _isFetchingData = signal<boolean>(false);
+  private readonly _errorMessage = signal<string>('');
+  private readonly _isCallingInventoryOperationApi = signal<boolean>(false);
+  private readonly _inventoryOperationErrorMessage = signal<string>('');
+  private readonly _inventoryProduct = signal<InventoryProduct | null>(null);
+  private readonly _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
+  private readonly _selectedInventory = signal<Inventory | null>(null);
+  private readonly _selectedArea = signal<Set<string>>(new Set<string>());
+  private readonly _selectedInventoryOperation = signal<string>('');
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _inventoryService: InventoryService = inject(MockInventoryService);
+  private readonly _drawerOpened = signal<boolean>(false);
+  private readonly _inventoryOperationSuccess = new Subject<void>();
   public readonly inventoryOperationSuccess$ = this._inventoryOperationSuccess.asObservable();
-  warehouseMapState = computed(() => {
+  public readonly warehouseMapState = computed(() => {
     const map = new Map<string, WarehouseMapState>();
     const groupedInventory = new Map<string, Inventory[]>();
 
@@ -37,7 +37,7 @@ export class InventoryDetailStateService {
         const warehouseState = groupedInventory.get(inventory.area);
         warehouseState?.push(inventory);
       } else {
-        groupedInventory.set(inventory.area, [ inventory ]);
+        groupedInventory.set(inventory.area, [inventory]);
       }
     }
     groupedInventory.forEach((inventories, area) => {
@@ -53,15 +53,15 @@ export class InventoryDetailStateService {
     return map;
   });
 
-  get isFetchingData() {
+  public get isFetchingData() {
     return this._isFetchingData.asReadonly();
   }
 
-  get errorMessage() {
+  public get errorMessage() {
     return this._errorMessage.asReadonly();
   }
 
-  get inventoryProduct() {
+  public get inventoryProduct() {
     return this._inventoryProduct.asReadonly();
   }
 
@@ -93,45 +93,45 @@ export class InventoryDetailStateService {
     return this._inventoryOperationErrorMessage.asReadonly();
   }
 
-  loadInventories(productId: number, updatedInventory?: Inventory): void {
+  public loadInventories(productId: number, updatedInventory?: Inventory): void {
     this._isFetchingData.set(true);
     const sort = this._currentSortState().columnProp ? `${this._currentSortState().columnProp}:${this._currentSortState().isAsc ? 'asc' : 'desc'}` : '';
     this._inventoryService.getInventoryProductById(productId, sort).pipe(
       finalize(() => this._isFetchingData.set(false))
     )
-    .subscribe({
-      next: (inventoryProduct) => {
-        if (inventoryProduct) {
-          // Reset sort state
-          if (inventoryProduct.inventories.length <= 0) {
-            this._currentSortState.set({ columnProp: '', isAsc: true });
-          }
+      .subscribe({
+        next: (inventoryProduct) => {
+          if (inventoryProduct) {
+            // Reset sort state
+            if (inventoryProduct.inventories.length <= 0) {
+              this._currentSortState.set({ columnProp: '', isAsc: true });
+            }
 
-          // Select current inventory and area if product inventories contains updated inventory from the operation
-          const foundInventory = inventoryProduct.inventories.find(inventory => inventory.id == updatedInventory?.id);
-          if (foundInventory) {
-            this._selectedInventory.set(foundInventory);
-            this._selectedArea.set(new Set<string>([ foundInventory.area ]));
+            // Select current inventory and area if product inventories contains updated inventory from the operation
+            const foundInventory = inventoryProduct.inventories.find(inventory => inventory.id == updatedInventory?.id);
+            if (foundInventory) {
+              this._selectedInventory.set(foundInventory);
+              this._selectedArea.set(new Set<string>([foundInventory.area]));
+            } else {
+              this._selectedInventory.set(null);
+              this._selectedArea.set(new Set<string>());
+            }
+
+            this._selectedInventoryOperation.set('');
+            this._inventoryProduct.set(inventoryProduct);
           } else {
-            this._selectedInventory.set(null);
-            this._selectedArea.set(new Set<string>());
+            this._errorMessage.set(`Unable to find inventories with product id (${productId})`);
           }
-          
-          this._selectedInventoryOperation.set('');
-          this._inventoryProduct.set(inventoryProduct);
-        } else {
-          this._errorMessage.set(`Unable to find inventories with product id (${productId})`);
         }
-      }
-    });
+      });
   }
 
-  sortInventories(sort: TableSortState) {
+  public sortInventories(sort: TableSortState): void {
     if (!sort.columnProp) {
       sort = { columnProp: 'id', isAsc: true };
     }
 
-    let sortedInventories = [ ...this._inventoryProduct()?.inventories ?? [] ];
+    let sortedInventories = [...this._inventoryProduct()?.inventories ?? []];
     sortedInventories = this._utilityService.sortArray(sortedInventories, sort.columnProp, sort.isAsc);
 
     this._currentSortState.set(sort);
@@ -141,44 +141,44 @@ export class InventoryDetailStateService {
     });
   }
 
-  selectInventory(inventory: Inventory | null) {
+  public selectInventory(inventory: Inventory | null): void {
     this._selectedInventory.set(inventory);
-    this._selectedArea.set(new Set<string>(inventory ? [ inventory.area ] : []));
+    this._selectedArea.set(new Set<string>(inventory ? [inventory.area] : []));
   }
 
-  selectInventoryOperation(inventoryOperation: string) {
+  public selectInventoryOperation(inventoryOperation: string): void {
     this._selectedInventoryOperation.set(inventoryOperation);
   }
 
-  openDrawer() {
+  public openDrawer(): void {
     this._drawerOpened.set(true);
   }
 
-  closeDrawer() {
+  public closeDrawer(): void {
     this._drawerOpened.set(false);
   }
 
-  inventoryInbound(input: InventoryOperation) {
+  public inventoryInbound(input: InventoryOperation): void {
     this.inventoryOperation(input, INVENTORY_OPERATION_INBOUND);
   }
 
-  inventoryOutbound(input: InventoryOperation) {
+  public inventoryOutbound(input: InventoryOperation): void {
     this.inventoryOperation(input, INVENTORY_OPERATION_OUTBOUND);
   }
 
-  inventoryAdjustment(input: InventoryOperation) {
+  public inventoryAdjustment(input: InventoryOperation): void {
     this.inventoryOperation(input, INVENTORY_OPERATION_ADJUSTMENT);
   }
-  
-  inventoryMoveArea(input: InventoryMoveAreaOperation) {
+
+  public inventoryMoveArea(input: InventoryMoveAreaOperation): void {
     this.inventoryOperation(input, INVENTORY_OPERATION_MOVE_AREA);
   }
 
-  clearInventoryOperationError() {
+  public clearInventoryOperationError(): void {
     this._inventoryOperationErrorMessage.set('');
   }
 
-  private inventoryOperation(input: InventoryOperation | InventoryMoveAreaOperation, type: string) {
+  private inventoryOperation(input: InventoryOperation | InventoryMoveAreaOperation, type: string): void {
     let inventoryOperations: Observable<Inventory>;
     switch (type) {
       case INVENTORY_OPERATION_INBOUND:

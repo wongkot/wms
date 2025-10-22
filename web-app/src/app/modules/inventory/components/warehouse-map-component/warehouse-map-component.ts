@@ -10,11 +10,11 @@ import { WarehouseMapState } from '@app/modules/inventory/models/warehouse-map-s
   styleUrl: './warehouse-map-component.css'
 })
 export class WarehouseMapComponent {
-  private _utilityService = inject(UtilityService);
-  warehouseMapState = input<Map<string, WarehouseMapState>>();
-  selectedArea = input<Set<string>>(new Set<string>());
-  canSelectArea = input<boolean>(false);
-  selectAreaChanged = output<string>();
+  private readonly _utilityService = inject(UtilityService);
+  public readonly warehouseMapState = input<Map<string, WarehouseMapState>>();
+  public readonly selectedArea = input<Set<string>>(new Set<string>());
+  public readonly canSelectArea = input<boolean>(false);
+  public readonly selectAreaChanged = output<string>();
   public readonly warehouseAreas: Map<string, string[][]> = new Map(ZONE_PREFIXES.map((zone) => {
     const areas: string[][] = [];
     for (let row = 0; row < AREA_ROWS; row++) {
@@ -24,19 +24,11 @@ export class WarehouseMapComponent {
       }
       areas.push(areaRow);
     }
-    return [ `Zone ${zone}`, areas ];
+    return [`Zone ${zone}`, areas];
   }));
 
-  generateNumberArray(length: number) {
-    return Array(length).keys();
-  }
-
-  getAreaName(prefix: string, row: number, column: number): string {
-    return this._utilityService.formatAreaName(prefix, row, column);
-  }
-
-  onAreaClick(area: string) {
-    if (! this.canSelectArea()) {
+  public onAreaClick(area: string): void {
+    if (!this.canSelectArea()) {
       return;
     }
     this.selectAreaChanged.emit(area);

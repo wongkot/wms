@@ -8,26 +8,25 @@ import { finalize, Subject } from 'rxjs';
 
 @Injectable()
 export class ProductManagementStateService {
-  private _isLoading = signal<boolean>(false);
-  private _errorMessage = signal<string>('');
-  private _selectedPageSize = signal<number>(10);
-  private _selectedPage = signal<number>(1);
-  private _searchTerm = signal<string>('');
-  private _selectedCategory = signal<string>('');
-  private _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
-  private _displayProducts = signal<Pagination<Product>>({
+  private readonly _isLoading = signal<boolean>(false);
+  private readonly _errorMessage = signal<string>('');
+  private readonly _selectedPageSize = signal<number>(10);
+  private readonly _selectedPage = signal<number>(1);
+  private readonly _searchTerm = signal<string>('');
+  private readonly _selectedCategory = signal<string>('');
+  private readonly _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
+  private readonly _displayProducts = signal<Pagination<Product>>({
     currentPage: this._selectedPage(),
     pageSize: this._selectedPageSize(),
     totalItems: 0,
     items: [],
   });
-  private _productService: ProductService;
-  private _deleteSuccess = new Subject<void>();
+  private readonly _productService: ProductService = inject(MockProductService);
+  private readonly _deleteSuccess = new Subject<void>();
   public readonly deleteSuccess$ = this._deleteSuccess.asObservable();
 
   constructor() {
-    this._productService = inject(MockProductService);
-    this.loadProducts(this._selectedPage(), this._selectedPageSize(), this._searchTerm(), this._selectedCategory(), this._currentSortState());
+    this.loadProducts();
   }
 
   public get displayProducts() {
@@ -54,12 +53,15 @@ export class ProductManagementStateService {
     return this._currentSortState.asReadonly();
   }
 
-  /**
-   * Load products for display
-   */
-  loadProducts(page: number, pageSize: number, query: string, category: string, sort: TableSortState): void {
+  public loadProducts(options?: { page?: number, pageSize?: number, query?: string, category?: string, sort?: TableSortState }): void {
     this._isLoading.set(true);
     this._errorMessage.set('');
+
+    let page = options?.page != undefined ? options.page : this._selectedPage();
+    let pageSize = options?.pageSize != undefined ? options.pageSize : this._selectedPageSize();
+    let query = options?.query != undefined ? options.query : this._searchTerm();
+    let category = options?.category !== undefined ? options.category : this._selectedCategory();
+    let sort = options?.sort != undefined ? options.sort : this._currentSortState();
 
     this._productService.getPageProducts(page, pageSize, query, category, `${sort.columnProp}:${sort.isAsc ? 'asc' : 'desc'}`).pipe(
       finalize(() => { this._isLoading.set(false); }),
@@ -77,17 +79,11 @@ export class ProductManagementStateService {
     });
   }
 
-  deleteProduct(id: number): void {
+  public deleteProduct(id: number): void {
     this._productService.deleteProduct(id).subscribe({
       next: () => {
         this._deleteSuccess.next();
-        this.loadProducts(
-          this._selectedPage(),
-          this._selectedPageSize(),
-          this._searchTerm(),
-          this._selectedCategory(),
-          this._currentSortState(),
-        );
+        this.loadProducts();
       }
     });
   }

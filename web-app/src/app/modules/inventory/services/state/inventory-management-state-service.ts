@@ -8,20 +8,20 @@ import { finalize } from 'rxjs';
 
 @Injectable()
 export class InventoryManagementStateService {
-  private _isLoading = signal<boolean>(false);
-  private _errorMessage = signal<string>('');
-  private _selectedPageSize = signal<number>(10);
-  private _selectedPage = signal<number>(1);
-  private _searchTerm = signal<string>('');
-  private _selectedCategory = signal<string>('');
-  private _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
-  private _displayInventoryProducts = signal<Pagination<InventoryProduct>>({
+  private readonly _isLoading = signal<boolean>(false);
+  private readonly _errorMessage = signal<string>('');
+  private readonly _selectedPageSize = signal<number>(10);
+  private readonly _selectedPage = signal<number>(1);
+  private readonly _searchTerm = signal<string>('');
+  private readonly _selectedCategory = signal<string>('');
+  private readonly _currentSortState = signal<TableSortState>({ columnProp: '', isAsc: true });
+  private readonly _displayInventoryProducts = signal<Pagination<InventoryProduct>>({
     currentPage: this._selectedPage(),
     pageSize: this._selectedPageSize(),
     totalItems: 0,
     items: [],
   });
-  private _inventoryService: InventoryService = inject(MockInventoryService);
+  private readonly _inventoryService: InventoryService = inject(MockInventoryService);
 
   constructor() {
     this.loadInventoryProducts()
@@ -51,7 +51,7 @@ export class InventoryManagementStateService {
     return this._currentSortState.asReadonly();
   }
 
-  loadInventoryProducts(options?: { page?: number, pageSize?: number, query?: string, category?: string, sort?: TableSortState }): void {
+  public loadInventoryProducts(options?: { page?: number, pageSize?: number, query?: string, category?: string, sort?: TableSortState }): void {
     this._isLoading.set(true);
     this._errorMessage.set('');
 

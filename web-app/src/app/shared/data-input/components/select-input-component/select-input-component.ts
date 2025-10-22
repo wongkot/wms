@@ -1,6 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { AfterViewInit, Component, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-select-input',
@@ -9,20 +10,18 @@ import { FormControl } from '@angular/forms';
   styleUrl: './select-input-component.css'
 })
 export class SelectInputComponent implements AfterViewInit {
-  fieldName = input<string>('');
-  required = input<boolean>(false);
-  placeHolder = input<string>('');
-  inputControl = input.required<FormControl>();
-  options = input<KeyValue<string, string>[]>([]);
-  customErrorMessages = input<Map<string, string>>(new Map<string, string>());
-  tooltipMessage = input<string>('');
-
-  readonly errorMessages = new Map<string, string>([
-    [ 'required', 'Please select an option' ],
+  public readonly fieldName = input<string>('');
+  public readonly required = input<boolean>(false);
+  public readonly placeHolder = input<string>('');
+  public readonly inputControl = input.required<FormControl>();
+  public readonly options = input<KeyValue<string, string>[]>([]);
+  public readonly customErrorMessages = input<Map<string, string>>(new Map<string, string>());
+  public readonly tooltipMessage = input<string>('');
+  public readonly errorMessages = new Map<string, string>([
+    ['required', MESSAGES.INPUT_DROPDOWN_REQUIRED],
   ]);
-  
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.customErrorMessages().forEach((value, key) => {
       this.errorMessages.set(key, value);
     });

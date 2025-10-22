@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, effect, input, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { DEFAULT_MAX_CHARS, MESSAGES } from '@app/core/constants/app';
 
 @Component({
   selector: 'app-text-input',
@@ -8,26 +9,26 @@ import { FormControl } from '@angular/forms';
   styleUrl: './text-input-component.css',
 })
 export class TextInputComponent implements AfterViewInit {
-  fieldName = input<string>('');
-  required = input<boolean>(false);
-  inputControl = input.required<FormControl>();
-  showCharacterHint = input<boolean>(false);
-  maxCharacters = input<number>(100);
-  textPlaceHolder = input<string>('');
-  customErrorMessages = input<Map<string, string>>(new Map<string, string>());
-  tooltipMessage = input<string>('');
-  autocompleteOptions = input<string[]>([]);
-  private _isFocused = signal<boolean>(false);
-  private _currentFocusedItemIndex = signal<number>(-1);
-  readonly errorMessages = new Map<string, string>([
-    [ 'required', 'This field cannot be empty' ],
+  public fieldName = input<string>('');
+  public required = input<boolean>(false);
+  public inputControl = input.required<FormControl>();
+  public showCharacterHint = input<boolean>(false);
+  public maxCharacters = input<number>(DEFAULT_MAX_CHARS);
+  public textPlaceHolder = input<string>('');
+  public customErrorMessages = input<Map<string, string>>(new Map<string, string>());
+  public tooltipMessage = input<string>('');
+  public autocompleteOptions = input<string[]>([]);
+  public readonly errorMessages = new Map<string, string>([
+    ['required', MESSAGES.INPUT_REQUIRED],
   ]);
+  private readonly _isFocused = signal<boolean>(false);
+  private readonly _currentFocusedItemIndex = signal<number>(-1);
 
-  public get isFocused () {
+  public get isFocused() {
     return this._isFocused.asReadonly();
   }
 
-  public get currentFocusedItemIndex () {
+  public get currentFocusedItemIndex() {
     return this._currentFocusedItemIndex.asReadonly();
   }
 
@@ -38,22 +39,22 @@ export class TextInputComponent implements AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.customErrorMessages().forEach((value, key) => {
       this.errorMessages.set(key, value);
     });
   }
 
-  onFocus() {
+  public onFocus(): void {
     this._isFocused.set(true);
   }
 
-  onLostFocus() {
+  public onLostFocus(): void {
     this._isFocused.set(false);
     this._currentFocusedItemIndex.set(-1);
   }
 
-  onKeydown(event: KeyboardEvent) {
+  public onKeydown(event: KeyboardEvent): void {
     if (this.autocompleteOptions().length <= 0) {
       return;
     }
@@ -86,7 +87,7 @@ export class TextInputComponent implements AfterViewInit {
     }
   }
 
-  onAutocompleteItemClick(item: string) {
+  public onAutocompleteItemClick(item: string): void {
     this.inputControl().setValue(item);
   }
 }

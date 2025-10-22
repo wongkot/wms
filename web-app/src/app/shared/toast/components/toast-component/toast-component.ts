@@ -8,9 +8,9 @@ import { ToastService } from '@app/shared/toast/services/toast-service';
   styleUrl: './toast-component.css'
 })
 export class ToastComponent {
-  public toastService = inject(ToastService);
+  public readonly toastService = inject(ToastService);
 
-  onClose() {
+  public onClose(): void {
     this.toastService.close();
   }
 }

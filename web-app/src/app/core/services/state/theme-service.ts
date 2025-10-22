@@ -5,10 +5,11 @@ import { ThemeInfo } from '@app/core/models/theme-info';
   'providedIn': 'root'
 })
 export class ThemeService {
-  private _document = inject(DOCUMENT);
+  private readonly _document = inject(DOCUMENT);
   private readonly _defaultTheme = 'dark';
+  // NOTE: Do not forget to add these theme name (key of this map) to global style.css file
   public readonly allThemes = new Map<string, ThemeInfo>([
-    [ 
+    [
       this._defaultTheme,
       {
         displayName: 'Dark',
@@ -19,7 +20,7 @@ export class ThemeService {
         colorAccentClass: 'bg-teal-400',
       }
     ],
-    [ 
+    [
       'night',
       {
         displayName: 'Night',
@@ -30,7 +31,7 @@ export class ThemeService {
         colorAccentClass: 'bg-[#F471B5]',
       }
     ],
-    [ 
+    [
       'halloween',
       {
         displayName: 'Halloween',
@@ -41,7 +42,7 @@ export class ThemeService {
         colorAccentClass: 'bg-[#42AA00]',
       }
     ],
-    [ 
+    [
       'dim',
       {
         displayName: 'Dim',
@@ -52,7 +53,7 @@ export class ThemeService {
         colorAccentClass: 'bg-[#C792E9]',
       }
     ],
-    [ 
+    [
       'synthwave',
       {
         displayName: 'Synthwave',
@@ -63,8 +64,8 @@ export class ThemeService {
         colorAccentClass: 'bg-orange-400',
       }
     ],
-  ]); // NOTE: Also add these themes to global style.css file
-  private _currentTheme = signal<string>(this._defaultTheme);
+  ]);
+  private readonly _currentTheme = signal<string>(this._defaultTheme);
 
   public get currentTheme() {
     return this._currentTheme.asReadonly();
@@ -74,7 +75,7 @@ export class ThemeService {
     this.loadTheme();
   }
 
-  setTheme(newTheme: string) {
+  public setTheme(newTheme: string): void {
     if (this._currentTheme() == newTheme) {
       return;
     }
@@ -87,7 +88,7 @@ export class ThemeService {
     this._currentTheme.set(newTheme);
   }
 
-  loadTheme() {
+  private loadTheme(): void {
     const savedTheme = localStorage.getItem('theme') ?? '';
     this.setTheme(this.allThemes.has(savedTheme) ? savedTheme : this._defaultTheme);
   }

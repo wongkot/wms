@@ -8,10 +8,10 @@ import { ThemeService } from '@app/core/services/state/theme-service';
   styleUrl: './theme-button-component.css'
 })
 export class ThemeButtonComponent {
-  largeButtonSize = input<boolean>(false);
-  themeService = inject(ThemeService);
+  public readonly largeButtonSize = input<boolean>(false);
+  public readonly themeService = inject(ThemeService);
 
-  onChangeTheme(newTheme: string) {
+  public onChangeTheme(newTheme: string): void {
     this.themeService.setTheme(newTheme);
   }
 }

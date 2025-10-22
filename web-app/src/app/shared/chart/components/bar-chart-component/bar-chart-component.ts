@@ -19,8 +19,8 @@ import {
   styleUrl: './bar-chart-component.css'
 })
 export class BarChartComponent {
-  chartInput = input.required<BaseChartInput>();
-  series = computed<ApexAxisChartSeries>(() => {
+  public readonly chartInput = input.required<BaseChartInput>();
+  public readonly series = computed<ApexAxisChartSeries>(() => {
     return this.chartInput().chartSeries.map(serie => {
       return {
         name: serie.name,
@@ -29,7 +29,7 @@ export class BarChartComponent {
       };
     });
   });
-  chart = computed<ApexChart>(() => {
+  public readonly chart = computed<ApexChart>(() => {
     return {
       height: this.chartInput().chartHeight,
       type: 'bar',
@@ -39,7 +39,7 @@ export class BarChartComponent {
       },
     };
   });
-  title = computed<ApexTitleSubtitle>(() => {
+  public readonly title = computed<ApexTitleSubtitle>(() => {
     return {
       text: this.chartInput().chartTitle,
       align: 'center',
@@ -48,7 +48,7 @@ export class BarChartComponent {
       }
     };
   });
-  xAxis = computed<ApexXAxis>(() => {
+  public readonly xAxis = computed<ApexXAxis>(() => {
     const xValues = this.chartInput().chartSeries.length <= 0 ? [] :
       this.chartInput().chartSeries[0].values.map(xy => xy[0]);
     return {
@@ -66,14 +66,14 @@ export class BarChartComponent {
       },
     };
   });
-  readonly yAxis: ApexYAxis = {
+  public readonly yAxis: ApexYAxis = {
     labels: {
       style: {
         colors: 'var(--color-base-content)',
       }
     }
   };
-  readonly tooltip: ApexTooltip = {
+  public readonly tooltip: ApexTooltip = {
     custom: function ({ series, seriesIndex, dataPointIndex }) {
       return `
       <div class="bg-base-300 p-2">
@@ -81,7 +81,7 @@ export class BarChartComponent {
       </div>`;
     }
   }
-  readonly states: ApexStates = {
+  public readonly states: ApexStates = {
     hover: {
       filter: {
         type: 'none',
@@ -93,7 +93,7 @@ export class BarChartComponent {
       }
     }
   };
-  readonly legend: ApexLegend = {
+  public readonly legend: ApexLegend = {
     position: 'bottom',
     labels: {
       colors: 'var(--color-base-content)',
@@ -105,7 +105,7 @@ export class BarChartComponent {
       highlightDataSeries: false,
     }
   };
-  readonly grid: ApexGrid = {
+  public readonly grid: ApexGrid = {
     show: true,
     borderColor: 'var(--color-base-300)',
     yaxis: {
@@ -114,14 +114,14 @@ export class BarChartComponent {
       },
     }
   };
-  readonly plotOption: ApexPlotOptions = {
+  public readonly plotOption: ApexPlotOptions = {
     bar: {
       dataLabels: {
         position: 'top',
       }
     }
   };
-  dataLabels = computed<ApexDataLabels>(() => {
+  public readonly dataLabels = computed<ApexDataLabels>(() => {
     return {
       style: {
         colors: [({ seriesIndex, dataPointIndex, w }: any) => {

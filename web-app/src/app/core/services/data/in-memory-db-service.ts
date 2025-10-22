@@ -8,7 +8,19 @@ import { InventoryProductDb } from '@app/modules/inventory/models/inventory-prod
 import { AddProduct } from '@app/modules/product/models/add-product';
 import { EditProduct } from '@app/modules/product/models/edit-product';
 import { Product } from '@app/modules/product/models/product';
-import { AREA_COLUMNS, AREA_ROWS, DATE_FORMAT, ZONE_PREFIXES } from '@app/core/constants/app';
+import {
+  AREA_COLUMNS,
+  AREA_ROWS,
+  DATE_FORMAT,
+  DEFAULT_LOCALE,
+  MESSAGES,
+  PRODUCT_CATEGORY_CABLES,
+  PRODUCT_CATEGORY_COMPUTERS,
+  PRODUCT_CATEGORY_MISC,
+  PRODUCT_CATEGORY_NETWORKING,
+  PRODUCT_CATEGORY_PERIPHERALS,
+  ZONE_PREFIXES,
+} from '@app/core/constants/app';
 import { InventoryOperation } from '@app/modules/inventory/models/inventory-operation';
 import { InventoryMoveAreaOperation } from '@app/modules/inventory/models/inventory-move-area-operation';
 import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
@@ -23,10 +35,10 @@ import { NotificationService } from '@app/core/services/state/notification-servi
   providedIn: 'root'
 })
 export class InMemoryDbService {
-  private _products = new Map<number, Product>();
+  private readonly _products = new Map<number, Product>();
   private _currentProductId = 1;
-  private _productInventory = new Map<number, InventoryProductDb>();
-  private _displayInventoryStatusMap = new Map<InventoryStatus, string>([
+  private readonly _productInventory = new Map<number, InventoryProductDb>();
+  private readonly _displayInventoryStatusMap = new Map<InventoryStatus, string>([
     [InventoryStatus.OK, 'OK'],
     [InventoryStatus.Low, 'Low'],
     [InventoryStatus.OutOfStock, 'Out of stock'],
@@ -34,9 +46,9 @@ export class InMemoryDbService {
   private _currentInventoryId = 1;
   private _inventoryHistory: InventoryHistoryDb[] = [];
   private _currentInventoryHistoryId = 1;
-  private _utilityService = inject(UtilityService);
-  private _notificationService = inject(NotificationService);
-  private _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _notificationService = inject(NotificationService);
+  private readonly _displayInventoryOperationMap = new Map<InventoryOperationType, string>([
     [InventoryOperationType.Inbound, 'Inbound'],
     [InventoryOperationType.Outbound, 'Outbound'],
     [InventoryOperationType.Adjustment, 'Adjustment'],
@@ -47,186 +59,388 @@ export class InMemoryDbService {
     this.seedData();
   }
 
-  private seedData() {
+  private seedData(): void {
+    let inventoryProductRandomParameters = new Map<number, InventoryProductRandomParam>();
+
     // Products
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'Apple Watch #1',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        reorderThreshold: 40,
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #2',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #3',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
-        tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
-      });
-    
-    this._currentProductId++;
-
-    this._products.set(this._currentProductId,
-      {
-        id: this._currentProductId,
-        name: 'Apple Watch #4',
-        description: 'Description for Apple Watch',
-        unitPrice: 599,
-        category: 'Smart Watches',
+        name: 'Notebook',
+        description: 'Quad-Core, 16GB RAM, 512GB SSD, 16 inch, LCD',
+        unitPrice: 15000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
         reorderThreshold: 50,
-        imageUrl: 'https://flowbite.com/docs/images/products/apple-watch.png',
+        imageUrl: './product/images/notebook.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 5,
+      outboundProbability: 40,
+      maxTotalGeneratedQuantity: 40,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #1',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'PC',
+        description: '8-Core, 32GB RAM, 1TB SSD',
+        unitPrice: 22000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        reorderThreshold: 40,
+        imageUrl: './product/images/pc.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 15,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #2',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Server',
+        description: '32-Core, 64GB RAM, 2TB SSDx2, 4TB HDDx2',
+        unitPrice: 35000,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/server.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 3,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #3',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Tablet',
+        description: '16GB RAM, 512GB, 12.5 inch, LCD',
+        unitPrice: 17500,
+        category: PRODUCT_CATEGORY_COMPUTERS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/tablet.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 10,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iMac 27" #4',
-        description: 'Description for iMac 27"',
-        unitPrice: 2499,
-        category: 'PC',
+        name: 'Power Strip',
+        description: '6 Sockets, 2m Cable, 1200 W',
+        unitPrice: 1000,
+        category: PRODUCT_CATEGORY_MISC,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/imac.png',
+        imageUrl: './product/images/power_strip.png',
+        reorderThreshold: 15,
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 10,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #1',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'NAS',
+        description: '4 Bays, 8TB HDDx4, ARM 4-Core, 2GB RAM',
+        unitPrice: 23500,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/nas.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 2,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #2',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Switching Hub',
+        description: '3x 10/100/1000Mbps Ports, LED Indicator',
+        unitPrice: 500,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/switching_hub.png',
+        reorderThreshold: 5,
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 5,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #3',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Wi-Fi Router',
+        description: '2.4/5GHz, 1200Mbps, 3x Antennas, 4x LAN Ports',
+        unitPrice: 750,
+        category: PRODUCT_CATEGORY_NETWORKING,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/wifi_router.png',
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 3,
+    });
     this._currentProductId++;
 
     this._products.set(this._currentProductId,
       {
         id: this._currentProductId,
-        name: 'iPhone 12 #4',
-        description: 'Description for iPhone 12',
-        unitPrice: 999,
-        category: 'Smart Phones',
+        name: 'Headphones (Black)',
+        description: 'Noise Cancelling, USB/Bluetooth',
+        unitPrice: 3500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
         tags: [],
-        imageUrl: 'https://flowbite.com/docs/images/products/iphone-12.png',
+        imageUrl: './product/images/headphones_dark.png',
+        reorderThreshold: 15,
       });
-    
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 4,
+      outboundProbability: 30,
+      maxTotalGeneratedQuantity: 10,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Headphones (White)',
+        description: 'Noise Cancelling, USB/Bluetooth',
+        unitPrice: 3500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/headphones_light.png',
+        reorderThreshold: 15,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 0,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 0,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Inkjet Printer',
+        description: 'USB/Wi-Fi, 45 ppm, Resolution 4800 x 1200 dpi',
+        unitPrice: 4750,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/inkjet_printer.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 2,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Laser Printer',
+        description: 'USB/Wi-Fi, 100 ppm, Resolution 6400 x 1200 dpi',
+        unitPrice: 16500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/laser_printer.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 1,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 1,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Monitor',
+        description: '27 inch, Full HD, IPS, 2x HDMI, 1x DisplayPort',
+        unitPrice: 4500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/monitor.png',
+        reorderThreshold: 10,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 30,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Mouse (Blue)',
+        description: '2.4 GHz Wireless, Optical, 1000 DPI',
+        unitPrice: 950,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/mouse_blue.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 0,
+      outboundProbability: 0,
+      maxTotalGeneratedQuantity: 0,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Mouse (Red)',
+        description: '2.4 GHz Wireless, Optical, 1000 DPI',
+        unitPrice: 950,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/mouse_red.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 3,
+      outboundProbability: 20,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Keyboard',
+        description: 'Wired/Wireless, QWERTY, Red Switch',
+        unitPrice: 2500,
+        category: PRODUCT_CATEGORY_PERIPHERALS,
+        tags: [],
+        imageUrl: './product/images/keyboard.png',
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 0,
+      maxQuantityPerMonth: 2,
+      outboundProbability: 10,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'Ethernet Cable',
+        description: 'Cat 6, 1m, 1Gbps',
+        unitPrice: 120,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/ethernet_cable.png',
+        reorderThreshold: 20,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 4,
+      maxQuantityPerMonth: 8,
+      outboundProbability: 70,
+      maxTotalGeneratedQuantity: 15,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'USB Cable',
+        description: 'Type-A to Type-A, 0.5m, USB 3.0',
+        unitPrice: 60,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/usb_a.png',
+        reorderThreshold: 20,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 2,
+      maxQuantityPerMonth: 5,
+      outboundProbability: 70,
+      maxTotalGeneratedQuantity: 25,
+    });
+    this._currentProductId++;
+
+    this._products.set(this._currentProductId,
+      {
+        id: this._currentProductId,
+        name: 'HDMI Cable',
+        description: 'HDMI 2.0, 2m, 4K @ 60Hz',
+        unitPrice: 100,
+        category: PRODUCT_CATEGORY_CABLES,
+        tags: [],
+        imageUrl: './product/images/hdmi.png',
+        reorderThreshold: 10,
+      });
+    inventoryProductRandomParameters.set(this._currentProductId, {
+      minQuantityPerMonth: 3,
+      maxQuantityPerMonth: 6,
+      outboundProbability: 50,
+      maxTotalGeneratedQuantity: 20,
+    });
     this._currentProductId++;
 
     // Product inventory
-    const pickInventoryProductCount = 7; // Number for picking top X products for generating inventory data
-    const randomInventoryCount = 8;
-    const minRandomQuantity = 2;
-    const maxRandomQuantity = 5;
-    const randomOutboundProbability = 50; // Probability between 1 - 100
-    const firstXProducts = this._products.size > pickInventoryProductCount ? 
-      [ ...this._products.values() ].slice(0, pickInventoryProductCount)
-      : [ ...this._products.values() ];
-
-    firstXProducts.forEach(product => {
+    const totalGeneratedMonths = 8;
+    for (let product of [...this._products.values()]) {
       let inventories: Inventory[] = [];
+      let totalQuantity = 0;
+      const randomParams = inventoryProductRandomParameters.get(product.id);
+
+      if (!randomParams || randomParams.maxTotalGeneratedQuantity == 0 || randomParams.maxQuantityPerMonth == 0) {
+        continue;
+      }
 
       // Create random inventories of current product
       // Reverse index key in order to generate lot number from oldest to newest
-      for (let index of [...Array(randomInventoryCount).keys()].reverse()) {
+      for (let monthOffset of [...Array(totalGeneratedMonths).keys()].reverse()) {
+        if (totalQuantity >= randomParams.maxTotalGeneratedQuantity) {
+          continue;
+        }
+        let quantity = this.randInt(randomParams.minQuantityPerMonth, randomParams.maxQuantityPerMonth);
+        if (quantity <= 0) {
+          continue;
+        }
+
         const timestamp = new Date();
-        timestamp.setMonth(timestamp.getMonth() - index);
+        timestamp.setMonth(timestamp.getMonth() - monthOffset);
         // Generate random date if the current date is not in this month
-        if (index !== 0) {
+        if (monthOffset !== 0) {
           const lastDayOfMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 0);
           timestamp.setDate(this.randInt(1, lastDayOfMonth.getDate()));
           timestamp.setHours(this.randInt(0, 23));
@@ -244,7 +458,8 @@ export class InMemoryDbService {
         const column = this.randInt(0, AREA_COLUMNS - 1);
         const lot = this._utilityService.formatLotNumber(timestamp);
         const area = this._utilityService.formatAreaName(zonePrefix, row, column);
-        const quantity = this.randInt(minRandomQuantity, maxRandomQuantity);
+        // Prevent quantity exceed maximum total quantity
+        quantity = Math.min(quantity, randomParams.maxTotalGeneratedQuantity - totalQuantity);
 
         const inventory: Inventory = {
           id: this._currentInventoryId,
@@ -253,6 +468,7 @@ export class InMemoryDbService {
           area: area,
           quantity: quantity,
         };
+        totalQuantity += quantity;
         this._currentInventoryId++;
 
         // Create inventory inbound history
@@ -272,10 +488,12 @@ export class InMemoryDbService {
         this._currentInventoryHistoryId++;
 
         // Remove inventory randomly
-        if (this.randInt(1, 100) <= randomOutboundProbability) {
+        if (this.randInt(1, 100) <= randomParams.outboundProbability) {
           const currentTime = new Date();
           const outboundTimestamp = new Date(timestamp);
-          outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(1,3)); // Make outbound timestamp newer than inbound timestamp
+          // Make outbound timestamp newer than inbound timestamp
+          outboundTimestamp.setMinutes(outboundTimestamp.getMinutes() + this.randInt(1, 59));
+          outboundTimestamp.setHours(outboundTimestamp.getHours() + this.randInt(0, 2));
           const outboundHistory: InventoryHistoryDb = {
             id: this._currentInventoryHistoryId,
             timestamp: outboundTimestamp >= currentTime ? currentTime : outboundTimestamp, // Avoid future timestamp
@@ -288,6 +506,7 @@ export class InMemoryDbService {
             beforeQuantity: inventory.quantity,
             afterQuantity: 0,
           };
+          totalQuantity -= inventory.quantity;
           this._inventoryHistory.push(outboundHistory);
           this._currentInventoryHistoryId++;
         } else {
@@ -295,32 +514,29 @@ export class InMemoryDbService {
         }
       }
 
-      const totalInventoryQuantity = inventories.reduce((total, current) => {
-        return total + current.quantity;
-      }, 0);
       // Create inventory product
       this._productInventory.set(product.id, {
         productId: product.id,
-        quantity: totalInventoryQuantity,
+        quantity: totalQuantity,
         inventories: inventories,
       });
-    });
+    }
   }
 
-  hasProductName(name: string): boolean {
-    return [ ...this._products.values() ].some(product => product.name == name);
+  public hasProductName(name: string): boolean {
+    return [...this._products.values()].some(product => product.name == name);
   }
 
-  hasProductNameFromOtherId(name: string, id: number): boolean {
-    return [ ...this._products.values() ].some(product => product.name == name && product.id !== id);
+  public hasProductNameFromOtherId(name: string, id: number): boolean {
+    return [...this._products.values()].some(product => product.name == name && product.id !== id);
   }
 
-  getProducts(): Product[] {
-    return JSON.parse(JSON.stringify([ ...this._products.values() ]));
+  public getProducts(): Product[] {
+    return JSON.parse(JSON.stringify([...this._products.values()]));
   }
 
-  getProductNames(query: string, limit: number): string[] {
-    let filteredProductNames = this._utilityService.sortArray([ ...this._products.values() ], 'name', true)
+  public getProductNames(query: string, limit: number): string[] {
+    let filteredProductNames = this._utilityService.sortArray([...this._products.values()], 'name', true)
       .map(product => product.name);
     if (query) {
       return filteredProductNames.filter((productName) => {
@@ -331,8 +547,8 @@ export class InMemoryDbService {
     }
   }
 
-  getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
-    let filteredProducts = [ ...this._products.values() ];
+  public getPageProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<Product> {
+    let filteredProducts = [...this._products.values()];
     if (query) {
       query = query?.toLocaleLowerCase();
       filteredProducts = filteredProducts.filter(product => {
@@ -354,11 +570,11 @@ export class InMemoryDbService {
     return this.paginateItems(filteredProducts, page, pageSize);
   }
 
-  getProductById(id: number): Product | null {
+  public getProductById(id: number): Product | null {
     return this._products.get(id) ?? null;
   }
 
-  addProduct(input: AddProduct): Product {
+  public addProduct(input: AddProduct): Product {
     const addedProduct: Product = {
       id: this._currentProductId,
       name: input.name,
@@ -375,14 +591,14 @@ export class InMemoryDbService {
     return addedProduct;
   }
 
-  editProduct(input: EditProduct): Product {
+  public editProduct(input: EditProduct): Product {
     if (this.hasProductNameFromOtherId(input.name, input.id)) {
-      throw Error('This product name already used');
+      throw Error(MESSAGES.PRODUCT_NAME_EXISTS);
     }
-    
+
     const editProduct = this._products.get(input.id);
     if (!editProduct) {
-      throw Error(`This product with id (${input.id}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.id));
     }
 
     editProduct.name = input.name;
@@ -395,7 +611,7 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(editProduct));
   }
 
-  deleteProduct(id: number): Product | null {
+  public deleteProduct(id: number): Product | null {
     const deleteProduct = this._products.get(id);
     if (!deleteProduct) {
       return null;
@@ -420,38 +636,38 @@ export class InMemoryDbService {
     return deleteProduct;
   }
 
-  getInventoryProducts(): InventoryProduct[] {
-    const inventoryProducts: InventoryProduct[] = [ ...this._productInventory.values() ].filter((inventoryProductDb) => {
+  public getInventoryProducts(): InventoryProduct[] {
+    const inventoryProducts: InventoryProduct[] = [...this._productInventory.values()].filter((inventoryProductDb) => {
       return inventoryProductDb.quantity > 0;
     })
-    .map((inventoryProductDb) => {
-      const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
-      const totalPrice = inventoryProductDb.quantity * unitPrice;
-      const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
-      let inventoryStatus = InventoryStatus.OK;
-      if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
-        inventoryStatus = InventoryStatus.Low;
-      }
+      .map((inventoryProductDb) => {
+        const unitPrice = this._products.get(inventoryProductDb.productId)?.unitPrice ?? 0;
+        const totalPrice = inventoryProductDb.quantity * unitPrice;
+        const reorderThreshold = this._products.get(inventoryProductDb.productId)?.reorderThreshold;
+        let inventoryStatus = InventoryStatus.OK;
+        if (reorderThreshold != null && reorderThreshold != undefined && inventoryProductDb.quantity < reorderThreshold) {
+          inventoryStatus = InventoryStatus.Low;
+        }
 
-      return {
-        productId: inventoryProductDb.productId,
-        productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
-        category: this._products.get(inventoryProductDb.productId)?.category ?? '',
-        quantity: inventoryProductDb.quantity,
-        unitPrice: unitPrice,
-        totalPrice: totalPrice,
-        reorderThreshold: reorderThreshold,
-        inventoryStatus: inventoryStatus,
-        inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
-        imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
-        inventories: [],
-      };
-    });
+        return {
+          productId: inventoryProductDb.productId,
+          productName: this._products.get(inventoryProductDb.productId)?.name ?? '',
+          category: this._products.get(inventoryProductDb.productId)?.category ?? '',
+          quantity: inventoryProductDb.quantity,
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+          reorderThreshold: reorderThreshold,
+          inventoryStatus: inventoryStatus,
+          inventoryStatusName: this._displayInventoryStatusMap.get(inventoryStatus) ?? '',
+          imageUrl: this._products.get(inventoryProductDb.productId)?.imageUrl ?? '',
+          inventories: [],
+        };
+      });
 
     return JSON.parse(JSON.stringify(inventoryProducts));
   }
 
-  getPageInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<InventoryProduct> {
+  public getPageInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Pagination<InventoryProduct> {
     let filteredInventoryProducts = this.getInventoryProducts();
     if (query) {
       query = query?.toLocaleLowerCase();
@@ -474,7 +690,7 @@ export class InMemoryDbService {
     return this.paginateItems(filteredInventoryProducts, page, pageSize);
   }
 
-  getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
+  public getInventoryProductById(productId: number, sort?: string): InventoryProduct | null {
     const inventoryProductDb = this._productInventory.get(productId);
     if (!inventoryProductDb || inventoryProductDb.quantity <= 0) {
       return null;
@@ -514,10 +730,10 @@ export class InMemoryDbService {
     };
   }
 
-  inventoryInbound(input: InventoryOperation): Inventory {
+  public inventoryInbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
     const inventoryProduct = this._productInventory.get(input.productId);
     const timestamp = new Date();
@@ -623,14 +839,14 @@ export class InMemoryDbService {
     }
   }
 
-  inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
-    const product = [ ...this._products.values() ].find((product) => {
+  public inventoryInboundWithProductName(input: InventoryInboundOperation): Inventory {
+    const product = [...this._products.values()].find((product) => {
       return product.name == input.productName;
     });
     if (!product) {
-      throw Error(`This product with name (${input.productName}) not found`);
+      throw Error(MESSAGES.PRODUCT_NAME_NOT_FOUND(input.productName));
     }
-    
+
     return this.inventoryInbound({
       productId: product.id,
       lot: input.lot,
@@ -639,25 +855,25 @@ export class InMemoryDbService {
     });
   }
 
-  inventoryOutbound(input: InventoryOperation): Inventory {
+  public inventoryOutbound(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!inventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
     if (inventory.quantity < input.quantity) {
-      throw Error(`Outbound quantity (${input.quantity}) exceed inventory limit (${inventory.quantity})`);
+      throw Error(MESSAGES.INVENTORY_OUTBOUND_EXCEED_LIMIT(input.quantity, inventory.quantity));
     }
 
     const timestamp = new Date();
@@ -692,29 +908,29 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventory));
   }
 
-  inventoryAdjustment(input: InventoryOperation): Inventory {
+  public inventoryAdjustment(input: InventoryOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!inventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
     if (input.quantity < 0) {
-      throw Error(`Adjustment quantity must be equal or greater than zero`);
+      throw Error(MESSAGES.INVENTORY_ADJUSTMENT_QUANTITY_ZERO);
     }
     const adjustQuantity = input.quantity - inventory.quantity; // Calculate number of quantity that needs to be add/subtract
     if (adjustQuantity == 0) {
-      throw Error(`Adjustment quantity cannot be zero`);
+      throw Error(MESSAGES.INVENTORY_ADJUSTMENT_ADJUSTED_QUANTITY_ZERO);
     }
 
     const timestamp = new Date();
@@ -749,22 +965,22 @@ export class InMemoryDbService {
     return JSON.parse(JSON.stringify(inventory));
   }
 
-  inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
+  public inventoryMoveArea(input: InventoryMoveAreaOperation): Inventory {
     const product = this._products.get(input.productId);
     if (!product) {
-      throw Error(`This product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const inventoryProduct = this._productInventory.get(input.productId);
     if (!inventoryProduct) {
-      throw Error(`This inventory product with id (${input.productId}) not found`);
+      throw Error(MESSAGES.PRODUCT_ID_NOT_FOUND(input.productId));
     }
 
     const currentAreaInventory = inventoryProduct.inventories.find(inventory => {
       return inventory.lot == input.lot && inventory.area == input.area;
     });
     if (!currentAreaInventory) {
-      throw Error(`This inventory with lot (${input.lot}) and area (${input.area}) not found`);
+      throw Error(MESSAGES.INVENTORY_NOT_FOUND(input.lot, input.area));
     }
 
     const timestamp = new Date();
@@ -837,26 +1053,31 @@ export class InMemoryDbService {
     }
   }
 
-  getInventoryHistories(): InventoryHistory[] {
-    const inventoryHistory: InventoryHistory[] = [ ...this._inventoryHistory ]
-    .map((inventoryHistoryDb) => {
-      return {
-        ...inventoryHistoryDb,
-        operationName: this._displayInventoryOperationMap.get(inventoryHistoryDb.operationType) ?? '',
-      };
-    });
+  public getInventoryHistories(): InventoryHistory[] {
+    const inventoryHistory: InventoryHistory[] = [...this._inventoryHistory]
+      .map((inventoryHistoryDb) => {
+        return {
+          ...inventoryHistoryDb,
+          operationName: this._displayInventoryOperationMap.get(inventoryHistoryDb.operationType) ?? '',
+        };
+      });
 
     return JSON.parse(JSON.stringify(inventoryHistory));
   }
 
-  getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: Date, endDate: Date, sort: string): Pagination<InventoryHistory> {
+  public getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: string, endDate: string, sort: string): Pagination<InventoryHistory> {
     let filteredInventoryHistories = this.getInventoryHistories();
-    const actualEndDate = new Date(endDate);
-    actualEndDate.setDate(actualEndDate.getDate() + 1);
+    // Setup filter date (local time)
+    const inputStartDate = new Date(startDate);
+    const inputEndDate = new Date(endDate);
+    inputEndDate.setDate(inputEndDate.getDate() + 1);
+    // Create new date object from current input date (to convert local time to UTC)
+    const filterStartDate = new Date(inputStartDate.getUTCFullYear(), inputStartDate.getUTCMonth(), inputStartDate.getUTCDate());
+    const filterEndDate = new Date(inputEndDate.getUTCFullYear(), inputEndDate.getUTCMonth(), inputEndDate.getUTCDate());
 
     filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
       const timestamp = new Date(inventoryHistory.timestamp);
-      return timestamp >= startDate && timestamp < actualEndDate;
+      return timestamp >= filterStartDate && timestamp < filterEndDate;
     });
     if (query) {
       query = query?.toLocaleLowerCase();
@@ -879,12 +1100,12 @@ export class InMemoryDbService {
     return this.paginateItems(filteredInventoryHistories, page, pageSize);
   }
 
-  getRecentInventoryHistories(limit: number): InventoryHistory[] {
+  public getRecentInventoryHistories(limit: number): InventoryHistory[] {
     const sortedInventoryHistories = this._utilityService.sortArray(this.getInventoryHistories(), 'timestamp', false);
     return sortedInventoryHistories.slice(0, limit);
   }
 
-  getDashboardData(): InventoryDashboardApiOutput {
+  public getDashboardData(): InventoryDashboardApiOutput {
     const totalMonths = 6;
     const timestamp = new Date();
     const inboundByMonth = new Map<string, number>();
@@ -892,14 +1113,14 @@ export class InMemoryDbService {
 
     for (let offset = totalMonths - 1; offset >= 0; offset--) {
       const month = new Date(timestamp.getFullYear(), timestamp.getMonth() - offset, 1);
-      inboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
-      outboundByMonth.set(formatDate(month, DATE_FORMAT, 'en-Us'), 0);
+      inboundByMonth.set(formatDate(month, DATE_FORMAT, DEFAULT_LOCALE), 0);
+      outboundByMonth.set(formatDate(month, DATE_FORMAT, DEFAULT_LOCALE), 0);
     }
 
     for (let inventoryHistory of this._inventoryHistory) {
       const timestamp = new Date(inventoryHistory.timestamp);
       const historyMonth = new Date(timestamp.getFullYear(), timestamp.getMonth(), 1);
-      const monthKey = formatDate(historyMonth, DATE_FORMAT, 'en-Us');
+      const monthKey = formatDate(historyMonth, DATE_FORMAT, DEFAULT_LOCALE);
 
       if (!inboundByMonth.has(monthKey)) { // Check either inbound or outbound map is enough (both have the same key)
         continue;
@@ -927,23 +1148,23 @@ export class InMemoryDbService {
       }
     }
 
-    const totalInboundByMonth = [ ...inboundByMonth.values() ];
-    const totalOutboundByMonth = [ ...outboundByMonth.values() ];
+    const totalInboundByMonth = [...inboundByMonth.values()];
+    const totalOutboundByMonth = [...outboundByMonth.values()];
     const thisMonthTotalInbound = totalInboundByMonth.at(totalMonths - 1) ?? 0;
     const thisMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 1) ?? 0;
     const lastMonthTotalInbound = totalInboundByMonth.at(totalMonths - 2) ?? 0;
     const lastMonthTotalOutbound = totalOutboundByMonth.at(totalMonths - 2) ?? 0;
-    const inboundBarChartData: [string, number][] = [ ...inboundByMonth.entries() ].map((keyValue) => {
+    const inboundBarChartData: [string, number][] = [...inboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
-      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+      const monthName = date.toLocaleString(DEFAULT_LOCALE, { month: 'short' });
 
-      return [ monthName, keyValue[1] ];
+      return [monthName, keyValue[1]];
     });
-    const outboundBarChartData: [string, number][] = [ ...outboundByMonth.entries() ].map((keyValue) => {
+    const outboundBarChartData: [string, number][] = [...outboundByMonth.entries()].map((keyValue) => {
       const date = new Date(keyValue[0]);
-      const monthName = date.toLocaleString('en-Us', { month: 'short' });
+      const monthName = date.toLocaleString(DEFAULT_LOCALE, { month: 'short' });
 
-      return [ monthName, keyValue[1] ];
+      return [monthName, keyValue[1]];
     });
 
     const totalInventoryByCategory = new Map<string, number>();
@@ -958,12 +1179,12 @@ export class InMemoryDbService {
         const quantity = totalInventoryByCategory.get(product.category) ?? 0;
         totalInventoryByCategory.set(product.category, quantity + productInventory.quantity);
       }
-      if (product.reorderThreshold && productInventory.quantity < product.reorderThreshold) {
+      if (productInventory.quantity > 0 && product.reorderThreshold && productInventory.quantity < product.reorderThreshold) {
         totalLowInventory++;
       }
     }
-    const pieChartData: [string, number][] = [ ...totalInventoryByCategory.entries() ].map((keyValue) => {
-      return [ keyValue[0], keyValue[1] ];
+    const pieChartData: [string, number][] = [...totalInventoryByCategory.entries()].map((keyValue) => {
+      return [keyValue[0], keyValue[1]];
     });
 
     return {
@@ -972,8 +1193,8 @@ export class InMemoryDbService {
       pieChartSeries: pieChartData,
       currentMonthTotalInbound: thisMonthTotalInbound,
       currentMonthTotalOutbound: thisMonthTotalOutbound,
-      totalInboundPercent: lastMonthTotalInbound ? ((thisMonthTotalInbound - lastMonthTotalInbound) / lastMonthTotalInbound) * 100 : null,
-      totalOutboundPercent: lastMonthTotalOutbound ? ((thisMonthTotalOutbound - lastMonthTotalOutbound) / lastMonthTotalOutbound) * 100 : null,
+      totalInboundPercent: lastMonthTotalInbound > 0 ? ((thisMonthTotalInbound - lastMonthTotalInbound) / lastMonthTotalInbound) * 100 : null,
+      totalOutboundPercent: lastMonthTotalOutbound > 0 ? ((thisMonthTotalOutbound - lastMonthTotalOutbound) / lastMonthTotalOutbound) * 100 : null,
       totalLowInventory: totalLowInventory,
     };
   }
@@ -996,4 +1217,11 @@ export class InMemoryDbService {
       items: JSON.parse(JSON.stringify(items.slice(startIndex, endIndex))),
     };
   }
+}
+
+interface InventoryProductRandomParam {
+  minQuantityPerMonth: number;
+  maxQuantityPerMonth: number;
+  maxTotalGeneratedQuantity: number;
+  outboundProbability: number; // Probability between 1 - 100
 }

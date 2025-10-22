@@ -1,4 +1,5 @@
 <fieldset class="fieldset">
+  <!-- Field header -->
   <legend class="fieldset-legend">
     <div>
       {{ fieldName() }}
@@ -15,12 +16,15 @@
       }
     </div>
   </legend>
-  <textarea class="textarea w-full focus:border-0"
+
+  <!-- Input area -->
+  <textarea class="textarea w-full focus:outline-0"
             [placeholder]="textPlaceHolder()"
             [formControl]="inputControl()"
             [maxlength]="maxCharacters()"
             [class.input-error]="inputControl().touched && inputControl().invalid"></textarea>
   
+  <!-- Indicator/error message -->
   <div class="flex flex-row justify-between">
     @if (inputControl().pending) {
       <p class="label h-4">

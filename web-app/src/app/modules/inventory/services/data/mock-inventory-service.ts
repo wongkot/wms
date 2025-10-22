@@ -13,17 +13,17 @@ import { Observable, of, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class MockInventoryService implements InventoryService {
-  private _inMemoryDbService = inject(InMemoryDbService);
+  private readonly _inMemoryDbService = inject(InMemoryDbService);
 
-  getInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Observable<Pagination<InventoryProduct>> {
+  public getInventoryProducts(page: number, pageSize: number, query: string, category: string, sort: string): Observable<Pagination<InventoryProduct>> {
     return of(this._inMemoryDbService.getPageInventoryProducts(page, pageSize, query, category, sort));
   }
 
-  getInventoryProductById(productId: number, sort: string): Observable<InventoryProduct | null> {
+  public getInventoryProductById(productId: number, sort: string): Observable<InventoryProduct | null> {
     return of(this._inMemoryDbService.getInventoryProductById(productId, sort));
   }
 
-  inventoryInbound(input: InventoryOperation): Observable<Inventory> {
+  public inventoryInbound(input: InventoryOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryInbound(input));
     } catch (error) {
@@ -31,7 +31,7 @@ export class MockInventoryService implements InventoryService {
     }
   }
 
-  inventoryInboundWithProductName(input: InventoryInboundOperation): Observable<Inventory> {
+  public inventoryInboundWithProductName(input: InventoryInboundOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryInboundWithProductName(input));
     } catch (error) {
@@ -39,7 +39,7 @@ export class MockInventoryService implements InventoryService {
     }
   }
 
-  inventoryOutbound(input: InventoryOperation): Observable<Inventory> {
+  public inventoryOutbound(input: InventoryOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryOutbound(input));
     } catch (error) {
@@ -47,7 +47,7 @@ export class MockInventoryService implements InventoryService {
     }
   }
 
-  inventoryAdjustment(input: InventoryOperation): Observable<Inventory> {
+  public inventoryAdjustment(input: InventoryOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryAdjustment(input));
     } catch (error) {
@@ -55,7 +55,7 @@ export class MockInventoryService implements InventoryService {
     }
   }
 
-  inventoryMoveArea(input: InventoryMoveAreaOperation): Observable<Inventory> {
+  public inventoryMoveArea(input: InventoryMoveAreaOperation): Observable<Inventory> {
     try {
       return of(this._inMemoryDbService.inventoryMoveArea(input));
     } catch (error) {

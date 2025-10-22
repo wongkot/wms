@@ -1,5 +1,6 @@
 import { KeyValue } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { DEFAULT_LOCALE } from '@app/core/constants/app';
 import { InventoryOperationType } from '@app/modules/inventory-history/enums/inventory-operation-type';
 import { InventoryHistory } from '@app/modules/inventory-history/models/inventory-history';
 import { InventoryHistoryStateService } from '@app/modules/inventory-history/services/state/inventory-history-state-service';
@@ -12,10 +13,10 @@ import { TableSortState } from '@app/shared/table/models/table-sort-state';
   standalone: false,
   templateUrl: './inventory-history-page.html',
   styleUrl: './inventory-history-page.css',
-  providers: [ InventoryHistoryStateService ]
+  providers: [InventoryHistoryStateService]
 })
 export class InventoryHistoryPage {
-  public stateService: InventoryHistoryStateService;
+  public readonly stateService = inject(InventoryHistoryStateService);
   public readonly tableConfig: TableConfig = {
     columns: [
       {
@@ -76,11 +77,11 @@ export class InventoryHistoryPage {
         sortable: false,
         textFormat: (data: InventoryHistory) => {
           if (data.afterQuantity > data.beforeQuantity) {
-            return `+${data.quantity.toLocaleString('en-US')}`;
+            return `+${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else if (data.afterQuantity < data.beforeQuantity) {
-            return `-${data.quantity.toLocaleString('en-US')}`;
+            return `-${data.quantity.toLocaleString(DEFAULT_LOCALE)}`;
           } else {
-            return data.quantity.toLocaleString('en-US');
+            return data.quantity.toLocaleString(DEFAULT_LOCALE);
           }
         },
         cssClasses: (data: InventoryHistory) => {
@@ -119,61 +120,57 @@ export class InventoryHistoryPage {
     { key: InventoryOperationType.MoveArea.toString(), value: 'Move Area' },
   ];
 
-  constructor() {
-    this.stateService = inject(InventoryHistoryStateService);
-  }
-
-  onPageSizeChanged(newPageSize: number) {
+  public onPageSizeChanged(newPageSize: number): void {
     if (newPageSize === this.stateService.selectedPageSize()) return;
 
     this.stateService.loadInventoryHistories({ pageSize: newPageSize });
   }
 
-  onFirstPageClick(newPage: number) {
+  public onFirstPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
     this.stateService.loadInventoryHistories({ page: newPage });
   }
 
-  onPreviousPageClick(newPage: number) {
+  public onPreviousPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
     this.stateService.loadInventoryHistories({ page: newPage });
   }
 
-  onNextPageClick(newPage: number) {
+  public onNextPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
     this.stateService.loadInventoryHistories({ page: newPage });
   }
 
-  onLastPageClick(newPage: number) {
+  public onLastPageClick(newPage: number): void {
     if (newPage === this.stateService.selectedPage()) return;
 
     this.stateService.loadInventoryHistories({ page: newPage });
   }
 
-  onSearchTermChanged(newSearchTerm: string) {
+  public onSearchTermChanged(newSearchTerm: string): void {
     if (newSearchTerm === this.stateService.searchTerm()) return;
 
     this.stateService.loadInventoryHistories({ query: newSearchTerm });
   }
 
-  onSearchOperationTypeChanged(newSearchOperation: string) {
+  public onSearchOperationTypeChanged(newSearchOperation: string): void {
     const operationType = newSearchOperation ? Number(newSearchOperation) : null;
     if (operationType === this.stateService.selectedOperationType()) return;
 
     this.stateService.loadInventoryHistories({ operationType: operationType });
   }
 
-  onSortChanged(newSort: TableSortState) {
+  public onSortChanged(newSort: TableSortState): void {
     if (newSort.columnProp === this.stateService.currentSortState().columnProp &&
       newSort.isAsc === this.stateService.currentSortState().isAsc) return;
 
     this.stateService.loadInventoryHistories({ sort: newSort });
   }
 
-  onDateRangeChange(newDateRange: DateRange) {
+  public onDateRangeChange(newDateRange: DateRange): void {
     if (newDateRange.startDate === this.stateService.selectedDateRange().startDate &&
       newDateRange.endDate === this.stateService.selectedDateRange().endDate) return;
 

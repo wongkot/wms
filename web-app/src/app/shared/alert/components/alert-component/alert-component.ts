@@ -7,10 +7,10 @@ import { Component, computed, input, output } from '@angular/core';
   styleUrl: './alert-component.css'
 })
 export class AlertComponent {
-  message = input<string>();
-  type = input<'info' | 'success' | 'warning' | 'error'>('info')
-  dismissClick = output<void>();
-  alertStyle = computed(() => {
+  public readonly message = input<string>();
+  public readonly type = input<'info' | 'success' | 'warning' | 'error'>('info');
+  public readonly dismissClick = output<void>();
+  public readonly alertStyle = computed(() => {
     switch (this.type()) {
       case 'success':
         return 'alert-success';
@@ -23,7 +23,7 @@ export class AlertComponent {
         return 'alert-info';
     }
   });
-  alertButtonStyle = computed(() => {
+  public readonly alertButtonStyle = computed(() => {
     switch (this.type()) {
       case 'success':
         return 'btn-success';
@@ -37,7 +37,7 @@ export class AlertComponent {
     }
   });
 
-  onDismissClick() {
+  public onDismissClick(): void {
     this.dismissClick.emit();
   }
 }
