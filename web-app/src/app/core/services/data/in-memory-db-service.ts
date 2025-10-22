@@ -1067,10 +1067,13 @@ export class InMemoryDbService {
 
   public getPageInventoryHistories(page: number, pageSize: number, query: string, operationType: number | null, startDate: string, endDate: string, sort: string): Pagination<InventoryHistory> {
     let filteredInventoryHistories = this.getInventoryHistories();
-    const filterStartDate = new Date(startDate);
-    const filterEndDate = new Date(endDate);
-    const actualEndDate = new Date(endDate);
-    actualEndDate.setDate(actualEndDate.getDate() + 1);
+    // Setup filter date (local time)
+    const inputStartDate = new Date(startDate);
+    const inputEndDate = new Date(endDate);
+    inputEndDate.setDate(inputEndDate.getDate() + 1);
+    // Create new date object from current input date (to convert local time to UTC)
+    const filterStartDate = new Date(inputStartDate.getUTCFullYear(), inputStartDate.getUTCMonth(), inputStartDate.getUTCDate());
+    const filterEndDate = new Date(inputEndDate.getUTCFullYear(), inputEndDate.getUTCMonth(), inputEndDate.getUTCDate());
 
     filteredInventoryHistories = filteredInventoryHistories.filter(inventoryHistory => {
       const timestamp = new Date(inventoryHistory.timestamp);
