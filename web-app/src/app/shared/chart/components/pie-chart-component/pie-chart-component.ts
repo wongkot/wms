@@ -1,0 +1,131 @@
+import { Component, computed, input } from '@angular/core';
+import { DEFAULT_LOCALE } from '@app/core/constants/app';
+import { BaseChartInput } from '@app/shared/chart/models/base-chart-input';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexTitleSubtitle,
+  ApexTooltip,
+  ApexStates,
+  ApexLegend,
+  ApexFill,
+  ApexStroke,
+  ApexPlotOptions,
+} from "ng-apexcharts";
+
+@Component({
+  selector: 'app-pie-chart',
+  standalone: false,
+  templateUrl: './pie-chart-component.html',
+  styleUrl: './pie-chart-component.css'
+})
+export class PieChartComponent {
+  private readonly _sectionColor = [
+    'var(--color-success)',
+    'var(--color-warning)',
+    'var(--color-info)',
+    'var(--color-error)',
+    'var(--color-primary)',
+    'var(--color-secondary)',
+    'var(--color-accent)',
+  ];
+  private readonly _sectionTextColor = [
+    'var(--color-success-content)',
+    'var(--color-warning-content)',
+    'var(--color-info-content)',
+    'var(--color-error-content)',
+    'var(--color-primary-content)',
+    'var(--color-secondary-content)',
+    'var(--color-accent-content)',
+  ];
+  public readonly chartInput = input.required<BaseChartInput>();
+  public readonly series = computed<ApexAxisChartSeries>(() => {
+    const serie = this.chartInput().chartSeries.length <= 0 ? [] :
+      this.chartInput().chartSeries[0].values;
+    return serie.map(xy => xy[1]);
+  });
+  public readonly chart = computed<ApexChart>(() => {
+    return {
+      height: this.chartInput().chartHeight,
+      type: 'pie',
+      background: 'var(--color-base-100)',
+      toolbar: {
+        show: false,
+      },
+    };
+  });
+  public readonly fill = computed<ApexFill>(() => {
+    return {
+      colors: this._sectionColor,
+    };
+  });
+  public readonly labels = computed<string[]>(() => {
+    const serie = this.chartInput().chartSeries.length <= 0 ? [] :
+      this.chartInput().chartSeries[0].values;
+    return serie.map(xy => xy[0]);
+  });
+  public readonly title = computed<ApexTitleSubtitle>(() => {
+    return {
+      text: this.chartInput().chartTitle,
+      align: 'center',
+      style: {
+        color: 'var(--color-base-content)',
+      }
+    };
+  });
+  public readonly tooltip: ApexTooltip = {
+    custom: function ({ series, seriesIndex, w }) {
+      return `
+      <div class="bg-base-300 p-2">
+        <span class="text-base-content">
+          ${Number(series[seriesIndex]).toLocaleString(DEFAULT_LOCALE)} (${w.config.labels[seriesIndex]})
+        </span>
+      </div>`;
+    }
+  };
+  public readonly states: ApexStates = {
+    hover: {
+      filter: {
+        type: 'none',
+      }
+    },
+    active: {
+      filter: {
+        type: 'none',
+      }
+    }
+  };
+  public readonly legend: ApexLegend = {
+    position: 'bottom',
+    labels: {
+      colors: 'var(--color-base-content)',
+    },
+    onItemClick: {
+      toggleDataSeries: false,
+    },
+    onItemHover: {
+      highlightDataSeries: false,
+    },
+    formatter(legendName, { seriesIndex, w }) {
+      return `${legendName} (${Number(w?.config?.series[seriesIndex] ?? 0).toLocaleString(DEFAULT_LOCALE)})`;
+    },
+  };
+  public readonly dataLabels = computed<ApexDataLabels>(() => {
+    return {
+      dropShadow: {
+        enabled: false,
+      },
+      style: {
+        colors: this._sectionTextColor,
+      },
+    };
+  });
+  public readonly stroke: ApexStroke = {
+    show: false,
+  };
+  public readonly plotOptions: ApexPlotOptions = {
+    pie: {
+      expandOnClick: false,
+    }
+  };
+}

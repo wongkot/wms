@@ -1,0 +1,32 @@
+<!-- Search -->
+<div class="flex flex-col md:flex-row md:items-center gap-4">
+  <app-search-bar
+    placeHolder="Search product name"
+    (textChanged)="onSearchTermChanged($event)"></app-search-bar>
+  <app-dropdown prefix="Choose operation type" [options]="operationTypes" (selectionChanged)="onSearchOperationTypeChanged($event)"></app-dropdown>
+  <app-date-range-picker
+    [initialDateRange]="stateService.selectedDateRange()"
+    (dateRangeChanged)="onDateRangeChange($event)"></app-date-range-picker>
+</div>
+
+<!-- Table -->
+<div class="md:h-[75vh] mt-4">
+  <app-table
+    [tableConfig]="tableConfig"
+    [dataSource]="stateService.displayInventoryHistories().items"
+    [sortState]="stateService.currentSortState()"
+    (sortStateChange)="onSortChanged($event)">
+  </app-table>
+</div>
+<div class="mt-4">
+  <app-pagination
+    [selectedPage]="stateService.selectedPage()"
+    [selectedPageSize]="stateService.selectedPageSize()"
+    [totalItems]="stateService.displayInventoryHistories().totalItems"
+    (pageSizeChange)="onPageSizeChanged($event)"
+    (toFirstPageClick)="onFirstPageClick($event)"
+    (toPreviousPageClick)="onPreviousPageClick($event)"
+    (toNextPageClick)="onNextPageClick($event)"
+    (toLastPageClick)="onLastPageClick($event)">
+  </app-pagination>
+</div>

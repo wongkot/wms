@@ -1,0 +1,4 @@
+<div role="alert" [class]="'alert flex flex-row justify-between' + ' ' + alertStyle()">
+  <span>{{ message() }}.</span>
+  <button [class]="'btn btn-sm' + ' ' + alertButtonStyle()" (click)="onDismissClick()">✕</button>
+</div>

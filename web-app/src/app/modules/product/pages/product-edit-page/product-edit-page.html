@@ -1,0 +1,73 @@
+<!-- Navigation -->
+<div class="flex flex-row justify-between">
+  <app-breadcrumb [breadcrumbSections]="breadcrumbSections"></app-breadcrumb>
+  <button class="btn btn-soft"
+          (click)="onGoBack()">
+    <i class="'bi bi-arrow-left mr-2"></i>
+    Back
+  </button>
+</div>
+
+<!-- Input form -->
+<div class="mx-auto bg-base-100 shadow-md rounded-box border border-base-content/10 p-6 mt-4">
+  <h1 class="text-2xl font-bold mb-4">Edit Product</h1>
+  @if (stateService.isFetchingData()) {
+    <div class="flex flex-row justify-center py-5">
+      <span class="loading loading-spinner loading-md mr-2"></span>
+      Fetching product data
+    </div>
+  } @else if (stateService.errorMessage()) {
+    <div class="flex flex-row justify-center py-5 text-error">
+      <i class="bi bi-exclamation-circle-fill text-error mr-2"></i>
+      {{ stateService.errorMessage() }}
+    </div>
+  } @else {
+    <form [formGroup]="editProductForm"
+        class="grid grid-cols-1 md:grid-cols-2 md:gap-x-6">
+      <app-text-input fieldName="Name"
+                      textPlaceHolder="Enter product name"
+                      [required]="true"
+                      [maxCharacters]="50"
+                      [showCharacterHint]="true"
+                      [customErrorMessages]="customProductNameErrorMessages"
+                      [inputControl]="getFormControl('name')"></app-text-input>
+      <app-select-input fieldName="Category"
+                        placeHolder="Select category"
+                        [required]="true"
+                        [options]="productCategories"
+                        [customErrorMessages]="customCategoryErrorMessages"
+                        [inputControl]="getFormControl('category')"></app-select-input>
+      <app-number-input fieldName="Unit Price"
+                      textPlaceHolder="Enter unit price"
+                      [required]="true"
+                      [minValue]="1"
+                      [maxValue]="999999"
+                      [inputControl]="getFormControl('unitPrice')"></app-number-input>
+      <app-number-input fieldName="Reorder Threshold"
+                      textPlaceHolder="Enter reorder threshold"
+                      tooltipMessage="Show warning on the inventory menu if the quantity fall below this specified number."
+                      [minValue]="1"
+                      [maxValue]="999999"
+                      [inputControl]="getFormControl('reorderThreshold')"></app-number-input>
+      <app-text-area-input class="md:col-span-2"
+                           fieldName="Description"
+                           textPlaceHolder="Enter product description"
+                           [maxCharacters]="200"
+                           [showCharacterHint]="true"
+                           [inputControl]="getFormControl('description')"></app-text-area-input>
+      <app-file-input class="md:col-span-2"
+                      fileTypesFilter=".png,.jpg,.jpeg,image/png,image/jpeg"
+                      [inputControl]="getFormControl('imageUrl')"></app-file-input>
+    </form>
+    <div class="md:flex md:flex-row md:justify-end">
+      <button class="btn btn-primary w-full md:w-fit"
+            [disabled]="stateService.isSubmitting()"
+            (click)="onSubmit()">
+            @if (stateService.isSubmitting()) {
+              <span class="loading loading-spinner loading-xs"></span>
+            }
+            Submit
+      </button>
+    </div>
+  }
+</div>

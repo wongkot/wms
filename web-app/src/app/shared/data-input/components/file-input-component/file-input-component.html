@@ -1,0 +1,39 @@
+<fieldset class="fieldset">
+  <!-- Field header -->
+  <legend class="fieldset-legend">Image</legend>
+
+    @if (fileUrl()) {
+      <!-- Image preview -->
+      <div class="relative flex justify-center items-center bg-base-100 shadow-md rounded-box border border-base-content/30 border-dashed w-full h-64">
+        <img [src]="fileUrl()" alt="preview-image" class="w-full h-full object-contain">
+        <button class="btn btn-error absolute top-2 right-2" (click)="onDeleteImage()">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    } @else {
+      <!-- Image input -->
+      <label for="dropzone-file"
+             class="flex justify-center items-center bg-base-100 shadow-md rounded-box border border-base-content/30 border-dashed w-full h-64 cursor-pointer hover:bg-base-200"
+             [ngClass]="dragOverStyles()"
+             (drop)="onDrop($event)"
+             (dragenter)="onDragOver($event)"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)">
+        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <i class="bi bi-cloud-arrow-up-fill text-4xl"></i>
+            <p class="text-base-content/50 font-bold">Click to upload or drag and drop a file here</p>
+            <p class="text-base-content/50">
+              (Max size {{ maxFileSizeMb() }} MB)
+            </p>
+        </div>
+        <input id="dropzone-file" name="dropzone-file" type="file" class="file-input hidden" [accept]="fileTypesFilter()" (change)="onFileChange($event)"/>
+      </label>
+    }
+
+  <!-- Error message -->
+  <p class="label h-4 text-error">
+    @if (errorMessage()) {
+      {{ errorMessage() }}
+    }
+  </p>
+</fieldset>

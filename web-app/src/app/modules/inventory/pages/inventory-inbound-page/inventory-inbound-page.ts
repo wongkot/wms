@@ -1,0 +1,106 @@
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { DEFAULT_MAX_INBOUND_QUANTITY, DEFAULT_MIN_INBOUND_QUANTITY, MESSAGES } from '@app/core/constants/app';
+import { UtilityService } from '@app/core/services/data/utility-service';
+import { InventoryInboundOperation } from '@app/modules/inventory/models/inventory-inbound-operation';
+import { InventoryInboundStateService } from '@app/modules/inventory/services/state/inventory-inbound-state-service';
+import { BreadcrumbSection } from '@app/shared/breadcrumb/model/breadcrumb-section';
+import { ToastService } from '@app/shared/toast/services/toast-service';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-inventory-inbound',
+  standalone: false,
+  templateUrl: './inventory-inbound-page.html',
+  styleUrl: './inventory-inbound-page.css',
+  providers: [InventoryInboundStateService]
+})
+export class InventoryInboundPage implements OnInit, OnDestroy {
+  public readonly breadcrumbSections: BreadcrumbSection[] = [
+    { navigationUrl: '..', name: 'Inventory' },
+    { navigationUrl: '', name: 'Inbound' },
+  ];
+  public readonly minQuantity = DEFAULT_MIN_INBOUND_QUANTITY;
+  public readonly maxQuantity = DEFAULT_MAX_INBOUND_QUANTITY;
+  private readonly _defaultProductName = '';
+  private readonly _routerService = inject(Router);
+  private readonly _utilityService = inject(UtilityService);
+  private readonly _toastService = inject(ToastService);
+  private readonly _fb: FormBuilder = inject(FormBuilder);
+  private readonly _subscriptions = new Subscription();
+  public readonly stateService = inject(InventoryInboundStateService);
+  public readonly inboundOperationForm: FormGroup = this._fb.group({
+    productName: new FormControl(this._defaultProductName, Validators.required, this.stateService.isProductNameNotExistsValidator()),
+    lot: new FormControl(this._utilityService.formatLotNumber(new Date()), Validators.required),
+    area: new FormControl('', Validators.required),
+    quantity: new FormControl(1, [Validators.required, Validators.min(this.minQuantity), Validators.max(this.maxQuantity)]),
+  });
+  public readonly allAreas = this._utilityService.getAreasForDropdown();
+  public readonly customProductNameErrorMessages = new Map<string, string>([
+    ['nameDoesNotExists', MESSAGES.PRODUCT_NAME_NOT_EXISTS],
+  ]);
+  public readonly customAreaErrorMessages = new Map<string, string>([
+    ['required', MESSAGES.AREA_REQUIRED],
+  ]);
+
+  public ngOnInit(): void {
+    // Get default autocomplete list
+    this.stateService.getAutocompleteProductNames(this._defaultProductName);
+
+    this._subscriptions.add(this.inboundOperationForm.get('area')?.valueChanges.subscribe((newArea) => {
+      this.stateService.selectArea(newArea);
+    }));
+    this._subscriptions.add(this.inboundOperationForm.get('productName')?.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    )
+      .subscribe((productName) => {
+        this.stateService.getAutocompleteProductNames(productName);
+      }));
+    this._subscriptions.add(this.stateService.operationSuccess$.subscribe({
+      next: () => {
+        this._toastService.showSuccess(MESSAGES.INVENTORY_UPDATED);
+        this._routerService.navigate(['inventory']);
+      }
+    }));
+  }
+
+  public onGoBack(): void {
+    this._routerService.navigate(['inventory']);
+  }
+
+  public getFormControl(formControlName: string): FormControl {
+    return this.inboundOperationForm.get(formControlName) as FormControl;
+  }
+
+  public onSubmit(): void {
+    if (this.inboundOperationForm.invalid || this.inboundOperationForm.pending) {
+      this.inboundOperationForm.markAllAsTouched();
+      return;
+    }
+
+    const inventoryInboundInput: InventoryInboundOperation = {
+      productName: this.inboundOperationForm.get('productName')?.value,
+      lot: this.inboundOperationForm.get('lot')?.value!,
+      area: this.inboundOperationForm.get('area')?.value!,
+      quantity: this.inboundOperationForm.get('quantity')?.value!,
+    }
+    this.stateService.inventoryInbound(inventoryInboundInput);
+  }
+
+  public onDismissErrorMessage(): void {
+    this.stateService.closeErrorMessage();
+  }
+
+  public warehouseMapAreaClick(area: string): void {
+    this.stateService.selectArea(area);
+    this.inboundOperationForm.get('area')?.setValue(area);
+  }
+
+  public ngOnDestroy(): void {
+    if (this._subscriptions) {
+      this._subscriptions.unsubscribe();
+    }
+  }
+}

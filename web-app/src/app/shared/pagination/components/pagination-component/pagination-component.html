@@ -1,0 +1,46 @@
+<div class="flex flex-col sm:flex-row gap-4 items-center">
+  <!-- Page size selection -->
+  <div class="flex flex-row">
+    <span class="text-base-content text-sm flex items-center align-middle whitespace-nowrap mr-2">
+      Items per page:
+    </span>
+    <select class="select focus:outline-0 min-w-20"
+      (change)="onPageSizeChange($event)"
+    >
+      @for (pageSize of pageSizes(); track $index) {
+        <option [value]="pageSize" [selected]="pageSize == selectedPageSize()">
+          {{ pageSize }}
+        </option>
+      }
+    </select>
+  </div>
+
+  <!-- Page info -->
+  <div class="text-sm text-base-content flex items-center align-middle">
+    Page {{ selectedPage() }} of {{ totalPages() }}
+  </div>
+
+  <!-- Page navigation -->
+  <div class="join">
+    <button class="join-item btn hover:bg-primary hover:text-primary-content"
+     [disabled]="isFirstPage()" (click)="onFirstPageClick()"
+    >
+      <i class="bi bi-chevron-double-left"></i>
+    </button>
+    <button class="join-item btn hover:bg-primary hover:text-primary-content"
+      [disabled]="isFirstPage()" (click)="onPreviousPageClick()"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <button class="join-item btn hover:bg-primary hover:text-primary-content"
+      [disabled]="isLastPage()" (click)="onNextPageClick()"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+    <button class="join-item btn hover:bg-primary hover:text-primary-content"
+     [disabled]="isLastPage()" (click)="onLastPageClick()"
+    >
+      <i class="bi bi-chevron-double-right"></i>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<button popovertarget="cally-popover" class="input focus:outline-0 flex flex-row justify-between w-full cursor-pointer" id="cally" style="anchor-name:--cally">
+  <div>{{ displayText() }}</div>
+  <div class="pl-2">
+    <i class="bi bi-calendar"></i>
+  </div>
+</button>
+<div popover id="cally-popover" class="dropdown bg-base-100 rounded-box shadow-lg pt-2" style="position-anchor:--cally">
+  <calendar-range class="custom-cally" (change)="onRangeChange($event)" [value]="selectedValue()">
+    <i slot="previous" class="bg-transparent bi bi-caret-left-fill border-0"></i>
+    <i slot="next" class="bg-transparent bi bi-caret-right-fill border-0"></i>
+    <calendar-month></calendar-month>
+  </calendar-range>
+</div>

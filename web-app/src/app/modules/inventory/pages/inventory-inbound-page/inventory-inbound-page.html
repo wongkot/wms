@@ -1,0 +1,67 @@
+<!-- Navigation -->
+<div class="flex flex-row justify-between">
+  <app-breadcrumb [breadcrumbSections]="breadcrumbSections"></app-breadcrumb>
+  <button class="btn btn-soft"
+    (click)="onGoBack()">
+    <i class="'bi bi-arrow-left mr-2"></i>
+    Back
+  </button>
+</div>
+
+<!-- Inventory warehouse map + input form -->
+<div class="flex flex-row mt-4">
+  <div class="w-0 h-0 md:h-[80vh] md:w-6/10 md:mr-4">
+    <app-warehouse-map
+      [canSelectArea]="true"
+      [selectedArea]="stateService.selectedArea()"
+      (selectAreaChanged)="warehouseMapAreaClick($event)">
+    </app-warehouse-map>
+  </div>
+  <div class="w-full h-full mx-auto bg-base-100 shadow-md rounded-box border border-base-content/10 p-6 md:pt-0 md:h-[80vh] md:w-4/10 md:border-0 md:shadow-none md:bg-transparent overflow-auto">
+    <h1 class="text-2xl font-bold mb-4">Inbound</h1>
+    @if(stateService.errorMessage()) {
+      <div class="my-4">
+        <app-alert
+          type="error"
+          [message]="stateService.errorMessage()"
+          (dismissClick)="onDismissErrorMessage()"></app-alert>
+      </div>
+    }
+    <app-text-input fieldName="Product Name"
+      textPlaceHolder="Enter product name"
+      [required]="true"
+      [maxCharacters]="50"
+      [showCharacterHint]="true"
+      [customErrorMessages]="customProductNameErrorMessages"
+      [autocompleteOptions]="stateService.autoCompleteProductName()"
+      [inputControl]="getFormControl('productName')"></app-text-input>
+    <app-text-input fieldName="Lot"
+      textPlaceHolder="Enter lot number"
+      [required]="true"
+      [maxCharacters]="50"
+      [showCharacterHint]="true"
+      [inputControl]="getFormControl('lot')"></app-text-input>
+    <app-select-input fieldName="Area"
+      placeHolder="Select area"
+      [required]="true"
+      [options]="allAreas"
+      [customErrorMessages]="customAreaErrorMessages"
+      [inputControl]="getFormControl('area')"></app-select-input>
+    <app-number-input fieldName="Quantity"
+      textPlaceHolder="Enter quantity"
+      [required]="true"
+      [minValue]="minQuantity"
+      [maxValue]="maxQuantity"
+      [inputControl]="getFormControl('quantity')"></app-number-input>
+    <div class="md:flex md:flex-row md:justify-end my-4">
+      <button class="btn btn-primary w-full md:w-fit"
+              [disabled]="stateService.isSubmitting()"
+              (click)="onSubmit()">
+            @if (stateService.isSubmitting()) {
+              <span class="loading loading-spinner loading-xs"></span>
+            }
+            Submit
+      </button>
+    </div>
+  </div>
+</div>

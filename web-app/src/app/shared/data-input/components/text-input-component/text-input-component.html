@@ -1,0 +1,67 @@
+<fieldset class="fieldset">
+  <!-- Field header -->
+  <legend class="fieldset-legend">
+    <div>
+      {{ fieldName() }}
+      @if(required()) {
+        <span class="font-bold text-secondary">*</span>
+      }
+      @if (tooltipMessage()) {
+        <div class="tooltip text-info ml-1">
+          <div class="tooltip-content">
+            {{ tooltipMessage() }}
+          </div>
+          <i class="bi bi-info-circle"></i>
+        </div>
+      }
+    </div>
+  </legend>
+
+  <!-- Input area -->
+  <div class="relative">
+    <input type="text"
+         class="input w-full focus:outline-0"
+         [placeholder]="textPlaceHolder()"
+         [formControl]="inputControl()"
+         [maxlength]="maxCharacters()"
+         [class.input-error]="inputControl().touched && inputControl().invalid"
+         (focus)="onFocus()"
+         (blur)="onLostFocus()"
+         (keydown)="onKeydown($event)"/>
+    @if(autocompleteOptions().length > 0 && isFocused()) {
+      <ul class="w-full bg-base-100 border border-base-content overflow-y-auto absolute z-99">
+        @for (option of autocompleteOptions(); track option; let optionIndex = $index) {
+          <!-- Use mousedown event instead of click to make the event trigger before it gets remove from DOM (blur will happened before click event) -->
+          <li class="p-4 cursor-pointer hover:bg-base-200 text-nowrap"
+              [class.text-primary]="optionIndex == currentFocusedItemIndex()"
+              (mousedown)="onAutocompleteItemClick(option)">
+          {{ option }}</li>
+        }
+      </ul>
+    }
+  </div>
+  
+  <!-- Indicator/error message -->
+  <div class="flex flex-row justify-between">
+    @if (inputControl().pending) {
+      <p class="label h-4">
+        <span class="loading loading-dots loading-xs"></span>
+      </p>
+    } @else {
+      <p class="label h-4 text-error">
+        @if(inputControl().touched && inputControl().invalid) {
+          @for (errorMessageKey of errorMessages.keys(); track errorMessageKey) {
+            @if (inputControl().hasError(errorMessageKey)) {
+              {{ this.errorMessages.get(errorMessageKey) }}
+            }
+          }
+        }
+      </p>
+    }
+    @if (showCharacterHint()) {
+      <p class="label h-4">
+        {{ inputControl().value?.length ?? 0 }}/{{ maxCharacters() }}
+      </p>
+    }
+  </div>
+</fieldset>

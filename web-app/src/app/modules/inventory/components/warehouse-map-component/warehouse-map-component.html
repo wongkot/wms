@@ -1,0 +1,35 @@
+<div class="h-full w-full rounded-box border border-base-content/5 bg-base-100 overflow-auto">
+  <div class="h-full flex justify-center items-center">
+    <div class="max-w-full max-h-full flex flex-row gap-20">
+      @for (area of warehouseAreas | keyvalue; track area.key) {
+        <div class="flex flex-col">
+          <div class="text-center p-4">{{ area.key }}</div>
+          @for (areaRow of area.value; track areaRow) {
+            <div class="flex flex-row">
+              @for (area of areaRow; track area) {
+                <div class="relative text-base-content/70 border border-base-content/40 px-7 py-5 text-nowrap"
+                     [class.cursor-pointer]="canSelectArea()"
+                     [class.bg-primary]="(warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0"
+                     [class.text-primary-content]="(warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0"
+                     [class.bg-secondary]="selectedArea().has(area)"
+                     [class.text-secondary-content]="selectedArea().has(area)"
+                     (click)="onAreaClick(area)">
+                  {{ area }}
+                  @if ((warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 0) {
+                    <div class="badge badge-sm absolute bottom-1 right-1 w-6"
+                         [class.badge-secondary]="!selectedArea().has(area)"
+                         [class.badge-primary]="selectedArea().has(area)">
+                      {{ (warehouseMapState()?.get(area)?.totalQuantity ?? 0) > 99 ? '99+' : warehouseMapState()?.get(area)?.totalQuantity }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+          <!-- Add bottom padding -->
+          <div class="text-center p-2">{{ '' }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
